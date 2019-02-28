@@ -13,6 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DatabaseModule\DatabaseModule.csproj" />
+    <ProjectReference Include="..\TcpCommunication\TcpCommunication.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="csmatio">
       <HintPath>..\..\..\..\Users\cezyc\Downloads\csmatio.rev19\DotNETv40\csmatio.dll</HintPath>
     </Reference>
