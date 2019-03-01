@@ -20,9 +20,10 @@ namespace DataAcquisitionAnalysis
 
         public static int PacketSaver(TcpSocketSaveOptions options)
         {
-            var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
-            client.StartClient();
-
+            //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
+            //client.StartClient();
+            var pokus = new TcpClientSocket(options.Ip, options.Port, options.Database, options.Document);
+            pokus.ConnectAndReceive();
             return 0;
         }
 

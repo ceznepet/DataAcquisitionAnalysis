@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "socket"
+      "commandLineArgs": "socket -i  \"10.35.91.61\" -p 54600"
     }
   }
 }

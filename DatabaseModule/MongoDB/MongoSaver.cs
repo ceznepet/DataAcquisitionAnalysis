@@ -20,13 +20,13 @@ namespace DatabaseModule.MongoDB
 
         }
 
-        public async Task SavePacket(string xml)
+        public void SavePacket(string xml)
         {
             var packet = xml.XmlDeserialize<EthernetXmlSerilization>();
             var document =  BsonDocument.Parse(packet.ToJson());
             //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
             Console.WriteLine("Done");
-            await Collection.InsertOneAsync(document);
+            Collection.InsertOneAsync(document);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace TcpCommunication.TcpClient
     public class StateObject
     {
         public Socket WorkSocket;
-        public const int BufferSize = 1024;
+        public const int BufferSize = 360;
         public byte[] Buffer = new byte[BufferSize];
         public StringBuilder Sb = new StringBuilder();
     }
@@ -43,8 +43,8 @@ namespace TcpCommunication.TcpClient
         {
             try
             {
-                var ipHostInfo = Dns.GetHostEntry(Ip);
-                var ipAddress = ipHostInfo.AddressList[0];
+                var ipHostInfo = Dns.GetHostAddresses(Ip);
+                var ipAddress = ipHostInfo[0];
                 var remoteEP = new IPEndPoint(ipAddress, Port);
 
                 Socket client = new Socket(ipAddress.AddressFamily,
@@ -60,7 +60,7 @@ namespace TcpCommunication.TcpClient
                 {
                     Receive(client);
                     _receiveDone.WaitOne();
-                    Saver.SavePacket(_response).Wait();
+                    Saver.SavePacket(_response);
                     Console.WriteLine("Response received : {0}", _response);
                 }
 
@@ -131,6 +131,7 @@ namespace TcpCommunication.TcpClient
                         _response = state.Sb.ToString();
                     }
                     _receiveDone.Set();
+                   
                 }
             }
             catch (Exception e)
