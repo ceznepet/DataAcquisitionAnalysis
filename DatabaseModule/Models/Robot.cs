@@ -26,9 +26,4 @@ namespace DatabaseModule.Models
             }
         }
     }
-
-    public class Wrapper
-    {
-        public Robot Robot { get; set; }
-    }
 }

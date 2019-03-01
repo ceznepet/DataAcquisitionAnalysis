@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DataAcquisitionAnalysis": {
+      "commandName": "Project",
+      "commandLineArgs": "mongo -d \"Measurement\" -c \"Pokus\" -p 0 -f \"C:\\Data\\Measurement\\Test\""
+    }
+  }
+}

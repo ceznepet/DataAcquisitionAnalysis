@@ -27,9 +27,7 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
-            var mongoLoader = new MongoLoader(options.Database, options.Document, options.Profinet, options.Folder);
-            mongoLoader.ReadData().Wait();
-            Console.WriteLine("Data from your database are saved into .mat file.");
+            MongoDbCall.LoadDataAndSave(options.Database, options.Document, options.Profinet, options.Folder);
             return 0;
         }
     }

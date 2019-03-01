@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Xml;
+using DatabaseModule;
+using DatabaseModule.MongoDB;
 
 namespace TcpCommunication.TcpClient
 {
@@ -34,7 +36,7 @@ namespace TcpCommunication.TcpClient
         {
             Port = port;
             Ip = iP;
-            Saver = new MongoSaver("Measurement", "Pokus");
+            Saver = MongoDbCall.GetSaverToMongoDb("Measurement", "Pokus");
         }
 
         public void StartClient()
@@ -58,9 +60,7 @@ namespace TcpCommunication.TcpClient
                 {
                     Receive(client);
                     _receiveDone.WaitOne();
-                    var xml = new XmlDocument();
-                    xml.LoadXml(_response);
-                    Saver.SavePacket(xml).Wait();
+                    Saver.SavePacket(_response).Wait();
                     Console.WriteLine("Response received : {0}", _response);
                 }
 

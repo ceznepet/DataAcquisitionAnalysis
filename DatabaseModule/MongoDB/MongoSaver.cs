@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Xml;
+using DatabaseModule.Extensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
-namespace TcpCommunication.TcpClient
+namespace DatabaseModule.MongoDB
 {
     public class MongoSaver
     {
@@ -21,9 +20,11 @@ namespace TcpCommunication.TcpClient
 
         }
 
-        public async Task SavePacket(XmlDocument xml)
+        public async Task SavePacket(string xml)
         {
-            var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
+            var packet = xml.XmlDeserialize<EthernetXmlSerilization>();
+            var document =  BsonDocument.Parse(packet.ToJson());
+            //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
             Console.WriteLine("Done");
             await Collection.InsertOneAsync(document);
         }
