@@ -32,11 +32,11 @@ namespace TcpCommunication.TcpClient
         // The response from the remote device.  
         private string _response = string.Empty;
 
-        public SocketClient(int port, string iP)
+        public SocketClient(int port, string iP, string database, string document)
         {
             Port = port;
             Ip = iP;
-            Saver = MongoDbCall.GetSaverToMongoDb("Measurement", "Pokus");
+            Saver = MongoDbCall.GetSaverToMongoDb(database, document);
         }
 
         public void StartClient()

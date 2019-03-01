@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
+using KunbusRevolutionPiModule.KunbusPNS;
 
-namespace KunbusRevolutionPiModule
+namespace KunbusRevolutionPiModule.Wrapper
 {
     class KunbusRevolutionPiWrapper
     {

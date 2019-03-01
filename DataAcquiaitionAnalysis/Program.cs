@@ -11,15 +11,16 @@ namespace DataAcquisitionAnalysis
         static void Main(string[] args)
         {
             Parser.Default
-                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions>(args)
+                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions>(args)
                 .MapResult((TcpSocketSaveOptions options) => PacketSaver(options),
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
+                    (KunbusOptions options) => KunbusModule(options),
                     errs => 1);
         }
 
         public static int PacketSaver(TcpSocketSaveOptions options)
         {
-            var client = new SocketClient(int.Parse(options.Port), options.IP);
+            var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
             client.StartClient();
 
             return 0;
@@ -28,6 +29,11 @@ namespace DataAcquisitionAnalysis
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
             MongoDbCall.LoadDataAndSave(options.Database, options.Document, options.Profinet, options.Folder);
+            return 0;
+        }
+
+        public static int KunbusModule(KunbusOptions options)
+        {
             return 0;
         }
     }
