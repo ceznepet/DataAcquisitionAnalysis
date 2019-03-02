@@ -1,7 +1,7 @@
 ﻿using CommandLine;
 using DataAcquisitionAnalysis.Options;
 using DatabaseModule.MongoDB;
-using System;
+using KunbusRevolutionPiModule;
 using TcpCommunication.TcpClient;
 
 namespace DataAcquisitionAnalysis
@@ -35,6 +35,7 @@ namespace DataAcquisitionAnalysis
 
         public static int KunbusModule(KunbusOptions options)
         {
+            var kunbus = new TestOfKunbus();
             return 0;
         }
     }

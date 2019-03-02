@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using DatabaseModule.MongoDB;
 
 namespace TcpCommunication.TcpClient
@@ -18,48 +17,67 @@ namespace TcpCommunication.TcpClient
 
         private string Server { get; }
         private int Port { get; }
-        private MongoSaver Saver { get; set; }
+        private MongoSaver Saver { get; }
 
         public void ConnectAndReceive()
         {
+            var bytes = new byte[1024];
+
             try
             {
+                // Establish the remote endpoint for the socket.  
+                // This example uses port 11000 on the local computer.  
+                var ipHostInfo = Dns.GetHostAddresses(Server);
+                var ipAddress = ipHostInfo[0];
+                var remoteEP = new IPEndPoint(ipAddress, Port);
 
-                var client = new System.Net.Sockets.TcpClient(Server, Port);
-                const string message = @"<Start>Ok</Start>";
-                var data = Encoding.ASCII.GetBytes(message);
+                // Create a TCP/IP  socket.  
+                var sender = new Socket(ipAddress.AddressFamily,
+                    SocketType.Stream, ProtocolType.Tcp);
 
-
-                var stream = client.GetStream();
-
-                stream.Write(data, 0, data.Length);
-
-                Console.WriteLine("Sent connection request to Server.");
-
-                while (client.Connected)
+                // Connect the socket to the remote endpoint. Catch any errors.  
+                try
                 {
-                    data = new byte[512];
+                    sender.Connect(remoteEP);
 
-                    var bytes = stream.Read(data, 0, data.Length);
-                    var reader = new StreamReader(stream);
+                    Console.WriteLine("Socket connected to {0}",
+                        sender.RemoteEndPoint);
 
-                    
+                    // Encode the data string into a byte array.  
+                    var msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
 
-                    var responseData = Encoding.ASCII.GetString(data, 0, bytes);
-                    Saver.SavePacket(responseData);
-                    stream.FlushAsync();
+                    // Send the data through the socket.  
+                    var bytesSent = sender.Send(msg);
+                    while (sender.Connected)
+                    {
+                        var bytesRec = sender.Receive(bytes);
+                        var mes = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                        Saver.SavePacket(mes);
+                        Console.WriteLine("Echoed test = {0}", mes);
+                    }
+                    // Receive the response from the remote device.  
+
+
+                    // Release the socket.  
+                    sender.Shutdown(SocketShutdown.Both);
+                    sender.Close();
                 }
-                
-                stream.Close();
-                client.Close();
+                catch (ArgumentNullException ane)
+                {
+                    Console.WriteLine("ArgumentNullException : {0}", ane);
+                }
+                catch (SocketException se)
+                {
+                    Console.WriteLine("SocketException : {0}", se);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Unexpected exception : {0}", e);
+                }
             }
-            catch (ArgumentNullException e)
+            catch (Exception e)
             {
-                Console.WriteLine("ArgumentNullException: {0}", e);
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine("SocketException: {0}", e);
+                Console.WriteLine(e.ToString());
             }
 
             Console.WriteLine("\n Press Enter to continue...");
