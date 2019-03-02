@@ -37,7 +37,7 @@ namespace DataAcquisitionAnalysis
         public static int KunbusModule(KunbusOptions options)
         {
             Console.WriteLine("Kunbus Start");
-            var kunbus = new TestOfKunbus();
+            var kunbus = new TestOfKunbus(options.NumberOfBytes);
             return 0;
         }
     }

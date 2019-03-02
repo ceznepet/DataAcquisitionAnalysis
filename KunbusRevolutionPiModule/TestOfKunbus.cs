@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
+using KunbusRevolutionPiModule.Conversion;
 using KunbusRevolutionPiModule.KunbusPNS;
 using KunbusRevolutionPiModule.Wrapper;
 
@@ -13,9 +11,11 @@ namespace KunbusRevolutionPiModule
         private readonly ProfinetIOConfig config;
         private readonly bool deviceActive = true;
         private readonly Thread samplerThread;
+        private uint NumberOfBytes { get; set; }
 
-        public TestOfKunbus()
+        public TestOfKunbus(uint numberOfBytes)
         {
+            NumberOfBytes = numberOfBytes;
             config = new ProfinetIOConfig();
             config.Period = 4;
             config.BigEndian = true;
@@ -40,37 +40,32 @@ namespace KunbusRevolutionPiModule
 
                 if (!deviceActive) continue;
 
-                int dataRead = 4;
                 uint offset = 0;
-                IntPtr dataPtr = new IntPtr(0);
-                var outData = new byte[dataRead];
+                var outData = new byte[NumberOfBytes];
 
                 Console.WriteLine();
 
                 var profinetIocStatus =
-                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint)dataRead, outData);
-                //Console.WriteLine(PnSimaticnetErrorNumber());
-                
+                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint)NumberOfBytes, outData);
+
                 Console.WriteLine("Status of connection is: {0}", profinetIocStatus);
-                // if endianing is reverse, reorder the array
+
                 if (config.BigEndian ^ BitConverter.IsLittleEndian) Array.Reverse(outData);
 
-                var pokus = BitConverter.ToString(outData);
+                var pokus = outData.OutputConversion(new Int64());
 
-                if (profinetIocStatus != (int) KunbusProfinetIOStatus.HWCONFIG_ERR)
+                if (profinetIocStatus > 0)
                 {
-                    foreach (var bit in outData)
-                    {
-                        Console.Write("{0}, ", bit);
-                    }
+                    foreach (var bit in outData) Console.Write("{0}, ", bit);
                     Console.WriteLine();
                     Console.WriteLine(pokus);
                     Console.ReadKey();
                 }
                 else
+                {
                     Console.WriteLine("Hups...");
+                }
             }
-
         }
     }
 }
