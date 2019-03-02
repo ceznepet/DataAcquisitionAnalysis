@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using KunbusRevolutionPiModule.KunbusPNS;
@@ -10,7 +11,7 @@ namespace KunbusRevolutionPiModule
     public class TestOfKunbus
     {
         private readonly ProfinetIOConfig config;
-        private readonly bool deviceActive = false;
+        private readonly bool deviceActive = true;
         private readonly Thread samplerThread;
 
         public TestOfKunbus()
@@ -20,8 +21,15 @@ namespace KunbusRevolutionPiModule
             config.BigEndian = true;
 
             KunbusRevolutionPiWrapper.piControlOpen();
+            Console.WriteLine("Thread started!!");
             samplerThread = new Thread(GatherData);
             samplerThread.Start();
+        }
+
+        ~TestOfKunbus()
+        {
+            KunbusRevolutionPiWrapper.piControlClose();
+            samplerThread.Interrupt();
         }
 
         private void GatherData()
@@ -32,20 +40,37 @@ namespace KunbusRevolutionPiModule
 
                 if (!deviceActive) continue;
 
-                var outData = new byte[16];
+                int dataRead = 4;
+                uint offset = 0;
+                IntPtr dataPtr = new IntPtr(0);
+                var outData = new byte[dataRead];
+
+                Console.WriteLine();
 
                 var profinetIocStatus =
-                    KunbusRevolutionPiWrapper.piControlRead(0, 16, outData);
+                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint)dataRead, outData);
                 //Console.WriteLine(PnSimaticnetErrorNumber());
-
+                
+                Console.WriteLine("Status of connection is: {0}", profinetIocStatus);
                 // if endianing is reverse, reorder the array
                 if (config.BigEndian ^ BitConverter.IsLittleEndian) Array.Reverse(outData);
 
-                if (profinetIocStatus != (uint)KunbusProfinetIOStatus.OK)
-                    Console.WriteLine(outData);
+                var pokus = BitConverter.ToString(outData);
+
+                if (profinetIocStatus != (int) KunbusProfinetIOStatus.HWCONFIG_ERR)
+                {
+                    foreach (var bit in outData)
+                    {
+                        Console.Write("{0}, ", bit);
+                    }
+                    Console.WriteLine();
+                    Console.WriteLine(pokus);
+                    Console.ReadKey();
+                }
                 else
                     Console.WriteLine("Hups...");
             }
+
         }
     }
 }

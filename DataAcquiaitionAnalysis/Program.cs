@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System;
+using CommandLine;
 using DataAcquisitionAnalysis.Options;
 using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
@@ -35,6 +36,7 @@ namespace DataAcquisitionAnalysis
 
         public static int KunbusModule(KunbusOptions options)
         {
+            Console.WriteLine("Kunbus Start");
             var kunbus = new TestOfKunbus();
             return 0;
         }
