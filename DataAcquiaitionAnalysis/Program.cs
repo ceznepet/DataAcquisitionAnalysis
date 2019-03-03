@@ -43,7 +43,7 @@ namespace DataAcquisitionAnalysis
             Console.WriteLine("Kunbus Start");
             //var pokus = JsonConvert.DeserializeObject<Measurement>(
             //    File.ReadAllText(@"C:\Users\cezyc\OneDrive\Plocha\test.json"));          
-            var kunbus = new TestOfKunbus((uint) options.NumberOfBytes, endian, options.ConfigurationFile);
+            var kunbus = new TestOfKunbus(options.NumberOfBytes, endian, options.ConfigurationFile);
             return 0;
         }
     }
