@@ -2,20 +2,15 @@
 {
     public class Joint
     {
-        public readonly int _length = 4;
-        public int BytOffset { get; }
+        public readonly uint _length = 4;
+        public uint BytOffset { get; }
         public string JointName { get; }
-        public byte[] Outputs { get; private set; }
+        public float Outputs { get; set; }
 
-        public Joint(int bytOffset, string jointName)
+        public Joint(uint bytOffset, string jointName)
         {
             BytOffset = bytOffset;
             JointName = jointName;
-        }
-
-        public void SetOutputs(byte[] outputs)
-        {
-            Outputs = outputs;
         }
     }
 }

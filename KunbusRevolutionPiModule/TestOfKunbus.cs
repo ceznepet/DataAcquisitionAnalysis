@@ -1,9 +1,13 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using KunbusRevolutionPiModule.Conversion;
 using KunbusRevolutionPiModule.KunbusPNS;
+using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
+using Newtonsoft.Json;
 
 namespace KunbusRevolutionPiModule
 {
@@ -13,11 +17,13 @@ namespace KunbusRevolutionPiModule
         private readonly bool deviceActive = true;
         private readonly Thread _samplerThread;
         private uint NumberOfBytes { get; set; }
+        private Measurement MeasuredVariables { get; set; }
 
-        public TestOfKunbus(uint numberOfBytes, bool endian)
+        public TestOfKunbus(uint numberOfBytes, bool endian, string path)
         {
             NumberOfBytes = numberOfBytes;
-            _config = new ProfinetIOConfig {Period = 500, BigEndian = endian};
+            MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(path));
+            _config = new ProfinetIOConfig {Period = 12, BigEndian = endian};
 
             KunbusRevolutionPiWrapper.piControlOpen();
             _samplerThread = new Thread(GatherData);
@@ -37,22 +43,29 @@ namespace KunbusRevolutionPiModule
                 Thread.Sleep(_config.Period);
 
                 if (!deviceActive) continue;
+                foreach (var variable in MeasuredVariables.Variables)
+                {
+                    GetOneVariable(variable);
+                }              
+            }
+        }
 
-                uint offset = 0;
-                var outData = new byte[NumberOfBytes];
-
-
-                var readBytes =
-                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint) NumberOfBytes, outData);
+        private void GetOneVariable(MeasurementVariable variable)
+        {
+            foreach (var joint in variable.Joints)
+            {
+                var readData = new byte[joint._length];
+                var readBytes = KunbusRevolutionPiWrapper.piControlRead(joint.BytOffset, joint._length, readData);
 
                 if (_config.BigEndian ^ BitConverter.IsLittleEndian)
                 {
-                    Array.Reverse(outData);
+                    Array.Reverse(readData);
                 }
 
                 if (readBytes == NumberOfBytes)
                 {
-                    Console.WriteLine("Act_pos A3: {0}", BitConverter.ToSingle(outData, 0));
+                    joint.Outputs = BitConverter.ToSingle(readData, 0);
+                    Console.WriteLine("{0} {1}: {2}",variable.VariableName, joint.JointName, joint.Outputs);
                 }
                 else
                 {
@@ -61,4 +74,5 @@ namespace KunbusRevolutionPiModule
             }
         }
     }
+
 }

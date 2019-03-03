@@ -5,6 +5,9 @@ namespace DataAcquisitionAnalysis.Options
     [Verb("kunbus", HelpText = "Start Kunbus modeule for data acquisition from Profinet.")]
     public class KunbusOptions
     {
+        [Option('f', "file", HelpText = "Configuration file for I/O measurement set up.", Default = "../../../../data/setUp.json")]
+        public string ConfigurationFile { get; set; }
+
         [Option('b', "byte", HelpText = "Number of bytes to read", Default = 4)]
         public int NumberOfBytes { get; set; }
 
