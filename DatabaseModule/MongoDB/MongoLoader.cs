@@ -61,7 +61,7 @@ namespace DatabaseModule.MongoDB
             }
             else
             {
-                var measuredData = JsonConvert.DeserializeObject<Robot>(document.ToJson());
+                var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
                 return measuredData.FilePreparation().ToArray();
             }
         }

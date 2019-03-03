@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
 using CommandLine;
 using DataAcquisitionAnalysis.Options;
 using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
+using KunbusRevolutionPiModule.Robot;
+using Newtonsoft.Json;
 using TcpCommunication.TcpClient;
 
 namespace DataAcquisitionAnalysis
@@ -23,8 +26,8 @@ namespace DataAcquisitionAnalysis
         {
             //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
             //client.StartClient();
-            var pokus = new TcpClientSocket(options.Ip, options.Port, options.Database, options.Document);
-            pokus.ConnectAndReceive();
+            var client = new TcpClientSocket(options.Ip, options.Port, options.Database, options.Document);
+            client.ConnectAndReceive();
             return 0;
         }
 
@@ -38,6 +41,8 @@ namespace DataAcquisitionAnalysis
         {
             var endian = options.BigEndian == "1" ? true : false;
             Console.WriteLine("Kunbus Start");
+            //var pokus = JsonConvert.DeserializeObject<Measurement>(
+            //    File.ReadAllText(@"C:\Users\cezyc\OneDrive\Plocha\test.json"));          
             var kunbus = new TestOfKunbus((uint) options.NumberOfBytes, endian);
             return 0;
         }

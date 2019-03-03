@@ -2,7 +2,7 @@
 
 namespace DatabaseModule.Models
 {
-    public class Robot
+    public class TcpRobot
     {
         public List<RobotAxes> Measurement = new List<RobotAxes>();
         public RobotAxes Position { get; set; }

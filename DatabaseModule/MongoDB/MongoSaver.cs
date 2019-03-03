@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using DatabaseModule.Extensions;
+﻿using DatabaseModule.Extensions;
+using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
 
 namespace DatabaseModule.MongoDB
 {
@@ -22,7 +22,7 @@ namespace DatabaseModule.MongoDB
 
         public void SavePacket(string xml)
         {
-            var packet = xml.XmlDeserialize<EthernetXmlSerilization>();
+            var packet = xml.XmlDeserialize<EthernetXmlSerialization>();
             var document =  BsonDocument.Parse(packet.ToJson());
             //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
             Console.WriteLine("Done");

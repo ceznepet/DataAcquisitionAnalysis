@@ -2,10 +2,10 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace DatabaseModule
+namespace DatabaseModule.Models
 {
     [XmlRoot("Robot")]
-    public class EthernetXmlSerilization
+    public class EthernetXmlSerialization
     {
         [XmlElement("Position")]
         public RobotJoint Position { get; set; }
