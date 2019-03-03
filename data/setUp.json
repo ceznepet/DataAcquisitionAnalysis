@@ -1,0 +1,184 @@
+{
+    "Variables": [
+        {
+            "VariableName": "Current",
+            "NameInRobot": "CURR_ACT",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        },
+        {
+            "VariableName": "Velocity",
+            "NameInRobot": "VEL_AXIS_ACT",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        },
+        {
+            "VariableName": "Position",
+            "NameInRobot": "AXIS_ACT",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        },
+        {
+            "VariableName": "Motor Temperature",
+            "NameInRobot": "MOT_TEMP",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        },
+        {
+            "VariableName": "Gear Jerk",
+            "NameInRobot": "GEAR_JERK",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        },
+        {
+            "VariableName": "Acceleration of axis",
+            "NameInRobot": "ACC_AXIS",
+            "Joints": [
+                {
+                    "JointName": "A1",
+                    "BytOffset": 0
+                },
+                {
+                    "JointName": "A2",
+                    "BytOffset": 4
+                },
+                {
+                    "JointName": "A3",
+                    "BytOffset": 8
+                },
+                {
+                    "JointName": "A4",
+                    "BytOffset": 12
+                },
+                {
+                    "JointName": "A5",
+                    "BytOffset": 16
+                },
+                {
+                    "JointName": "A6",
+                    "BytOffset": 20
+                }
+            ]
+        }
+    ]
+}
