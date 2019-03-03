@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="resources\libkunbuspn.so" />
+    <None Remove="Resources\libkunbuspn.so" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="resources\libkunbuspn.so">
+    <EmbeddedResource Include="Resources\libkunbuspn.so">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

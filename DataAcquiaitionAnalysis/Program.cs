@@ -36,8 +36,9 @@ namespace DataAcquisitionAnalysis
 
         public static int KunbusModule(KunbusOptions options)
         {
+            var endian = options.BigEndian == "1" ? true : false;
             Console.WriteLine("Kunbus Start");
-            var kunbus = new TestOfKunbus(options.NumberOfBytes);
+            var kunbus = new TestOfKunbus((uint) options.NumberOfBytes, endian);
             return 0;
         }
     }
