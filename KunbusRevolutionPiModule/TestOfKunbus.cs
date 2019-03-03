@@ -44,7 +44,7 @@ namespace KunbusRevolutionPiModule
                 Console.WriteLine();
 
                 var profinetIocStatus =
-                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint)NumberOfBytes, outData);
+                    KunbusRevolutionPiWrapper.piControlRead(offset, (uint) NumberOfBytes, outData);
 
                 Console.WriteLine("Status of connection is: {0}", profinetIocStatus);
 
@@ -56,49 +56,13 @@ namespace KunbusRevolutionPiModule
                 {
                     foreach (var bit in outData) Console.Write("{0}, ", bit);
                     Console.WriteLine();
-                    Console.WriteLine("From convertor: {0}",pokus);
-                    Console.WriteLine("From ByteArray: {0}",FromByteArray(outData, 0) / 1000);
+                    Console.WriteLine("From convertor: {0}", pokus);
                 }
                 else
                 {
                     Console.WriteLine("Hups...");
                 }
             }
-        }
-
-        public static float FromByteArray(byte[] arr, int ix = 0)
-        {
-            var uitos = new UInt32ToSingle
-            {
-                Byte0 = arr[ix],
-                Byte1 = arr[ix + 1],
-                Byte2 = arr[ix + 2],
-                Byte3 = arr[ix + 3],
-            };
-
-            return uitos.Single;
-        }
-
-        [StructLayout(LayoutKind.Explicit)]
-        public struct UInt32ToSingle
-        {
-            [FieldOffset(0)]
-            public uint UInt32;
-
-            [FieldOffset(0)]
-            public float Single;
-
-            [FieldOffset(0)]
-            public byte Byte0;
-
-            [FieldOffset(1)]
-            public byte Byte1;
-
-            [FieldOffset(2)]
-            public byte Byte2;
-
-            [FieldOffset(3)]
-            public byte Byte3;
         }
     }
 }
