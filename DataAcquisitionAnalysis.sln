@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAcquisitionAnalysis", "DataAcquiaitionAnalysis\DataAcquisitionAnalysis.csproj", "{4BA5B74C-ACAB-46A9-AACA-00CC5BAC80A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAcquisitionAnalysis", "DataAcquiaitionAnalysis\DataAcquisitionAnalysis.csproj", "{4BA5B74C-ACAB-46A9-AACA-00CC5BAC80A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpCommunication", "TcpCommunication\TcpCommunication.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpCommunication", "TcpCommunication\TcpCommunication.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseModule", "DatabaseModule\DatabaseModule.csproj", "{944B6E9C-5D28-418E-9125-F168DDBD0B33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseModule", "DatabaseModule\DatabaseModule.csproj", "{944B6E9C-5D28-418E-9125-F168DDBD0B33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KunbusRevolutionPiModule", "KunbusRevolutionPiModule\KunbusRevolutionPiModule.csproj", "{3CA894E0-1EB2-476F-BD3E-96E63A33DFEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KunbusRevolutionPiModule", "KunbusRevolutionPiModule\KunbusRevolutionPiModule.csproj", "{3CA894E0-1EB2-476F-BD3E-96E63A33DFEC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
