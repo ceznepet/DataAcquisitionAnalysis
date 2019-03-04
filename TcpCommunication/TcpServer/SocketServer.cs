@@ -17,109 +17,64 @@ namespace TcpCommunication.TcpServer
 
     public class SocketServer
     {
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        public TcpListener Listener;
+        public TcpClient Client = new TcpClient();
+        private bool Started = false;
+        // Thread signal.
+        private ManualResetEvent tcpClientConnected =
+            new ManualResetEvent(false);
 
-        public static void StartListening()
+        public int SendData(string message)
         {
-            var ipHostInfo = Dns.GetHostEntry("127.0.0.1");
-            var ipAddress = ipHostInfo.AddressList[0];
-            var localEndPoint = new IPEndPoint(ipAddress, 1000);
-
-            var listener = new Socket(ipAddress.AddressFamily,
-                SocketType.Stream, ProtocolType.Tcp);
-
-            try
+            if (Client.Connected)
             {
-                listener.Bind(localEndPoint);
-                listener.Listen(100);
-
-                while (true)
-                {
-                    allDone.Reset();
-
-                    Console.WriteLine("Waiting for a connection...");
-                    listener.BeginAccept(
-                        AcceptCallback,
-                        listener);
-
-                    allDone.WaitOne();
-                }
+                Started = false;
+                Send(message);
+                return 0;
             }
-            catch (Exception e)
+            else if (!Client.Connected && !Started)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Client {0} is no longer connected.", Client.Client.LocalEndPoint);
+                DoBeginAcceptTcpClient(Listener);
+                Started = true;
+                return -1;
             }
-
-            Console.WriteLine("\nPress ENTER to continue...");
-            Console.Read();
+            return -1;
         }
 
-        public static void AcceptCallback(IAsyncResult ar)
+        private void DoBeginAcceptTcpClient(TcpListener listener)
         {
-            allDone.Set();
+            tcpClientConnected.Reset();
 
-            var listener = (Socket) ar.AsyncState;
-            var handler = listener.EndAccept(ar);
+            Console.WriteLine("Waiting for a connection...");
 
-            var state = new StateObject();
-            state.WorkSocket = handler;
-            handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                ReadCallback, state);
+            listener.BeginAcceptTcpClient(
+                new AsyncCallback(DoAcceptTcpClientCallback),
+                listener);
+
+            tcpClientConnected.WaitOne();
         }
 
-        public static void ReadCallback(IAsyncResult ar)
+        private void DoAcceptTcpClientCallback(IAsyncResult ar)
         {
-            var content = string.Empty;
-            var state = (StateObject) ar.AsyncState;
-            var handler = state.WorkSocket;
+            TcpListener listener = (TcpListener)ar.AsyncState;
 
-            var bytesRead = handler.EndReceive(ar);
-            if (bytesRead > 0)
-            {
-                state.StringBuilder.Append(Encoding.ASCII.GetString(
-                    state.Buffer, 0, bytesRead));
+            Client = listener.EndAcceptTcpClient(ar);
 
-                content = state.StringBuilder.ToString();
-                if (content.Length < 1024)
-                {
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                        content.Length, content);
-                    var xmlElement = XElement.Load(@"../../../packet.xml");
-                    Send(handler, xmlElement.ToString());
-                }
-                else
-                {
-                    handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                        ReadCallback, state);
-                }
-            }
+            Console.WriteLine("Client {0} is connected.", Client.Client.LocalEndPoint);
+
+            tcpClientConnected.Set();
+
         }
 
-        private static void Send(Socket handler, string data)
+        private void Send(string message)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
-            var byteData = Encoding.ASCII.GetBytes(data);
+            var nwStream = Client.GetStream();
 
-            handler.BeginSend(byteData, 0, byteData.Length, 0,
-                SendCallback, handler);
-        }
+            var sendBytes = Encoding.ASCII.GetBytes(message);
 
-        private static void SendCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var handler = (Socket) ar.AsyncState;
-
-                var bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
+            Console.WriteLine("Sending back : " + message);
+            nwStream.WriteAsync(sendBytes, 0, sendBytes.Length);
         }
     }
 }

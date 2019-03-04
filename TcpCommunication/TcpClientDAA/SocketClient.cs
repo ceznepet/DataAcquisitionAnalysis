@@ -7,7 +7,7 @@ using System.Xml;
 using DatabaseModule;
 using DatabaseModule.MongoDB;
 
-namespace TcpCommunication.TcpClient
+namespace TcpCommunication.TcpClientDAA
 {
     public class StateObject
     {
@@ -60,7 +60,7 @@ namespace TcpCommunication.TcpClient
                 {
                     Receive(client);
                     _receiveDone.WaitOne();
-                    Saver.SavePacket(_response);
+                    //Saver.SavePacket(_response);
                     Console.WriteLine("Response received : {0}", _response);
                 }
 

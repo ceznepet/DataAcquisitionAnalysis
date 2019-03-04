@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <Reference Include="csmatio">
-      <HintPath>..\..\..\..\Users\cezyc\Downloads\csmatio.rev19\DotNETv40\csmatio.dll</HintPath>
+      <HintPath>..\..\..\Users\petrc\Downloads\csmatio.rev19\DotNETv40\csmatio.dll</HintPath>
     </Reference>
   </ItemGroup>
 

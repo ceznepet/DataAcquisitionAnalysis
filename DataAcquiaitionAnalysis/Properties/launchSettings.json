@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "kunbus -e 0"
+      "commandLineArgs": "socket -i \"127.0.0.1\" -p 28000"
     }
   }
 }

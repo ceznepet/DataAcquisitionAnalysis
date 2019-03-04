@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using DatabaseModule.MongoDB;
 
-namespace TcpCommunication.TcpClient
+namespace TcpCommunication.TcpClientDAA
 {
     public class TcpClientSocket
     {
@@ -50,10 +50,14 @@ namespace TcpCommunication.TcpClient
                     var bytesSent = sender.Send(msg);
                     while (sender.Connected)
                     {
+                        
                         var bytesRec = sender.Receive(bytes);
-                        var mes = Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                        Saver.SavePacket(mes);
-                        Console.WriteLine("Echoed test = {0}", mes);
+                        if(bytesRec > 0)
+                        {
+                            var mes = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                            //Saver.SavePacket(mes);
+                            Console.WriteLine("Echoed test = {0}", mes);
+                        }
                     }
                     // Receive the response from the remote device.  
 
