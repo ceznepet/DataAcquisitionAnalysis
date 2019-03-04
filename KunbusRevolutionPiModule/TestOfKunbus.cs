@@ -35,8 +35,6 @@ namespace KunbusRevolutionPiModule
             KunbusRevolutionPiWrapper.piControlOpen();
             _samplerThread = new Thread(GatherData);
             _samplerThread.Start();
-            var serverThread = new Thread(SendData);
-            serverThread.Start();
         }
 
         ~TestOfKunbus()
@@ -54,8 +52,10 @@ namespace KunbusRevolutionPiModule
                 if (!deviceActive) continue;
                 foreach (var variable in MeasuredVariables.Variables)
                 {
+                    var time = GetDataRobotTime().ToDataTime();
                     GetOneVariable(variable);
-                }              
+                } 
+                
             }
         }
 
@@ -63,24 +63,19 @@ namespace KunbusRevolutionPiModule
         {
             foreach (var joint in variable.Joints)
             {
-                var readData = new byte[joint._length];
-                var readBytes = KunbusRevolutionPiWrapper.piControlRead(joint.BytOffset, joint._length, readData);
-
-                if (_config.BigEndian ^ BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(readData);
-                }
-
-                if (readBytes == joint._length)
-                {
-                    joint.Outputs = BitConverter.ToSingle(readData, 0);
-                    Console.WriteLine("{0} {1}: {2}",variable.VariableName, joint.JointName, joint.Outputs);
-                }
-                else
-                {
-                    Console.WriteLine("Hups... Somethink went wrong! No data were read.");
-                }
+                joint.Value = ReadKunbusData(joint);
             }
+        }
+
+        private RobotTime GetDataRobotTime()
+        {
+            var roboTime = new RobotTime();
+            foreach(var commponent in roboTime.CurrentTime)
+            {
+                commponent.Value = ReadKunbusData(commponent);
+
+            }
+            return roboTime;
         }
 
         private void ReadOutput()
@@ -109,9 +104,25 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private void SendData()
+        private float ReadKunbusData(KunbusIOData kunbusIO)
         {
+            var readData = new byte[kunbusIO._length];
+            var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIO.BytOffset, kunbusIO._length, readData);
 
+            if (_config.BigEndian ^ BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(readData);
+            }
+
+            if (readBytes == kunbusIO._length)
+            {
+                return BitConverter.ToSingle(readData, 0);
+            }
+            else
+            {
+                Console.WriteLine("Hups... Somethink went wrong! No data were read.");
+                throw new IOException();
+            }
         }
 
     }

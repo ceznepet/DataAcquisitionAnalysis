@@ -8,6 +8,9 @@ namespace DataAcquisitionAnalysis.Options
     [Verb("socket", HelpText = "Use given IP and Port for connection to server.")]
     public class TcpSocketSaveOptions
     {
+        [Option('l', "local", HelpText = "Location of MongoDB.", Default = "mongodb://localhost:27017")]
+        public string Location { get; set; }
+
         [Option('i', "ip", HelpText = "IP address of TCP server", Default = "127.0.0.1")]
         public string Ip { get; set; }
 

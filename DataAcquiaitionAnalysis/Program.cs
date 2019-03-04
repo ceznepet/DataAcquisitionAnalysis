@@ -6,7 +6,7 @@ using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
 using KunbusRevolutionPiModule.Robot;
 using Newtonsoft.Json;
-using TcpCommunication.TcpClient;
+using TcpCommunication.TcpClientDAA;
 
 namespace DataAcquisitionAnalysis
 {
@@ -26,7 +26,7 @@ namespace DataAcquisitionAnalysis
         {
             //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
             //client.StartClient();
-            var client = new TcpClientSocket(options.Ip, options.Port, options.Database, options.Document);
+            var client = new TcpClientSocket(options.Ip, options.Port, options.Location, options.Database, options.Document);
             client.ConnectAndReceive();
             return 0;
         }

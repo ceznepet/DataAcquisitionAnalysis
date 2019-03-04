@@ -8,11 +8,11 @@ namespace TcpCommunication.TcpClientDAA
 {
     public class TcpClientSocket
     {
-        public TcpClientSocket(string server, int port, string database, string document)
+        public TcpClientSocket(string server, int port, string location, string database, string document)
         {
             Server = server;
             Port = port;
-            Saver = MongoDbCall.GetSaverToMongoDb(database, document);
+            Saver = MongoDbCall.GetSaverToMongoDb(location, database, document);
         }
 
         private string Server { get; }
