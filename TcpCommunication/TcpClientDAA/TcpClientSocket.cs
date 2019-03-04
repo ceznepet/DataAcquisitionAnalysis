@@ -49,6 +49,7 @@ namespace TcpCommunication.TcpClientDAA
                         if(bytesRec > 0)
                         {
                             var mes = Encoding.ASCII.GetString(bytes, 0, bytesRec);
+                            Saver.SavePacket(mes);
                             Console.WriteLine("Echoed test = {0}", mes);
                         }
                     }
