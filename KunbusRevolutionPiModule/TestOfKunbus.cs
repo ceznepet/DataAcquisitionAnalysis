@@ -21,10 +21,11 @@ namespace KunbusRevolutionPiModule
         private MongoSaver Saver { get; }
 
         public TestOfKunbus(int numberOfBytes, bool endian, string pathToConfiguration,
-                            string location, string database, string document)
+                            string databaseLocation, string database, string document)
         {
             NumberOfBytes = numberOfBytes;
             MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(pathToConfiguration));
+            Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
             NumberOfOutputs = MeasuredVariables.Variables.Count *
                               MeasuredVariables.Variables.First().Joints.Count * NumberOfBytes; // variables count * axis * byteField
             _config = new ProfinetIOConfig {Period = 12, BigEndian = endian};            
@@ -54,8 +55,9 @@ namespace KunbusRevolutionPiModule
                 foreach (var variable in MeasuredVariables.Variables)
                 {                    
                     GetOneVariable(variable);
-                } 
-                
+                }
+                var toSave = MeasuredVariables;
+                Saver.SaveIOData(toSave);
             }
         }
 

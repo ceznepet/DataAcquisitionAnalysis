@@ -5,27 +5,27 @@
             "NameInRobot": "CURR_ACT",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
@@ -35,27 +35,27 @@
             "NameInRobot": "VEL_AXIS_ACT",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
@@ -65,27 +65,27 @@
             "NameInRobot": "AXIS_ACT",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
@@ -95,27 +95,27 @@
             "NameInRobot": "MOT_TEMP",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
@@ -125,27 +125,27 @@
             "NameInRobot": "GEAR_JERK",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
@@ -155,27 +155,27 @@
             "NameInRobot": "ACC_AXIS",
             "Joints": [
                 {
-                    "JointName": "A1",
+                    "Name": "A1",
                     "BytOffset": 0
                 },
                 {
-                    "JointName": "A2",
+                    "Name": "A2",
                     "BytOffset": 4
                 },
                 {
-                    "JointName": "A3",
+                    "Name": "A3",
                     "BytOffset": 8
                 },
                 {
-                    "JointName": "A4",
+                    "Name": "A4",
                     "BytOffset": 12
                 },
                 {
-                    "JointName": "A5",
+                    "Name": "A5",
                     "BytOffset": 16
                 },
                 {
-                    "JointName": "A6",
+                    "Name": "A6",
                     "BytOffset": 20
                 }
             ]
