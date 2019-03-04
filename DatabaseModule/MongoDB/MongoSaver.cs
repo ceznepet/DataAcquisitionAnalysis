@@ -3,10 +3,6 @@ using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
 
 namespace DatabaseModule.MongoDB
 {
@@ -15,9 +11,9 @@ namespace DatabaseModule.MongoDB
         private IMongoDatabase Database { get; set; }
         private IMongoCollection<BsonDocument> Collection { get; set; }
 
-        public MongoSaver(string location, string database, string document)
+        public MongoSaver(string databaseLocation, string database, string document)
         {
-            var client = new MongoClient(MongoUrl.Create(location));
+            var client = new MongoClient(MongoUrl.Create(databaseLocation));
             Database = client.GetDatabase(database);
 
             Collection = Database.GetCollection<BsonDocument>(document);
@@ -31,6 +27,13 @@ namespace DatabaseModule.MongoDB
             //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
             Console.WriteLine("Done");
             Collection.InsertOneAsync(document);
-        }        
+        }
+        
+        public void SaveIOData(dynamic measurement)
+        {
+            var document = measurement.ToBsonDocument();
+            Console.WriteLine("Done");
+            Collection.InsertOneAsync(document);
+        }
     }
 }

@@ -26,7 +26,8 @@ namespace DataAcquisitionAnalysis
         {
             //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
             //client.StartClient();
-            var client = new TcpClientSocket(options.Ip, options.Port, options.Location, options.Database, options.Document);
+            var client = new TcpClientSocket(options.Ip, options.Port, options.DatabaseLocation, 
+                                             options.Database, options.Document);
             client.ConnectAndReceive();
             return 0;
         }
@@ -41,8 +42,8 @@ namespace DataAcquisitionAnalysis
         {
             var endian = options.BigEndian == "1" ? true : false;
             Console.WriteLine("Kunbus Start");
-            //var pokus = JsonConvert.DeserializeObject<Measurement>(
-            //    File.ReadAllText(@"C:\Users\cezyc\OneDrive\Plocha\test.json"));          
+            var pokus = JsonConvert.DeserializeObject<Measurement>(
+                File.ReadAllText(options.ConfigurationFile));
             var kunbus = new TestOfKunbus(options.NumberOfBytes, endian, options.ConfigurationFile);
             return 0;
         }

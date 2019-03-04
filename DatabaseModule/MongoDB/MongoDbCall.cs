@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DatabaseModule.MongoDB
 {
@@ -13,9 +11,9 @@ namespace DatabaseModule.MongoDB
             Console.WriteLine("Data from your database are saved into .mat file.");
         }
 
-        public static MongoSaver GetSaverToMongoDb(string location, string database, string document)
+        public static MongoSaver GetSaverToMongoDb(string databaseLocation, string database, string document)
         {
-            return new MongoSaver(location, database, document);
+            return new MongoSaver(databaseLocation, database, document);
         }
     }
 }

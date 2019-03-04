@@ -1,15 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Threading;
-using KunbusRevolutionPiModule.Conversion;
+using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule.KunbusPNS;
 using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
 using Newtonsoft.Json;
-using TcpCommunication.TcpServer;
 
 namespace KunbusRevolutionPiModule
 {
@@ -17,15 +14,17 @@ namespace KunbusRevolutionPiModule
     {
         private readonly ProfinetIOConfig _config;
         private readonly bool deviceActive = true;
-        private readonly Thread _samplerThread;
-        private int NumberOfBytes { get; set; }
+        private readonly Thread _samplerThread;        
         private Measurement MeasuredVariables { get; set; }
         private int NumberOfOutputs { get; set; }
+        private int NumberOfBytes { get; set; }
+        private MongoSaver Saver { get; }
 
-        public TestOfKunbus(int numberOfBytes, bool endian, string path)
+        public TestOfKunbus(int numberOfBytes, bool endian, string pathToConfiguration,
+                            string location, string database, string document)
         {
             NumberOfBytes = numberOfBytes;
-            MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(path));
+            MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(pathToConfiguration));
             NumberOfOutputs = MeasuredVariables.Variables.Count *
                               MeasuredVariables.Variables.First().Joints.Count * NumberOfBytes; // variables count * axis * byteField
             _config = new ProfinetIOConfig {Period = 12, BigEndian = endian};            
@@ -50,9 +49,10 @@ namespace KunbusRevolutionPiModule
                 Thread.Sleep(_config.Period);
 
                 if (!deviceActive) continue;
+                var time = GetDataRobotTime().ToDataTime();
+                MeasuredVariables.Time = time;
                 foreach (var variable in MeasuredVariables.Variables)
-                {
-                    var time = GetDataRobotTime().ToDataTime();
+                {                    
                     GetOneVariable(variable);
                 } 
                 
@@ -107,7 +107,9 @@ namespace KunbusRevolutionPiModule
         private float ReadKunbusData(KunbusIOData kunbusIO)
         {
             var readData = new byte[kunbusIO._length];
-            var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIO.BytOffset, kunbusIO._length, readData);
+            var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIO.BytOffset,
+                                                                    kunbusIO._length, 
+                                                                    readData);
 
             if (_config.BigEndian ^ BitConverter.IsLittleEndian)
             {

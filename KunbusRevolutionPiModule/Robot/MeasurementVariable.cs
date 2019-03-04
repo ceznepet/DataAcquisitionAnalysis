@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System.Collections.Generic;
 
 namespace KunbusRevolutionPiModule.Robot
 {
@@ -8,9 +6,7 @@ namespace KunbusRevolutionPiModule.Robot
     {
         public string VariableName { get; }
         public string NameInRobot { get; }
-        public List<KunbusIOData> Joints = new List<KunbusIOData>();
-        [BsonId]
-        public DateTime Time { get; set; }        
+        public List<KunbusIOData> Joints = new List<KunbusIOData>();             
 
         public MeasurementVariable(string variableName, string nameInRobot)
         {
