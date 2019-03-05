@@ -1,4 +1,4 @@
-﻿namespace KunbusRevolutionPiModule.Robot
+﻿namespace KunbusRevolutionPiModule.Kunbus
 {
     public class KunbusIOData
     {

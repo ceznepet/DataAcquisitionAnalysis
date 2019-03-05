@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using DatabaseModule.MongoDB;
-using KunbusRevolutionPiModule.KunbusPNS;
+using KunbusRevolutionPiModule.Kunbus;
 using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
 using Newtonsoft.Json;

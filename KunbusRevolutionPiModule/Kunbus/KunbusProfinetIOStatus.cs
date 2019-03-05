@@ -1,4 +1,4 @@
-﻿namespace KunbusRevolutionPiModule.KunbusPNS
+﻿namespace KunbusRevolutionPiModule.Kunbus
 {
     public enum KunbusProfinetIOStatus
     {

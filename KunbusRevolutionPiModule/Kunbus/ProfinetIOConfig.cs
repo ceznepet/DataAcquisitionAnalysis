@@ -1,4 +1,4 @@
-﻿namespace KunbusRevolutionPiModule.KunbusPNS
+﻿namespace KunbusRevolutionPiModule.Kunbus
 {
     public struct ProfinetIOConfig
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace KunbusRevolutionPiModule.KunbusPNS
+namespace KunbusRevolutionPiModule.Kunbus
 {
     public class KunbusProfinetCardIVariable
     {
