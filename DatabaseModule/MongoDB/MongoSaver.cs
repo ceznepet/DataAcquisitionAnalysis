@@ -51,7 +51,7 @@ namespace DatabaseModule.MongoDB
         public void SaveBatchIoData(IEnumerable<object> measurements)
         {
             var doc = measurements.Select(element => BsonDocument.Parse(JsonConvert.SerializeObject(element)));
-            Collection.InsertManyAsync(doc);
+            Collection.InsertMany(doc);
             _logger.Info("Saving of the I/O batch is done.");
         }
     }
