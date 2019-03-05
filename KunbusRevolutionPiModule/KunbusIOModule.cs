@@ -20,10 +20,10 @@ namespace KunbusRevolutionPiModule
         private int NumberOfOutputs { get; set; }
         private int NumberOfBytes { get; set; }
         private bool DeviceActive { get; set; }
-        private readonly uint ChangeDetectionStatus = 3;
-        private readonly KunbusIOData ChangeCycle = new KunbusIOData(8, "Change");
+        private readonly uint ChangeDetectionStatus = 0;
+        private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
 
-        private static readonly Logger _logger = LogManager.GetLogger("Kunbus Thread");
+        private static readonly Logger Logger = LogManager.GetLogger("Kunbus Thread");
 
         public KunbusIOModule(int numberOfBytes, bool endian, string pathToConfiguration,
                             string databaseLocation, string database, string document)
@@ -45,9 +45,9 @@ namespace KunbusRevolutionPiModule
             }
             catch (BadImageFormatException exception)
             {
-                _logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
+                Logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
             }
-            _logger.Trace("End of I/O read.");
+            Logger.Trace("End of I/O read.");
         }
 
         ~KunbusIOModule()
@@ -59,7 +59,7 @@ namespace KunbusRevolutionPiModule
             }
             else
             {
-                _logger.Warn("Application is not runnig on Kunbus Device...");
+                Logger.Warn("Application is not runnig on Kunbus Device...");
             }
         }
 
@@ -70,16 +70,16 @@ namespace KunbusRevolutionPiModule
                 Thread.Sleep(_config.Period);
 
                 if (!DeviceActive) continue;
-                if (DataChange(ChangeCycle))
+                if (DataChange(_changeCycle))
                 {
                     ReadVariablesFromInputs();
                 }
             }
         }
 
-        private bool DataChange(KunbusIOData kunbusIO)
+        private bool DataChange(KunbusIOData kunbusIo)
         {
-            var result = ReadKunbusInputs(kunbusIO);
+            var result = ReadKunbusInputs(kunbusIo);
             if (result == ChangeDetectionStatus)
             {
                 return true;
@@ -120,11 +120,11 @@ namespace KunbusRevolutionPiModule
 
 
 
-        private float ReadKunbusInputs(KunbusIOData kunbusIO)
+        private float ReadKunbusInputs(KunbusIOData kunbusIo)
         {
-            var readData = new byte[kunbusIO._length];
-            var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIO.BytOffset,
-                                                                    kunbusIO._length,
+            var readData = new byte[kunbusIo._length];
+            var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIo.BytOffset,
+                                                                    kunbusIo._length,
                                                                     readData);
 
             if (_config.BigEndian ^ BitConverter.IsLittleEndian)
@@ -132,13 +132,13 @@ namespace KunbusRevolutionPiModule
                 Array.Reverse(readData);
             }
 
-            if (readBytes == kunbusIO._length)
+            if (readBytes == kunbusIo._length)
             {
                 return BitConverter.ToSingle(readData, 0);
             }
             else
             {
-                _logger.Warn("Hups... Somethink went wrong! No data were read.");
+                Logger.Warn("Hups... Somethink went wrong! No data were read.");
                 throw new IOException();
             }
         }
