@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DataAcquisitionAnalysis": {
+      "commandName": "Project",
+      "commandLineArgs": "kunbus"
+    }
+  }
+}

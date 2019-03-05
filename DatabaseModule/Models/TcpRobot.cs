@@ -2,7 +2,7 @@
 
 namespace DatabaseModule.Models
 {
-    public class Robot
+    public class TcpRobot
     {
         public List<RobotAxes> Measurement = new List<RobotAxes>();
         public RobotAxes Position { get; set; }
@@ -25,10 +25,5 @@ namespace DatabaseModule.Models
                 foreach (var axis in data.Axis) yield return axis;
             }
         }
-    }
-
-    public class Wrapper
-    {
-        public Robot Robot { get; set; }
     }
 }

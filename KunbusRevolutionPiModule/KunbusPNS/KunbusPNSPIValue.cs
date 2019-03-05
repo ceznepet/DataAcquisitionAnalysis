@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace KunbusRevolutionPiModule
+namespace KunbusRevolutionPiModule.KunbusPNS
 {
     public struct KunbusPNSPIValue
     {

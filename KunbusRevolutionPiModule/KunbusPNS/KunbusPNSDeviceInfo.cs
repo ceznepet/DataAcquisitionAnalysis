@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace KunbusRevolutionPiModule
+namespace KunbusRevolutionPiModule.KunbusPNS
 {
     public struct KunbusPNSDeviceInfo
     {
