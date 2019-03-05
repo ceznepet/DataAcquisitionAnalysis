@@ -7,13 +7,17 @@ using KunbusRevolutionPiModule;
 using KunbusRevolutionPiModule.Robot;
 using Newtonsoft.Json;
 using TcpCommunication.TcpClientDAA;
+using Common.Logging;
+using NLog;
 
 namespace DataAcquisitionAnalysis
 {
     class Program
     {
+        private static Logger _logger = LogManager.GetLogger("Main");
         static void Main(string[] args)
         {
+            LoggerSetUp.SetUpLogger();
             Parser.Default
                 .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions>(args)
                 .MapResult((TcpSocketSaveOptions options) => PacketSaver(options),
@@ -40,12 +44,12 @@ namespace DataAcquisitionAnalysis
 
         public static int KunbusModule(KunbusOptions options)
         {
+            _logger.Info("Kunbus start.");
             var endian = options.BigEndian == "1" ? true : false;
-            Console.WriteLine("Kunbus Start");
             var pokus = JsonConvert.DeserializeObject<Measurement>(
                 File.ReadAllText(options.ConfigurationFile));
-            var kunbus = new TestOfKunbus(options.NumberOfBytes, endian, options.ConfigurationFile,
-                                          options.ConfigurationFile, options.Database, options.Document);
+            var kunbus = new KunbusIOModule(options.NumberOfBytes, endian, options.ConfigurationFile,
+                                          options.DatabaseLocation, options.Database, options.Document);
             return 0;
         }
     }

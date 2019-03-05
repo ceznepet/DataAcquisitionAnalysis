@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\TcpCommunication\TcpCommunication.csproj" />
   </ItemGroup>
 

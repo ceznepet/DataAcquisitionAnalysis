@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -20,7 +21,8 @@ namespace TcpCommunication.TcpServer
         public TcpListener Listener;
         public TcpClient Client = new TcpClient();
         private bool Started = false;
-        // Thread signal.
+        private static readonly Logger _logger = LogManager.GetLogger("Socket Server");
+
         private ManualResetEvent tcpClientConnected =
             new ManualResetEvent(false);
 
@@ -34,7 +36,7 @@ namespace TcpCommunication.TcpServer
             }
             else if (!Client.Connected && !Started)
             {
-                Console.WriteLine("Client {0} is no longer connected.", Client.Client.LocalEndPoint);
+                _logger.Warn("Client {0} is no longer connected.", Client.Client.LocalEndPoint);
                 DoBeginAcceptTcpClient(Listener);
                 Started = true;
                 return -1;
@@ -46,7 +48,7 @@ namespace TcpCommunication.TcpServer
         {
             tcpClientConnected.Reset();
 
-            Console.WriteLine("Waiting for a connection...");
+            _logger.Info("Waiting for a connection...");
 
             listener.BeginAcceptTcpClient(
                 new AsyncCallback(DoAcceptTcpClientCallback),
@@ -61,8 +63,7 @@ namespace TcpCommunication.TcpServer
 
             Client = listener.EndAcceptTcpClient(ar);
 
-            Console.WriteLine("Client {0} is connected.", Client.Client.LocalEndPoint);
-
+            _logger.Info("Client {0} is connected.", Client.Client.LocalEndPoint);
             tcpClientConnected.Set();
 
         }
@@ -73,7 +74,6 @@ namespace TcpCommunication.TcpServer
 
             var sendBytes = Encoding.ASCII.GetBytes(message);
 
-            Console.WriteLine("Sending back : " + message);
             nwStream.WriteAsync(sendBytes, 0, sendBytes.Length);
         }
     }

@@ -7,20 +7,22 @@ using KunbusRevolutionPiModule.KunbusPNS;
 using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
 using Newtonsoft.Json;
+using NLog;
 
 namespace KunbusRevolutionPiModule
 {
-    public class TestOfKunbus
+    public class KunbusIOModule
     {
         private readonly ProfinetIOConfig _config;
-        private readonly bool deviceActive = true;
         private readonly Thread _samplerThread;        
         private Measurement MeasuredVariables { get; set; }
         private int NumberOfOutputs { get; set; }
         private int NumberOfBytes { get; set; }
+        private bool DeviceActive { get; set; }
         private MongoSaver Saver { get; }
+        private static readonly Logger _logger = LogManager.GetLogger("Kunbus Thread");
 
-        public TestOfKunbus(int numberOfBytes, bool endian, string pathToConfiguration,
+        public KunbusIOModule(int numberOfBytes, bool endian, string pathToConfiguration,
                             string databaseLocation, string database, string document)
         {
             NumberOfBytes = numberOfBytes;
@@ -28,19 +30,32 @@ namespace KunbusRevolutionPiModule
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
             NumberOfOutputs = MeasuredVariables.Variables.Count *
                               MeasuredVariables.Variables.First().Joints.Count * NumberOfBytes; // variables count * axis * byteField
-            _config = new ProfinetIOConfig {Period = 12, BigEndian = endian};            
+            _config = new ProfinetIOConfig { Period = 4, BigEndian = endian };
 
-            
 
-            KunbusRevolutionPiWrapper.piControlOpen();
-            _samplerThread = new Thread(GatherData);
-            _samplerThread.Start();
+            try { 
+                KunbusRevolutionPiWrapper.piControlOpen();
+                DeviceActive = true;
+                _samplerThread = new Thread(GatherData);
+                _samplerThread.Start();
+            } catch(BadImageFormatException exception)
+            {
+                _logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
+            }
+            _logger.Trace("End of I/O read.");
         }
 
-        ~TestOfKunbus()
+        ~KunbusIOModule()
         {
-            KunbusRevolutionPiWrapper.piControlClose();
-            _samplerThread.Interrupt();
+            if (DeviceActive)
+            {
+                KunbusRevolutionPiWrapper.piControlClose();
+                _samplerThread.Interrupt();
+            }
+            else
+            {
+                _logger.Warn("Application is not runnig on Kunbus Device...");
+            }
         }
 
         private void GatherData()
@@ -49,7 +64,7 @@ namespace KunbusRevolutionPiModule
             {
                 Thread.Sleep(_config.Period);
 
-                if (!deviceActive) continue;
+                if (!DeviceActive) continue;
                 var time = GetDataRobotTime().ToDataTime();
                 MeasuredVariables.Time = time;
                 foreach (var variable in MeasuredVariables.Variables)
@@ -97,11 +112,11 @@ namespace KunbusRevolutionPiModule
 
                 if (readBytes == NumberOfOutputs)
                 {
-                    Console.WriteLine("Data has been read! All of them: {0}", NumberOfOutputs);
+                    _logger.Info("Data has been read! All of them: {0}", NumberOfOutputs);
                 }
                 else
                 {
-                    Console.WriteLine("Hups... Somethink went wrong! No data were read.");
+                    _logger.Warn("Hups... Somethink went wrong! No data were read.");
                 }
             }
         }
@@ -124,7 +139,7 @@ namespace KunbusRevolutionPiModule
             }
             else
             {
-                Console.WriteLine("Hups... Somethink went wrong! No data were read.");
+                _logger.Warn("Hups... Somethink went wrong! No data were read.");
                 throw new IOException();
             }
         }

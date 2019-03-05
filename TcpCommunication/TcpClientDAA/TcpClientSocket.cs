@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using DatabaseModule.MongoDB;
+using NLog;
 
 namespace TcpCommunication.TcpClientDAA
 {
@@ -18,6 +19,7 @@ namespace TcpCommunication.TcpClientDAA
         private string Server { get; }
         private int Port { get; }
         private MongoSaver Saver { get; }
+        private static readonly Logger _logger = LogManager.GetLogger("Tcp Socket Client");
 
         public void ConnectAndReceive()
         {
@@ -35,8 +37,7 @@ namespace TcpCommunication.TcpClientDAA
                 try
                 {
                     sender.Connect(remoteEP);
-
-                    Console.WriteLine("Socket connected to {0}",
+                    _logger.Info("Socket connected to {0}",
                         sender.RemoteEndPoint);
 
                     var msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
@@ -50,7 +51,7 @@ namespace TcpCommunication.TcpClientDAA
                         {
                             var mes = Encoding.ASCII.GetString(bytes, 0, bytesRec);
                             Saver.SavePacket(mes);
-                            Console.WriteLine("Echoed test = {0}", mes);
+                            _logger.Debug("Echoed test = {0}", mes);                            
                         }
                     }
 
@@ -60,23 +61,22 @@ namespace TcpCommunication.TcpClientDAA
                 }
                 catch (ArgumentNullException ane)
                 {
-                    Console.WriteLine("ArgumentNullException : {0}", ane);
+                    _logger.Error("ArgumentNullException : {0}", ane);
                 }
                 catch (SocketException se)
                 {
-                    Console.WriteLine("SocketException : {0}", se);
+                    _logger.Error("SocketException : {0}", se);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Unexpected exception : {0}", e);
+                    _logger.Error("Unexpected exception : {0}", e.ToString());
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                _logger.Error(e.ToString());
             }
-
-            Console.WriteLine("\n Press Enter to continue...");
+            _logger.Info("\n Press Enter to continue...");
             Console.Read();
         }
     }

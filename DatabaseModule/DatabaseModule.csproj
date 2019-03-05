@@ -10,6 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="csmatio">
       <HintPath>..\..\..\Users\petrc\Downloads\csmatio.rev19\DotNETv40\csmatio.dll</HintPath>
     </Reference>
