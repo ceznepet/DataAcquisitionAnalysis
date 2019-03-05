@@ -2,7 +2,7 @@
 
 namespace KunbusRevolutionPiModule.KunbusPNS
 {
-    public struct KunbusPNSPIValue
+    public struct KunbusProfinetCardPIValue
     {
         /**
          * Address of the byte in the process image

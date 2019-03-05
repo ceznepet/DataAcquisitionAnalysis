@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace KunbusRevolutionPiModule.KunbusPNS
 {
-    public class KunbusPNSPIVariable
+    public class KunbusProfinetCardIVariable
     {
         /**
          * Variable name

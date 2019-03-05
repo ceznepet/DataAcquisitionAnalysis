@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace KunbusRevolutionPiModule.KunbusPNS
 {
-    public struct KunbusPNSDeviceInfo
+    public struct KunbusProfinetCardDeviceInfo
     {
         /**
          * Address of module in current configuration

@@ -21,19 +21,19 @@ namespace KunbusRevolutionPiModule.Wrapper
         public static extern int piControlWrite(uint Offset, uint Length, byte[] pData);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int piControlGetDeviceInfo(ref KunbusPNSDeviceInfo pDev);
+        public static extern int piControlGetDeviceInfo(ref KunbusProfinetCardDeviceInfo pDev);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int piControlGetDeviceInfoList(ref KunbusPNSDeviceInfo pDev);
+        public static extern int piControlGetDeviceInfoList(ref KunbusProfinetCardDeviceInfo pDev);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int piControlGetBitValue(ref KunbusPNSPIValue pSpiValue);
+        public static extern int piControlGetBitValue(ref KunbusProfinetCardPIValue pSpiValue);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int piControlSetBitValue(ref KunbusPNSPIValue pSpiValue);
+        public static extern int piControlSetBitValue(ref KunbusProfinetCardPIValue pSpiValue);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int piControlGetVariableInfo(ref KunbusPNSPIVariable pSpiVariable);
+        public static extern int piControlGetVariableInfo(ref KunbusProfinetCardIVariable pSpiVariable);
 
         [DllImport("Resources/libkunbuspn.so", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int piControlFindVariable([MarshalAs(UnmanagedType.LPStr)] string name);

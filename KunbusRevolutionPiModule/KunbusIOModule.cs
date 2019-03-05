@@ -21,7 +21,7 @@ namespace KunbusRevolutionPiModule
         private int NumberOfBytes { get; set; }
         private bool DeviceActive { get; set; }
         private readonly uint ChangeDetectionStatus = 3;
-        private KunbusIOData ChangeCycle = new KunbusIOData(8, "Change");
+        private readonly KunbusIOData ChangeCycle = new KunbusIOData(8, "Change");
 
         private static readonly Logger _logger = LogManager.GetLogger("Kunbus Thread");
 
