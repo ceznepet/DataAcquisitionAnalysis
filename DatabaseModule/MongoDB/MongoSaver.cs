@@ -42,10 +42,9 @@ namespace DatabaseModule.MongoDB
         public void SaveIOData(dynamic measurement)
         {
             //TODO: Test if this is correct serialization
-            _logger.Debug(Collection);
             var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
             Collection.InsertOneAsync(document);
-            _logger.Trace("Saving of the I/O is done.");
+            //_logger.Trace("Saving of the I/O is done.");
         }
     }
 }
