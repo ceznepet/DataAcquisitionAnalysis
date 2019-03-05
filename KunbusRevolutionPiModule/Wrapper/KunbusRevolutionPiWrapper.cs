@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using KunbusRevolutionPiModule.KunbusPNS;
+using KunbusRevolutionPiModule.Kunbus;
 
 namespace KunbusRevolutionPiModule.Wrapper
 {
