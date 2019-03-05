@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using DatabaseModule.MongoDB;
+using KunbusRevolutionPiModule.Conversion;
 using KunbusRevolutionPiModule.Kunbus;
 using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
@@ -79,7 +80,7 @@ namespace KunbusRevolutionPiModule
 
         private bool DataChange(KunbusIOData kunbusIo)
         {
-            var result = ReadKunbusInputs(kunbusIo);
+            var result = ReadKunbusInputs(kunbusIo, false);
             if (result == ChangeDetectionStatus)
             {
                 return true;
@@ -93,7 +94,7 @@ namespace KunbusRevolutionPiModule
             MeasuredVariables.Time = time;
             foreach (var variable in MeasuredVariables.Variables)
             {
-                ReadVariableFromInputs(variable);
+                ReadVariableFromInputs(variable, false);
             }
             var toSave = MeasuredVariables;
             Saver.SaveIOData(toSave);
@@ -104,23 +105,24 @@ namespace KunbusRevolutionPiModule
             var roboTime = new RobotTime();
             foreach (var commponent in roboTime.CurrentTime)
             {
-                commponent.Value = ReadKunbusInputs(commponent);
+                var valeu = ReadKunbusInputs(commponent, true);
+                commponent.Value = valeu;
 
             }
             return roboTime;
         }
 
-        private void ReadVariableFromInputs(MeasurementVariable variable)
+        private void ReadVariableFromInputs(MeasurementVariable variable, bool time)
         {
             foreach (var joint in variable.Joints)
             {
-                joint.Value = ReadKunbusInputs(joint);
+                joint.Value = ReadKunbusInputs(joint, time);
             }
         }
 
 
 
-        private float ReadKunbusInputs(KunbusIOData kunbusIo)
+        private float ReadKunbusInputs(KunbusIOData kunbusIo, bool time)
         {
             var readData = new byte[kunbusIo._length];
             var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIo.BytOffset,
@@ -134,7 +136,7 @@ namespace KunbusRevolutionPiModule
 
             if (readBytes == kunbusIo._length)
             {
-                return BitConverter.ToSingle(readData, 0);
+                return time ? readData.OutputConversion(new uint()) : BitConverter.ToSingle(readData, 0);
             }
             else
             {

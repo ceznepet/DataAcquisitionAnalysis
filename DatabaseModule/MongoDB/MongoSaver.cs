@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NLog;
 using System;
+using Newtonsoft.Json;
 
 namespace DatabaseModule.MongoDB
 {
@@ -41,7 +42,8 @@ namespace DatabaseModule.MongoDB
         public void SaveIOData(dynamic measurement)
         {
             //TODO: Test if this is correct serialization
-            var document = measurement.ToBsonDocument();
+            _logger.Debug(Collection);
+            var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
             Collection.InsertOneAsync(document);
             _logger.Trace("Saving of the I/O is done.");
         }

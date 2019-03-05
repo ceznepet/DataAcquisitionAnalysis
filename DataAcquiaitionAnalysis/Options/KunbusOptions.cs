@@ -5,7 +5,7 @@ namespace DataAcquisitionAnalysis.Options
     [Verb("kunbus", HelpText = "Start Kunbus modeule for data acquisition from Profinet.")]
     public class KunbusOptions
     {
-        [Option('f', "file", HelpText = "Configuration file for I/O measurement set up.", Default = @"../../../../Configuration/measureVariable.json")]
+        [Option('f', "file", HelpText = "Configuration file for I/O measurement set up.", Default = @"measureVariable.json")]
         public string ConfigurationFile { get; set; }
 
         [Option('b', "byte", HelpText = "Number of bytes to read", Default = 4)]
@@ -20,7 +20,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('o', "document", HelpText = "Name of the document in database", Default = "TestbedTest")]
         public string Document { get; set; }
 
-        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://localhost:27017")]
+        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://192.268.0.55:27017")]
         public string DatabaseLocation { get; set; }
     }
 }
