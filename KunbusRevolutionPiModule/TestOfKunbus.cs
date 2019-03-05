@@ -144,6 +144,11 @@ namespace KunbusRevolutionPiModule
             }
         }
 
+        private bool DataChange()
+        {
+
+        }
+
     }
 
 }
