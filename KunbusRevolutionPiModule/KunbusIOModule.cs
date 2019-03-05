@@ -66,7 +66,6 @@ namespace KunbusRevolutionPiModule
             {
                 Thread.Sleep(_config.Period);
 
-                if (!DeviceActive) continue;
                 if (DataChange(_changeCycle))
                 {
                     ReadVariablesFromInputs();
