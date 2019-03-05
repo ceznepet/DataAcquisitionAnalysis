@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -19,6 +20,10 @@ namespace KunbusRevolutionPiModule
         private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
         private readonly Thread _samplerThread;
         private readonly uint ChangeDetectionStatus = 0;
+        private Measurement MeasuredVariables { get; }
+        private List<Measurement> BatchMeasurement { get; }        
+        private MongoSaver Saver { get; }
+        private bool DeviceActive { get; }
 
         public KunbusIOModule(bool endian, string pathToConfiguration,
             string databaseLocation, string database, string document)
@@ -26,8 +31,7 @@ namespace KunbusRevolutionPiModule
             MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(pathToConfiguration));
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
             _config = new ProfinetIOConfig {Period = 4, BigEndian = endian};
-
-
+            BatchMeasurement = new List<Measurement>();
             try
             {
                 KunbusRevolutionPiWrapper.piControlOpen();
@@ -42,10 +46,6 @@ namespace KunbusRevolutionPiModule
 
             Logger.Trace("End of I/O read.");
         }
-
-        private Measurement MeasuredVariables { get; }
-        private MongoSaver Saver { get; }
-        private bool DeviceActive { get; }
 
         ~KunbusIOModule()
         {
@@ -71,6 +71,16 @@ namespace KunbusRevolutionPiModule
                 {
                     ReadVariablesFromInputs();
                 }
+
+                if (BatchMeasurement.Count != 100)
+                {
+                    continue;
+                }
+
+                var saveThread = new Thread(() => Saver.SaveBatchIoData((BatchMeasurement.AsEnumerable())));
+                saveThread.IsBackground = true;
+                saveThread.Start();
+                BatchMeasurement.Clear();
             }
         }
 
@@ -92,12 +102,7 @@ namespace KunbusRevolutionPiModule
             {
                 ReadVariableFromInputs(variable, false);
             }
-            var toSave = MeasuredVariables;
-            var saveThread = new Thread(() => Saver.SaveIOData(toSave))
-            {
-                IsBackground = true
-            };
-            saveThread.Start();
+            BatchMeasurement.Add(MeasuredVariables);
         }
 
         private RobotTime GetDataRobotTime()

@@ -4,6 +4,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NLog;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace DatabaseModule.MongoDB
@@ -39,12 +41,18 @@ namespace DatabaseModule.MongoDB
             _logger.Trace("Saving of the packet is done.");
         }
 
-        public void SaveIOData(dynamic measurement)
+        public void SaveIoData(dynamic measurement)
         {
-            //TODO: Test if this is correct serialization
             var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
             Collection.InsertOneAsync(document);
-            //_logger.Trace("Saving of the I/O is done.");
+            //_logger.Info("Saving of the I/O is done.");
+        }
+
+        public void SaveBatchIoData(IEnumerable<object> measurements)
+        {
+            var doc = measurements.Select(element => BsonDocument.Parse(JsonConvert.SerializeObject(element)));
+            Collection.InsertManyAsync(doc);
+            _logger.Info("Saving of the I/O batch is done.");
         }
     }
 }
