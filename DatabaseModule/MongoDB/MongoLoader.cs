@@ -28,7 +28,7 @@ namespace DatabaseModule.MongoDB
             var client = new MongoClient();
             Database = client.GetDatabase(database);
             Collection = Database.GetCollection<BsonDocument>(document);
-            FileName = Folder + "/" + fileName + DateTime.Now.ToString("yy-MM-dd-hh-mm-ss");
+            FileName = Folder + "/" + fileName + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
         }
 
         public async Task ReadData()

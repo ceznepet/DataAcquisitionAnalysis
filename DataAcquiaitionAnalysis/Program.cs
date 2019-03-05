@@ -50,7 +50,7 @@ namespace DataAcquisitionAnalysis
             var endian = options.BigEndian == "1" ? true : false;
             var pokus = JsonConvert.DeserializeObject<Measurement>(
                 File.ReadAllText(options.ConfigurationFile));
-            var kunbus = new KunbusIOModule(options.NumberOfBytes, endian, options.ConfigurationFile,
+            var kunbus = new KunbusIOModule(endian, options.ConfigurationFile,
                                           options.DatabaseLocation, options.Database, options.Document);
             return 0;
         }

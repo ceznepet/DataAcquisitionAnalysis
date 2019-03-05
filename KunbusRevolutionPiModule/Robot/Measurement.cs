@@ -7,7 +7,7 @@ namespace KunbusRevolutionPiModule.Robot
 {
     public class Measurement
     {        
-        public DateTime Time { get; set; }
+        public string Time { get; set; }
         public List<MeasurementVariable> Variables = new List<MeasurementVariable>();
     }
 }

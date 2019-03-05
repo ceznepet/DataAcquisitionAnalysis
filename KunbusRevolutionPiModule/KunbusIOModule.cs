@@ -14,27 +14,18 @@ namespace KunbusRevolutionPiModule
 {
     public class KunbusIOModule
     {
-        private readonly ProfinetIOConfig _config;
-        private readonly Thread _samplerThread;
-        private Measurement MeasuredVariables { get; set; }
-        private MongoSaver Saver { get; set; }
-        private int NumberOfOutputs { get; set; }
-        private int NumberOfBytes { get; set; }
-        private bool DeviceActive { get; set; }
-        private readonly uint ChangeDetectionStatus = 0;
-        private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
-
         private static readonly Logger Logger = LogManager.GetLogger("Kunbus Thread");
+        private readonly ProfinetIOConfig _config;
+        private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
+        private readonly Thread _samplerThread;
+        private readonly uint ChangeDetectionStatus = 0;
 
-        public KunbusIOModule(int numberOfBytes, bool endian, string pathToConfiguration,
-                            string databaseLocation, string database, string document)
+        public KunbusIOModule(bool endian, string pathToConfiguration,
+            string databaseLocation, string database, string document)
         {
-            NumberOfBytes = numberOfBytes;
             MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(pathToConfiguration));
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
-            NumberOfOutputs = MeasuredVariables.Variables.Count *
-                              MeasuredVariables.Variables.First().Joints.Count * NumberOfBytes; // variables count * axis * byteField
-            _config = new ProfinetIOConfig { Period = 4, BigEndian = endian };
+            _config = new ProfinetIOConfig {Period = 4, BigEndian = endian};
 
 
             try
@@ -48,8 +39,13 @@ namespace KunbusRevolutionPiModule
             {
                 Logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
             }
+
             Logger.Trace("End of I/O read.");
         }
+
+        private Measurement MeasuredVariables { get; }
+        private MongoSaver Saver { get; }
+        private bool DeviceActive { get; }
 
         ~KunbusIOModule()
         {
@@ -90,26 +86,28 @@ namespace KunbusRevolutionPiModule
 
         private void ReadVariablesFromInputs()
         {
-            var time = GetDataRobotTime().ToDataTime();
+            var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             MeasuredVariables.Time = time;
             foreach (var variable in MeasuredVariables.Variables)
             {
                 ReadVariableFromInputs(variable, false);
             }
             var toSave = MeasuredVariables;
-            Saver.SaveIOData(toSave);
+            var saveThread = new Thread(() => Saver.SaveIOData(toSave))
+            {
+                IsBackground = true
+            };
+            saveThread.Start();
         }
 
         private RobotTime GetDataRobotTime()
         {
-            var roboTime = new RobotTime();
-            foreach (var commponent in roboTime.CurrentTime)
+            var robotTime = new RobotTime();
+            foreach (var component in robotTime.CurrentTime)
             {
-                var valeu = ReadKunbusInputs(commponent, true);
-                commponent.Value = valeu;
-
+                component.Value = ReadKunbusInputs(component, true);
             }
-            return roboTime;
+            return robotTime;
         }
 
         private void ReadVariableFromInputs(MeasurementVariable variable, bool time)
@@ -119,7 +117,6 @@ namespace KunbusRevolutionPiModule
                 joint.Value = ReadKunbusInputs(joint, time);
             }
         }
-
 
 
         private float ReadKunbusInputs(KunbusIOData kunbusIo, bool time)
@@ -138,12 +135,9 @@ namespace KunbusRevolutionPiModule
             {
                 return time ? readData.OutputConversion(new uint()) : BitConverter.ToSingle(readData, 0);
             }
-            else
-            {
-                Logger.Warn("Hups... Somethink went wrong! No data were read.");
-                throw new IOException();
-            }
-        }
 
+            Logger.Warn("Hups... Somethink went wrong! No data were read.");
+            throw new IOException();
+        }
     }
 }
