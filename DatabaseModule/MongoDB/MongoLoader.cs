@@ -4,6 +4,7 @@ using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,40 +19,39 @@ namespace DatabaseModule.MongoDB
         private IMongoCollection<BsonDocument> Collection { get; set; }
         private bool Profinet { get; set; }
         private string Folder { get; set; }
+        private string FileName { get; set; }
 
-        public MongoLoader(string database, string document, string profinet, string folder)
+        public MongoLoader(string database, string document, string profinet, string folder, string fileName)
         {
             Profinet = int.Parse(profinet) == 1 ? true : false;
             Folder = folder;
             var client = new MongoClient();
             Database = client.GetDatabase(database);
-
             Collection = Database.GetCollection<BsonDocument>(document);
+            FileName = Folder + "/" + fileName + DateTime.Now.ToString("yy-MM-dd-hh-mm-ss");
         }
 
         public async Task ReadData()
         {
             using (IAsyncCursor<BsonDocument> cursor = await Collection.FindAsync(new BsonDocument()))
             {
-                var dataList = new List<double[]>();
+                var measuredData = new List<double[]>();
                 while (await cursor.MoveNextAsync())
                 {
                     IEnumerable<BsonDocument> batch = cursor.Current;
 
                     foreach (BsonDocument document in batch)
                     {
-                        dataList.Add(Save2File(document));
+                        measuredData.Add(BsonDocToList(document));
                     }
                 }
-
-                ToMatFile(dataList);
-                ToCsvFile(dataList);
+                SaveToFile(measuredData);
             }
 
 
         }
 
-        private double[] Save2File(BsonDocument document)
+        private double[] BsonDocToList(BsonDocument document)
         {
             document.Remove("_id");
             if (Profinet)
@@ -65,26 +65,29 @@ namespace DatabaseModule.MongoDB
                 return measuredData.FilePreparation().ToArray();
             }
         }
-
-        public void ToMatFile(List<double[]> measuredData)
+        private void SaveToFile(List<double[]> measuredData)
         {
-            var data = measuredData.ToArray();
-            var mMatrix = new MLDouble("Measurement", data);
-            var mList = new List<MLArray>();
-            mList.Add(mMatrix);
-            var mFileWrite = new MatFileWriter(Folder + "/pokus.mat", mList, false);
+            ToMatFile(measuredData);
+            ToCsvFile(measuredData);
         }
 
-        public void ToCsvFile(List<double[]> measuredData)
+        private void ToMatFile(List<double[]> measuredData)
         {
-            var csvFile = Folder + "/pokus.csv";
+            var mMatrix = new MLDouble("Measurement", measuredData.ToArray());
+            var mList = new List<MLArray>();
+            mList.Add(mMatrix);
+            var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
+        }
+
+        private void ToCsvFile(List<double[]> measuredData)
+        {
             var csv = new StringBuilder();
             foreach (var data in measuredData)
             {
                 var newLine = string.Join(", ", data.Select(element => element.ToString()).ToArray());
                 csv.AppendLine(newLine);
             }
-            File.WriteAllTextAsync(csvFile, csv.ToString()).Wait();
+            File.WriteAllTextAsync(FileName + ".csv", csv.ToString()).Wait();
         }
     }
 }

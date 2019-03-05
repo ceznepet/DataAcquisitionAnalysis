@@ -38,7 +38,7 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
-            MongoDbCall.LoadDataAndSave(options.Database, options.Document, options.Profinet, options.Folder);
+            MongoDbCall.LoadDataAndSave(options.Database, options.Document, options.Profinet, options.Folder, options.FolderName);
             return 0;
         }
 

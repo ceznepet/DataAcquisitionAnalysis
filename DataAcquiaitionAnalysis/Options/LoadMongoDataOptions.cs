@@ -17,7 +17,10 @@ namespace DataAcquisitionAnalysis.Options
         [Option('p', "profinet", HelpText = "Is used profinet communication? 0 - no, 1 - yes.", Required = true)]
         public string Profinet { get; set; }
 
-        [Option('f', "folder", HelpText = "folder for saving the data from DB", Required = true)]
+        [Option('f', "folder", HelpText = "Folder for saving the data from DB.", Required = true)]
         public string Folder { get; set; }
+
+        [Option('n', "folderName", HelpText = "Name of the output file, time is automaticly included.", Default = "measurement")]
+        public string FolderName { get; set; }
     }
 }
