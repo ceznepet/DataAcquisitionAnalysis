@@ -30,6 +30,7 @@ namespace DataAcquisitionAnalysis
         {
             //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
             //client.StartClient();
+            _logger.Info("Tcp Socket client started.");
             var client = new TcpClientSocket(options.Ip, options.Port, options.DatabaseLocation, 
                                              options.Database, options.Document);
             client.ConnectAndReceive();
@@ -38,13 +39,14 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
+            _logger.Info("Loading of data from DB started.");
             MongoDbCall.LoadDataAndSave(options.Database, options.Document, options.Profinet, options.Folder, options.FolderName);
             return 0;
         }
 
         public static int KunbusModule(KunbusOptions options)
         {
-            _logger.Info("Kunbus start.");
+            _logger.Info("Kunbus started.");
             var endian = options.BigEndian == "1" ? true : false;
             var pokus = JsonConvert.DeserializeObject<Measurement>(
                 File.ReadAllText(options.ConfigurationFile));
