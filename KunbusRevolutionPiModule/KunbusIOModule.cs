@@ -14,12 +14,15 @@ namespace KunbusRevolutionPiModule
     public class KunbusIOModule
     {
         private readonly ProfinetIOConfig _config;
-        private readonly Thread _samplerThread;        
+        private readonly Thread _samplerThread;
         private Measurement MeasuredVariables { get; set; }
+        private MongoSaver Saver { get; set; }
         private int NumberOfOutputs { get; set; }
         private int NumberOfBytes { get; set; }
         private bool DeviceActive { get; set; }
-        private MongoSaver Saver { get; }
+        private readonly uint ChangeDetectionStatus = 3;
+        private KunbusIOData ChangeCycle = new KunbusIOData(8, "Change");
+
         private static readonly Logger _logger = LogManager.GetLogger("Kunbus Thread");
 
         public KunbusIOModule(int numberOfBytes, bool endian, string pathToConfiguration,
@@ -33,12 +36,14 @@ namespace KunbusRevolutionPiModule
             _config = new ProfinetIOConfig { Period = 4, BigEndian = endian };
 
 
-            try { 
+            try
+            {
                 KunbusRevolutionPiWrapper.piControlOpen();
                 DeviceActive = true;
-                _samplerThread = new Thread(GatherData);
+                _samplerThread = new Thread(DataAcquisition);
                 _samplerThread.Start();
-            } catch(BadImageFormatException exception)
+            }
+            catch (BadImageFormatException exception)
             {
                 _logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
             }
@@ -58,74 +63,68 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private void GatherData()
+        private void DataAcquisition()
         {
             while (true)
             {
                 Thread.Sleep(_config.Period);
 
                 if (!DeviceActive) continue;
-                var time = GetDataRobotTime().ToDataTime();
-                MeasuredVariables.Time = time;
-                foreach (var variable in MeasuredVariables.Variables)
-                {                    
-                    GetOneVariable(variable);
+                if (DataChange(ChangeCycle))
+                {
+                    ReadVariablesFromInputs();
                 }
-                var toSave = MeasuredVariables;
-                Saver.SaveIOData(toSave);
             }
         }
 
-        private void GetOneVariable(MeasurementVariable variable)
+        private bool DataChange(KunbusIOData kunbusIO)
         {
-            foreach (var joint in variable.Joints)
+            var result = ReadKunbusInputs(kunbusIO);
+            if (result == ChangeDetectionStatus)
             {
-                joint.Value = ReadKunbusData(joint);
+                return true;
             }
+            return false;
+        }
+
+        private void ReadVariablesFromInputs()
+        {
+            var time = GetDataRobotTime().ToDataTime();
+            MeasuredVariables.Time = time;
+            foreach (var variable in MeasuredVariables.Variables)
+            {
+                ReadVariableFromInputs(variable);
+            }
+            var toSave = MeasuredVariables;
+            Saver.SaveIOData(toSave);
         }
 
         private RobotTime GetDataRobotTime()
         {
             var roboTime = new RobotTime();
-            foreach(var commponent in roboTime.CurrentTime)
+            foreach (var commponent in roboTime.CurrentTime)
             {
-                commponent.Value = ReadKunbusData(commponent);
+                commponent.Value = ReadKunbusInputs(commponent);
 
             }
             return roboTime;
         }
 
-        private void ReadOutput()
+        private void ReadVariableFromInputs(MeasurementVariable variable)
         {
-            while (true)
+            foreach (var joint in variable.Joints)
             {
-                Thread.Sleep(_config.Period);
-
-                var readData = new byte[NumberOfOutputs];
-                uint start = 0;
-                var readBytes = KunbusRevolutionPiWrapper.piControlRead(start, (uint)NumberOfOutputs, readData);
-
-                if (_config.BigEndian ^ BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(readData);
-                }
-
-                if (readBytes == NumberOfOutputs)
-                {
-                    _logger.Info("Data has been read! All of them: {0}", NumberOfOutputs);
-                }
-                else
-                {
-                    _logger.Warn("Hups... Somethink went wrong! No data were read.");
-                }
+                joint.Value = ReadKunbusInputs(joint);
             }
         }
 
-        private float ReadKunbusData(KunbusIOData kunbusIO)
+
+
+        private float ReadKunbusInputs(KunbusIOData kunbusIO)
         {
             var readData = new byte[kunbusIO._length];
             var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIO.BytOffset,
-                                                                    kunbusIO._length, 
+                                                                    kunbusIO._length,
                                                                     readData);
 
             if (_config.BigEndian ^ BitConverter.IsLittleEndian)
@@ -144,11 +143,5 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private bool DataChange()
-        {
-
-        }
-
     }
-
 }
