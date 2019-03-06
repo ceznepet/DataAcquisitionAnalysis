@@ -19,7 +19,7 @@ namespace KunbusRevolutionPiModule
         private readonly ProfinetIOConfig _config;
         private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
         private readonly Thread _samplerThread;
-        private readonly uint ChangeDetectionStatus = 0;
+        private readonly float ChangeDetectionStatus = 0f;
         private Measurement MeasuredVariables { get; }
         private List<Measurement> BatchMeasurement { get; }        
         private MongoSaver Saver { get; }
@@ -66,17 +66,20 @@ namespace KunbusRevolutionPiModule
             {
                 Thread.Sleep(_config.Period);
 
-                if (DataChange(_changeCycle))
+                if (!DataChange(_changeCycle))
                 {
-                    ReadVariablesFromInputs();
+                   continue;
                 }
+
+                ReadVariablesFromInputs();
 
                 if (BatchMeasurement.Count != 100)
                 {
                     continue;
                 }
 
-                var saveThread = new Thread(() => Saver.SaveBatchIoData((BatchMeasurement.AsEnumerable())));
+                var copy = BatchMeasurement.Select(elemet => elemet);
+                var saveThread = new Thread(() => copy.ToList().ForEach(Saver.SaveIoData));
                 saveThread.IsBackground = true;
                 saveThread.Start();
                 BatchMeasurement.Clear();
@@ -95,7 +98,7 @@ namespace KunbusRevolutionPiModule
 
         private void ReadVariablesFromInputs()
         {
-            var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
+            var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss");
             MeasuredVariables.Time = time;
             foreach (var variable in MeasuredVariables.Variables)
             {

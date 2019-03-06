@@ -44,13 +44,17 @@ namespace DatabaseModule.MongoDB
         public void SaveIoData(dynamic measurement)
         {
             var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
-            Collection.InsertOneAsync(document);
-            //_logger.Info("Saving of the I/O is done.");
+            Collection.InsertOne(document);
+            _logger.Info("Saving of the I/O is done.");
         }
 
-        public void SaveBatchIoData(IEnumerable<object> measurements)
+        public void SaveBatchIoData(dynamic measurements)
         {
-            var doc = measurements.Select(element => BsonDocument.Parse(JsonConvert.SerializeObject(element)));
+            List<BsonDocument> doc = new List<BsonDocument>();
+            foreach (var measurement in measurements)
+            {
+                doc.Add(BsonDocument.Parse(JsonConvert.SerializeObject(measurement)));
+            }
             Collection.InsertMany(doc);
             _logger.Info("Saving of the I/O batch is done.");
         }

@@ -20,7 +20,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('d', "database", HelpText = "Name of the database in MongoDB on localhost", Default = "Measurement")]
         public string Database { get; set; }
 
-        [Option('o', "document", HelpText = "Name of the document in database", Default = "TestbedTest")]
+        [Option('o', "document", HelpText = "Name of the document in database", Default = "TestbedTest_EthernetKRL")]
         public string Document { get; set; }
     }
 }
