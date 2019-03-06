@@ -149,36 +149,6 @@
                     "BytOffset": 148
                 }
             ]
-        },
-        {
-            "VariableName": "Acceleration of axis",
-            "NameInRobot": "ACC_AXIS",
-            "Joints": [
-                {
-                    "Name": "A1",
-                    "BytOffset": 152
-                },
-                {
-                    "Name": "A2",
-                    "BytOffset": 156
-                },
-                {
-                    "Name": "A3",
-                    "BytOffset": 160
-                },
-                {
-                    "Name": "A4",
-                    "BytOffset": 164
-                },
-                {
-                    "Name": "A5",
-                    "BytOffset": 168
-                },
-                {
-                    "Name": "A6",
-                    "BytOffset": 172
-                }
-            ]
         }
     ]
 }

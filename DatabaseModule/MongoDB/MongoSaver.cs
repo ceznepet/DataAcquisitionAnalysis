@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using NLog;
 using System;
+using System.Threading;
 using Newtonsoft.Json;
 
 namespace DatabaseModule.MongoDB
@@ -43,8 +44,18 @@ namespace DatabaseModule.MongoDB
         {
             //TODO: Test if this is correct serialization
             var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
-            Collection.InsertOneAsync(document);
-            //_logger.Trace("Saving of the I/O is done.");
+            //try
+            //{
+            //    Collection.InsertOne(document);
+            //    _logger.Info("Saving of the I/O is done.");
+            //}
+            //catch (OutOfMemoryException exception)
+            //{
+            //    _logger.Info("Je to tady...: {0}", exception);
+            //    throw new OutOfMemoryException();
+            //}
+            Collection.InsertOne(document);
+            _logger.Info("Saving of the I/O is done.");            
         }
     }
 }

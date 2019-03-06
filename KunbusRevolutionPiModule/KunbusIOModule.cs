@@ -18,6 +18,8 @@ namespace KunbusRevolutionPiModule
         private readonly ProfinetIOConfig _config;
         private readonly KunbusIOData _changeCycle = new KunbusIOData(28, "Change");
         private readonly Thread _samplerThread;
+        private Thread SaveThread;
+        private Measurement ToSaveMeasurement;
         private readonly uint ChangeDetectionStatus = 0;
 
         public KunbusIOModule(bool endian, string pathToConfiguration,
@@ -34,6 +36,7 @@ namespace KunbusRevolutionPiModule
                 DeviceActive = true;
                 _samplerThread = new Thread(DataAcquisition);
                 _samplerThread.Start();
+
             }
             catch (BadImageFormatException exception)
             {
@@ -47,7 +50,7 @@ namespace KunbusRevolutionPiModule
         private MongoSaver Saver { get; }
         private bool DeviceActive { get; }
 
-        ~KunbusIOModule()
+        ~KunbusIOModule()   
         {
             if (DeviceActive)
             {
@@ -87,17 +90,17 @@ namespace KunbusRevolutionPiModule
         private void ReadVariablesFromInputs()
         {
             var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
-            MeasuredVariables.Time = time;
+            MeasuredVariables.RobotTime = time;
+            MeasuredVariables.SaveTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             foreach (var variable in MeasuredVariables.Variables)
             {
                 ReadVariableFromInputs(variable, false);
             }
-            var toSave = MeasuredVariables;
-            var saveThread = new Thread(() => Saver.SaveIOData(toSave))
-            {
-                IsBackground = true
-            };
-            saveThread.Start();
+
+            ToSaveMeasurement = null;
+            ToSaveMeasurement = MeasuredVariables;
+            SaveThread = new Thread(() => Saver.SaveIOData(ToSaveMeasurement));
+            SaveThread.Start();
         }
 
         private RobotTime GetDataRobotTime()
