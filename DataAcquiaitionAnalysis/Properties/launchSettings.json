@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "mongo"
+      "commandLineArgs": "mongo -d \"Measurement\" -c \"TestbedTest_EthernetKRL\" -f \"C:\\Data\\Measurement\\Test\""
     }
   }
 }

@@ -17,7 +17,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('o', "document", HelpText = "Name of the document in database", Default = "TestbedTest_Profinet")]
         public string Document { get; set; }
 
-        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://192.168.0.55:27017")]
+        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://10.35.91.210:27017")]
         public string DatabaseLocation { get; set; }
     }
 }
