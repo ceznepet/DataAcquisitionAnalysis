@@ -16,6 +16,12 @@ namespace DatabaseModule.Models
         [XmlElement("Current")]
         public RobotJoint Current { get; set; }
 
+        [XmlElement("Temp")]
+        public RobotJoint Temp { get; set; }
+
+        [XmlElement("Time")]
+        public XmlTime Time { get; set; }
+
     }
 
     public class RobotJoint
@@ -31,5 +37,23 @@ namespace DatabaseModule.Models
         [XmlAttribute("A5")] public double A5 { get; set; }
 
         [XmlAttribute("A6")] public double A6 { get; set; }
+    }
+
+    public class XmlTime
+    {
+        [XmlAttribute("Year")] public double Year { get; set; }
+
+        [XmlAttribute("Month")] public double Month { get; set; }
+
+        [XmlAttribute("Day")] public double Day { get; set; }
+
+        [XmlAttribute("Hour")] public double Hour { get; set; }
+
+        [XmlAttribute("Minute")] public double Minute { get; set; }
+
+        [XmlAttribute("Second")] public double Second { get; set; }
+
+        [XmlAttribute("Millisecond")] public double Millisecond { get; set; }
+        
     }
 }

@@ -11,10 +11,10 @@ namespace DataAcquisitionAnalysis.Options
         [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://localhost:27017")]
         public string DatabaseLocation { get; set; }
 
-        [Option('i', "ip", HelpText = "IP address of TCP server", Default = "10.35.91.42")]
+        [Option('i', "ip", HelpText = "IP address of TCP server", Default = "10.35.91.61")]
         public string Ip { get; set; }
 
-        [Option('p', "port", HelpText = "Port number", Default = 6008)]
+        [Option('p', "port", HelpText = "Port number", Default = 54600)]
         public int Port { get; set; }
 
         [Option('d', "database", HelpText = "Name of the database in MongoDB on localhost", Default = "Measurement")]

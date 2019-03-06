@@ -8,12 +8,15 @@ namespace DatabaseModule.Models
         public RobotAxes Position { get; set; }
         public RobotAxes Velocity { get; set; }
         public RobotAxes Current { get; set; }
+        public RobotAxes Temp { get; set; }
+        public RobotTime Time { get; set; }
 
         public void ToList()
         {
             Measurement.Add(Position);
             Measurement.Add(Velocity);
             Measurement.Add(Current);
+            Measurement.Add(Temp);
         }
 
         public IEnumerable<double> FilePreparation()

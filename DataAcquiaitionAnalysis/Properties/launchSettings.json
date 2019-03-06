@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "kunbus"
+      "commandLineArgs": "mongo"
     }
   }
 }
