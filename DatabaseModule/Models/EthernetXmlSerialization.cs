@@ -22,6 +22,9 @@ namespace DatabaseModule.Models
         [XmlElement("Time")]
         public XmlTime Time { get; set; }
 
+        [XmlElement("ProgramNum")]
+        public XmlTagValue ProgramNumber { get; set; }
+
     }
 
     public class RobotJoint
@@ -55,5 +58,12 @@ namespace DatabaseModule.Models
 
         [XmlAttribute("Millisecond")] public double Millisecond { get; set; }
         
+    }
+
+    public class XmlTagValue
+    {
+        [XmlAttribute("Value")] public double Value { get; set; }
+        
+
     }
 }

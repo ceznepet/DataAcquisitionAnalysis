@@ -2,7 +2,7 @@
 {
     public class KunbusIOData
     {
-        public readonly uint _length = 4;
+        public uint Length = 4;
         public uint BytOffset;
         public string Name;
         public float Value;

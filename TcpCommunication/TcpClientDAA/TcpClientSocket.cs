@@ -44,9 +44,6 @@ namespace TcpCommunication.TcpClientDAA
                         _logger.Info("Socket connected to {0}",
                             sender.RemoteEndPoint);
 
-                        var msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
-
-                        var bytesSent = sender.Send(msg);
                         while (sender.Connected)
                         {
                             var bytesRec = sender.Receive(bytes);
@@ -60,7 +57,6 @@ namespace TcpCommunication.TcpClientDAA
                                 bytes = new byte[1024];
                             }
                         }
-
 
                         sender.Shutdown(SocketShutdown.Both);
                         sender.Close();
