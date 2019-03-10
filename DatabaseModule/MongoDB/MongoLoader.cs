@@ -6,10 +6,12 @@ using MongoDB.Driver;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DatabaseModule.Models.Profinet;
 
 namespace DatabaseModule.MongoDB
 {
@@ -20,15 +22,17 @@ namespace DatabaseModule.MongoDB
         private bool Profinet { get; set; }
         private string Folder { get; set; }
         private string FileName { get; set; }
+        private StringBuilder LocalStringBuilder { get; set; }
 
-        public MongoLoader(string database, string document, string profinet, string folder, string fileName)
+        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder, string fileName)
         {
-            Profinet = int.Parse(profinet) == 1 ? true : false;
+            Profinet = int.Parse(profinet) == 1;
             Folder = folder;
-            var client = new MongoClient();
+            var client = new MongoClient(MongoUrl.Create(databaseLocation));
             Database = client.GetDatabase(database);
             Collection = Database.GetCollection<BsonDocument>(document);
-            FileName = Folder + "/" + fileName + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
+            var source = int.Parse(profinet) == 1 ? "_profinet_" : "_ethernet_";
+            FileName = Folder + "/" + fileName + source + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
         }
 
         public async Task ReadData()
@@ -36,6 +40,7 @@ namespace DatabaseModule.MongoDB
             using (IAsyncCursor<BsonDocument> cursor = await Collection.FindAsync(new BsonDocument()))
             {
                 var measuredData = new List<double[]>();
+                LocalStringBuilder = new StringBuilder();
                 while (await cursor.MoveNextAsync())
                 {
                     IEnumerable<BsonDocument> batch = cursor.Current;
@@ -46,6 +51,7 @@ namespace DatabaseModule.MongoDB
                     }
                 }
                 SaveToFile(measuredData);
+                File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
             }
 
 
@@ -56,19 +62,19 @@ namespace DatabaseModule.MongoDB
             document.Remove("_id");
             if (Profinet)
             {
-                //TODO: case for loading data from profinet
-                return null;
+                var measurement = JsonConvert.DeserializeObject<Measurement>(document.ToJson());
+                var values = measurement.GetMeasuredValues().ToArray();
+                ToCsvFile(measurement);
+                return values;
             }
-            else
-            {
-                var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
-                return measuredData.FilePreparation().ToArray();
-            }
+            var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
+            measuredData.ToList();
+            ToCsvFile(measuredData);
+            return measuredData.FilePreparation().ToArray();
         }
         private void SaveToFile(List<double[]> measuredData)
         {
             ToMatFile(measuredData);
-            ToCsvFile(measuredData);
         }
 
         private void ToMatFile(List<double[]> measuredData)
@@ -79,15 +85,23 @@ namespace DatabaseModule.MongoDB
             var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
         }
 
-        private void ToCsvFile(List<double[]> measuredData)
+        private void ToCsvFile(TcpRobot measuredData)
         {
-            var csv = new StringBuilder();
-            foreach (var data in measuredData)
-            {
-                var newLine = string.Join(", ", data.Select(element => element.ToString()).ToArray());
-                csv.AppendLine(newLine);
-            }
-            File.WriteAllTextAsync(FileName + ".csv", csv.ToString()).Wait();
+            var dateTime = measuredData.Time.GetDate().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
+            var prNumber = ((int)measuredData.ProgramNumber.Value).ToString();
+            var begin = string.Join(", ", dateTime, prNumber);
+            var newLine = string.Join(", ", measuredData.FilePreparation().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
+            measuredData.Called = true;
+            LocalStringBuilder.AppendLine(begin + ", " + newLine);
+        }
+
+        private void ToCsvFile(Measurement measuredData)
+        {
+            var dateTime = measuredData.SaveTime;
+            var prNumber = (measuredData.ProgramNumber).ToString();
+            var begin = string.Join(", ", dateTime, prNumber);
+            var newLine = string.Join(", ", measuredData.GetMeasuredValues().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
+            LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
     }
 }

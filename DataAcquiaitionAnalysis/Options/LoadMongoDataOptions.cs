@@ -8,7 +8,10 @@ namespace DataAcquisitionAnalysis.Options
     [Verb("mongo", HelpText = "Load and save data into file from MongoDB.")]
     public class LoadMongoDataOptions
     {
-        [Option('d', "database", HelpText = "Name of database.", Required = true)]
+        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://10.35.91.210:27017")]
+        public string DatabaseLocation { get; set; }
+
+        [Option('d', "database", HelpText = "Name of database.", Default = "Measurement")]
         public string Database { get; set; }
 
         [Option('c', "document", HelpText = "Name of document.", Required = true)]
@@ -20,7 +23,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('f', "folder", HelpText = "Folder for saving the data from DB.", Required = true)]
         public string Folder { get; set; }
 
-        [Option('n', "folderName", HelpText = "Name of the output file, time is automaticly included.", Default = "measurement")]
-        public string FolderName { get; set; }
+        [Option('n', "filderName", HelpText = "Name of the output file, time is automaticly included.", Default = "measurement")]
+        public string FilderName { get; set; }
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "kunbus"
+      "commandLineArgs": "mongo -f \"C:\\Data\\Measurement\" -c \"TestbedTest_EthernetKRL\" "
     }
   }
 }

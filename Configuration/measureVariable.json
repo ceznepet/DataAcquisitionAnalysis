@@ -121,8 +121,8 @@
       ]
     },
     {
-      "VariableName": "Gear Jerk",
-      "NameInRobot": "GEAR_JERK",
+      "VariableName": "Axis Torque",
+      "NameInRobot": "TORQUE_AXIS_ACT",
       "Joints": [
         {
           "Name": "A1",

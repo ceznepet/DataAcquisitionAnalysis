@@ -19,6 +19,9 @@ namespace DatabaseModule.Models
         [XmlElement("Temp")]
         public RobotJoint Temp { get; set; }
 
+        [XmlElement("Torque")]
+        public RobotJoint Torque { get; set; }
+
         [XmlElement("Time")]
         public XmlTime Time { get; set; }
 

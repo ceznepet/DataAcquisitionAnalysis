@@ -9,7 +9,10 @@ namespace DatabaseModule.Models
         public RobotAxes Velocity { get; set; }
         public RobotAxes Current { get; set; }
         public RobotAxes Temp { get; set; }
+        public RobotAxes Torque { get; set; }
         public RobotTime Time { get; set; }
+        public ProgramNumber ProgramNumber { get; set; }
+        public bool Called = false;
 
         public void ToList()
         {
@@ -17,16 +20,24 @@ namespace DatabaseModule.Models
             Measurement.Add(Velocity);
             Measurement.Add(Current);
             Measurement.Add(Temp);
+            Measurement.Add(Torque);
         }
 
         public IEnumerable<double> FilePreparation()
         {
-            ToList();
             foreach (var data in Measurement)
             {
-                data.CreateList();
+                if (!Called)
+                {
+                    data.CreateList();
+                }
                 foreach (var axis in data.Axis) yield return axis;
             }
         }
+    }
+
+    public class ProgramNumber
+    {
+        public double Value { get; set; }
     }
 }
