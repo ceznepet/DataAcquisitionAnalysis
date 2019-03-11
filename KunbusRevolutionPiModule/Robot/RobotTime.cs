@@ -1,4 +1,5 @@
-﻿using KunbusRevolutionPiModule.Kunbus;
+﻿using Common.Models;
+using KunbusRevolutionPiModule.Kunbus;
 using System;
 using System.Collections.Generic;
 
@@ -7,15 +8,15 @@ namespace KunbusRevolutionPiModule.Robot
     public class RobotTime
     {
         // $DATE
-        public KunbusIOData Millisecond = new KunbusIOData(24, "Millisecond");
-        public KunbusIOData Second = new KunbusIOData(20, "Second");
-        public KunbusIOData Minute = new KunbusIOData(16, "Minute");
-        public KunbusIOData Hour = new KunbusIOData(12, "Hours");
-        public KunbusIOData Day = new KunbusIOData(8, "Day");
-        public KunbusIOData Month = new KunbusIOData(4, "Month");
-        public KunbusIOData Year = new KunbusIOData(0, "Year");
+        public VariableComponent Millisecond = new VariableComponent(24, "Millisecond");
+        public VariableComponent Second = new VariableComponent(20, "Second");
+        public VariableComponent Minute = new VariableComponent(16, "Minute");
+        public VariableComponent Hour = new VariableComponent(12, "Hours");
+        public VariableComponent Day = new VariableComponent(8, "Day");
+        public VariableComponent Month = new VariableComponent(4, "Month");
+        public VariableComponent Year = new VariableComponent(0, "Year");
 
-        public List<KunbusIOData> CurrentTime = new List<KunbusIOData>();
+        public List<VariableComponent> CurrentTime = new List<VariableComponent>();
 
         public RobotTime()
         {

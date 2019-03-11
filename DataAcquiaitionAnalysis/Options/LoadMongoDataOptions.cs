@@ -11,7 +11,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://10.35.91.210:27017")]
         public string DatabaseLocation { get; set; }
 
-        [Option('d', "database", HelpText = "Name of database.", Default = "Measurement")]
+        [Option('d', "database", HelpText = "Name of database.", Default = "KunbusIoVariables")]
         public string Database { get; set; }
 
         [Option('c', "document", HelpText = "Name of document.", Required = true)]

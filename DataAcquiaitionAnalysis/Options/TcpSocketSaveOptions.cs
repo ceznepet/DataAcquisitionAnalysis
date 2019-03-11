@@ -17,7 +17,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('p', "port", HelpText = "Port number", Default = 54600)]
         public int Port { get; set; }
 
-        [Option('d', "database", HelpText = "Name of the database in MongoDB on localhost", Default = "Measurement")]
+        [Option('d', "database", HelpText = "Name of the database in MongoDB on localhost", Default = "KunbusIoVariables")]
         public string Database { get; set; }
 
         [Option('o', "document", HelpText = "Name of the document in database", Default = "TestbedTest_EthernetKRL")]

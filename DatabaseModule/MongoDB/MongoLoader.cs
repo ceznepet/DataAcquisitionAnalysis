@@ -11,7 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DatabaseModule.Models.Profinet;
+using Common.Models;
 
 namespace DatabaseModule.MongoDB
 {
@@ -62,7 +62,7 @@ namespace DatabaseModule.MongoDB
             document.Remove("_id");
             if (Profinet)
             {
-                var measurement = JsonConvert.DeserializeObject<Measurement>(document.ToJson());
+                var measurement = JsonConvert.DeserializeObject<MeasuredVaribles>(document.ToJson());
                 var values = measurement.GetMeasuredValues().ToArray();
                 ToCsvFile(measurement);
                 return values;
@@ -95,7 +95,7 @@ namespace DatabaseModule.MongoDB
             LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
 
-        private void ToCsvFile(Measurement measuredData)
+        private void ToCsvFile(MeasuredVaribles measuredData)
         {
             var dateTime = measuredData.SaveTime;
             var prNumber = (measuredData.ProgramNumber).ToString();

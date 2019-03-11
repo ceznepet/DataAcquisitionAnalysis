@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Common.Models;
 using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule.Conversion;
 using KunbusRevolutionPiModule.Kunbus;
@@ -14,18 +15,21 @@ namespace KunbusRevolutionPiModule
 {
     public class KunbusIOModule
     {
+        private KunbusIoVariables MeasuredVariables { get; }
+        private MongoSaver Saver { get; }
+        private bool DeviceActive { get; }
         private static readonly Logger Logger = LogManager.GetLogger("Kunbus Thread");
         private readonly ProfinetIOConfig _config;
-        private readonly KunbusIOData _changeCycle;
+        private readonly VariableComponent _changeCycle;
         private readonly Thread _samplerThread;
         private Thread SaveThread;
-        private MongoVariables ToSaveMeasurement;
+        private MeasuredVaribles ToSaveMeasurement;
         private readonly uint ChangeDetectionStatus = 0;
 
         public KunbusIOModule(bool endian, string pathToConfiguration,
             string databaseLocation, string database, string document)
         {       
-            MeasuredVariables = JsonConvert.DeserializeObject<Measurement>(File.ReadAllText(pathToConfiguration));
+            MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
             _config = new ProfinetIOConfig {Period = 4, BigEndian = endian};
             _changeCycle = MeasuredVariables.ProfinetProperty[1].IoData;
@@ -43,11 +47,7 @@ namespace KunbusRevolutionPiModule
             }
 
             Logger.Trace("End of I/O read.");
-        }
-
-        private Measurement MeasuredVariables { get; }
-        private MongoSaver Saver { get; }
-        private bool DeviceActive { get; }
+        }      
 
         ~KunbusIOModule()   
         {
@@ -76,7 +76,7 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private bool DataChange(KunbusIOData kunbusIo)
+        private bool DataChange(VariableComponent kunbusIo)
         {
             var result = GetIntIo(kunbusIo);
             if (result == ChangeDetectionStatus)
@@ -90,7 +90,7 @@ namespace KunbusRevolutionPiModule
         {
 
             ToSaveMeasurement = null;
-            ToSaveMeasurement = new MongoVariables();
+            ToSaveMeasurement = new MeasuredVaribles();
             var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var programNum = GetIntIo(MeasuredVariables.ProfinetProperty[0].IoData);
 
@@ -118,12 +118,12 @@ namespace KunbusRevolutionPiModule
             return robotTime;
         }
 
-        private int GetIntIo(KunbusIOData kunbusIo)
+        private int GetIntIo(VariableComponent kunbusIo)
         {
             return ReadKunbusInputs(kunbusIo);
         }
 
-        private void ReadVariableFromInputs(MeasurementVariable variable, bool time)
+        private void ReadVariableFromInputs(Variable variable, bool time)
         {
             foreach (var joint in variable.Joints)
             {
@@ -131,7 +131,7 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private int ReadKunbusInputs(KunbusIOData kunbusIo)
+        private int ReadKunbusInputs(VariableComponent kunbusIo)
         {
             var readData = new byte[kunbusIo.Length];
             var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIo.BytOffset,
@@ -145,7 +145,7 @@ namespace KunbusRevolutionPiModule
 
             if (readBytes == kunbusIo.Length)
             {
-                return (int) readData[0];
+                return readData[0];
             }
 
             Logger.Warn("Hups... Somethink went wrong! No data were read.");
@@ -153,7 +153,7 @@ namespace KunbusRevolutionPiModule
         }
 
 
-        private float ReadKunbusInputs(KunbusIOData kunbusIo, bool time)
+        private float ReadKunbusInputs(VariableComponent kunbusIo, bool time)
         {
             var readData = new byte[kunbusIo.Length];
             var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIo.BytOffset,

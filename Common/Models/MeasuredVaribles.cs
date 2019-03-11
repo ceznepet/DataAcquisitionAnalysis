@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
-namespace DatabaseModule.Models.Profinet
+namespace Common.Models
 {
-    public class Measurement
+    public class MeasuredVaribles
     {
         public string RobotTime { get; set; }
         public string SaveTime { get; set; }
         public int ProgramNumber { get; set; }
-        public List<MeasurementVariable> Variables = new List<MeasurementVariable>();
+        public List<Variable> Variables = new List<Variable>();
 
         public IEnumerable<double> GetMeasuredValues()
         {
@@ -19,7 +17,7 @@ namespace DatabaseModule.Models.Profinet
                 {
                     yield return value;
                 }
-            }            
+            }
         }
     }
 }

@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DatabaseModule.Models.Profinet
+namespace Common.Models
 {
-    public class MeasurementVariable
+    public class Variable
     {
         public string VariableName { get; }
         public string NameInRobot { get; }
-        public List<DbJoint> Joints = new List<DbJoint>();
+        public List<VariableComponent> Joints = new List<VariableComponent>();
 
-        public MeasurementVariable(string variableName, string nameInRobot)
+        public Variable(string variableName, string nameInRobot)
         {
             VariableName = variableName;
             NameInRobot = nameInRobot;

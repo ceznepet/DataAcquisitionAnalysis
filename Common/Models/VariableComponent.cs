@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DatabaseModule.Models.Profinet
+﻿namespace Common.Models
 {
-    public class DbJoint
+    public class VariableComponent
     {
         public uint Length = 4;
         public uint BytOffset;
         public string Name;
         public float Value;
 
-        public DbJoint(uint bytOffset, string name)
+        public VariableComponent(uint bytOffset, string name)
         {
             BytOffset = bytOffset;
             Name = name;
