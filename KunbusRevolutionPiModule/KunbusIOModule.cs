@@ -82,7 +82,7 @@ namespace KunbusRevolutionPiModule
 
         private bool DataChange(VariableComponent kunbusIo)
         {
-            var result = GetIntIo(kunbusIo);
+            var result = ReadKunbusInputs(kunbusIo);
             if (result == ChangeDetectionStatus)
             {
                 return true;
@@ -97,7 +97,7 @@ namespace KunbusRevolutionPiModule
             ToSaveMeasurement = new MeasuredVaribles();
             GetDataRobotTime();
             var time = Time.ToDateTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
-            var programNum = GetIntIo(MeasuredVariables.ProfinetProperty[0]);
+            var programNum = ReadKunbusInputs(MeasuredVariables.ProfinetProperty[0]);
 
             ToSaveMeasurement.RobotTime = time;
             ToSaveMeasurement.SaveTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
@@ -125,14 +125,9 @@ namespace KunbusRevolutionPiModule
                 else
                 {
                     component.Value = 0;
-                    component.Value = (int) ReadKunbusInputs(component);
+                    component.Value = ReadKunbusInputs(component);
                 }
             }
-        }
-
-        private int GetIntIo(VariableComponent kunbusIo)
-        {
-            return ReadKunbusInputs(kunbusIo);
         }
 
         private void ReadVariableFromInputs(Variable variable, bool time)

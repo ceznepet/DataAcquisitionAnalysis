@@ -14,7 +14,7 @@ namespace DataAcquisitionAnalysis
 {
     class Program
     {
-        private static Logger _logger = LogManager.GetLogger("Main");
+        private static readonly Logger Logger = LogManager.GetLogger("Main");
         static void Main(string[] args)
         {
             LoggerSetUp.SetUpLogger();
@@ -28,9 +28,7 @@ namespace DataAcquisitionAnalysis
 
         public static int PacketSaver(TcpSocketSaveOptions options)
         {
-            //var client = new SocketClient(options.Port, options.Ip, options.Database, options.Document);
-            //client.StartClient();
-            _logger.Info("Tcp Socket client started.");
+            Logger.Info("Tcp Socket client started.");
             var client = new TcpClientSocket(options.Ip, options.Port, options.DatabaseLocation, 
                                              options.Database, options.Document);
             client.ConnectAndReceive();
@@ -39,17 +37,16 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
-            _logger.Info("Loading of data from DB started.");
-            MongoDbCall.LoadDataAndSave(options.DatabaseLocation, options.Database, options.Document, options.Profinet, options.Folder, options.FilderName);
+            Logger.Info("Loading of data from DB started.");
+            MongoDbCall.LoadDataAndSave(options.DatabaseLocation, options.Database, options.Document,
+                                        options.Profinet, options.Folder, options.FilderName);
             return 0;
         }
 
         public static int KunbusModule(KunbusOptions options)
         {
-            _logger.Info("Kunbus started.");
-            var endian = options.BigEndian == "1" ? true : false;
-            //var pokus = JsonConvert.DeserializeObject<KunbusIoVariables>(
-            //    File.ReadAllText(options.ConfigurationFile));
+            Logger.Info("Kunbus started.");
+            var endian = options.BigEndian == "1";
             var kunbus = new KunbusIOModule(endian, options.ConfigurationFile,
                                           options.DatabaseLocation, options.Database, options.Document);
             return 0;
