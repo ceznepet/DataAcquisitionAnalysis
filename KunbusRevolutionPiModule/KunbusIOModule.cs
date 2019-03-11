@@ -95,6 +95,7 @@ namespace KunbusRevolutionPiModule
 
             ToSaveMeasurement = null;
             ToSaveMeasurement = new MeasuredVaribles();
+            GetDataRobotTime();
             var time = Time.ToDateTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var programNum = GetIntIo(MeasuredVariables.ProfinetProperty[0]);
 
@@ -116,7 +117,16 @@ namespace KunbusRevolutionPiModule
         {
             foreach (var component in Time)
             {
-                component.Value = ReadKunbusInputs(component, true);
+                if (component.Length > 1)
+                {
+                    component.Value = 0;
+                    component.Value = (int) ReadKunbusInputs(component, true);
+                }
+                else
+                {
+                    component.Value = 0;
+                    component.Value = (int) ReadKunbusInputs(component);
+                }
             }
         }
 
@@ -147,6 +157,7 @@ namespace KunbusRevolutionPiModule
 
             if (readBytes == kunbusIo.Length)
             {
+                Logger.Info("Read: {0}", readData[0]);                
                 return readData[0];
             }
 
@@ -169,7 +180,7 @@ namespace KunbusRevolutionPiModule
 
             if (readBytes == kunbusIo.Length)
             {
-                return time ? readData.OutputConversion(new uint()) : BitConverter.ToSingle(readData, 0);
+                return time ? readData.OutputConversion(new ushort()) : BitConverter.ToSingle(readData, 0);
             }
 
             Logger.Warn("Hups... Somethink went wrong! No data were read.");
