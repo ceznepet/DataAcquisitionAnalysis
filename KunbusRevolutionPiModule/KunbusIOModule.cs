@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -115,11 +115,9 @@ namespace KunbusRevolutionPiModule
         private void GetDataRobotTime()
         {
             foreach (var component in Time)
-            foreach (var component in robotTime.CurrentTime)
             {
                 component.Value = ReadKunbusInputs(component, true);
             }
-            return robotTime;
         }
 
         private int GetIntIo(VariableComponent kunbusIo)
