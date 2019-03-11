@@ -1,5 +1,5 @@
-﻿using csmatio.io;
-using csmatio.types;
+﻿//using csmatio.io;
+//using csmatio.types;
 using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -74,16 +74,16 @@ namespace DatabaseModule.MongoDB
         }
         private void SaveToFile(List<double[]> measuredData)
         {
-            ToMatFile(measuredData);
+            //ToMatFile(measuredData);
         }
 
-        private void ToMatFile(List<double[]> measuredData)
-        {
-            var mMatrix = new MLDouble("Measurement", measuredData.ToArray());
-            var mList = new List<MLArray>();
-            mList.Add(mMatrix);
-            var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
-        }
+        //private void ToMatFile(List<double[]> measuredData)
+        //{
+        //    var mMatrix = new MLDouble("Measurement", measuredData.ToArray());
+        //    var mList = new List<MLArray>();
+        //    mList.Add(mMatrix);
+        //    var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
+        //}
 
         private void ToCsvFile(TcpRobot measuredData)
         {

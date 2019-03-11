@@ -24,15 +24,17 @@ namespace KunbusRevolutionPiModule
         private readonly Thread _samplerThread;
         private Thread SaveThread;
         private MeasuredVaribles ToSaveMeasurement;
+        private RobotTime Time;
         private readonly uint ChangeDetectionStatus = 0;
 
         public KunbusIOModule(bool endian, string pathToConfiguration,
             string databaseLocation, string database, string document)
         {       
             MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
+            Time = new RobotTime(MeasuredVariables.Time);
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
             _config = new ProfinetIOConfig {Period = 4, BigEndian = endian};
-            _changeCycle = MeasuredVariables.ProfinetProperty[1].IoData;
+            _changeCycle = MeasuredVariables.ProfinetProperty[1];
             try
             {
                 KunbusRevolutionPiWrapper.piControlOpen();
@@ -92,7 +94,7 @@ namespace KunbusRevolutionPiModule
             ToSaveMeasurement = null;
             ToSaveMeasurement = new MeasuredVaribles();
             var time = GetDataRobotTime().ToDataTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
-            var programNum = GetIntIo(MeasuredVariables.ProfinetProperty[0].IoData);
+            var programNum = GetIntIo(MeasuredVariables.ProfinetProperty[0]);
 
             ToSaveMeasurement.RobotTime = time;
             ToSaveMeasurement.SaveTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
@@ -110,7 +112,7 @@ namespace KunbusRevolutionPiModule
 
         private RobotTime GetDataRobotTime()
         {
-            var robotTime = new RobotTime();
+            var robotTime = Time;
             foreach (var component in robotTime.CurrentTime)
             {
                 component.Value = ReadKunbusInputs(component, true);

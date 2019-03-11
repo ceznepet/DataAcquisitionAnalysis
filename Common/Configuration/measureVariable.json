@@ -1,0 +1,233 @@
+{
+  "Variables": [
+    {
+      "VariableName": "Current",
+      "NameInRobot": "CURR_ACT",
+      "Joints": [
+        {
+          "Name": "A1",
+          "BytOffset": 56,
+          "Length": 4
+        },
+        {
+          "Name": "A2",
+          "BytOffset": 60,
+          "Length": 4
+        },
+        {
+          "Name": "A3",
+          "BytOffset": 64,
+          "Length": 4
+        },
+        {
+          "Name": "A4",
+          "BytOffset": 68,
+          "Length": 4
+        },
+        {
+          "Name": "A5",
+          "BytOffset": 72,
+          "Length": 4
+        },
+        {
+          "Name": "A6",
+          "BytOffset": 76,
+          "Length": 4
+        }
+      ]
+    },
+    {
+      "VariableName": "Velocity",
+      "NameInRobot": "VEL_AXIS_ACT",
+      "Joints": [
+        {
+          "Name": "A1",
+          "BytOffset": 32,
+          "Length": 4
+        },
+        {
+          "Name": "A2",
+          "BytOffset": 36,
+          "Length": 4
+        },
+        {
+          "Name": "A3",
+          "BytOffset": 40,
+          "Length": 4
+        },
+        {
+          "Name": "A4",
+          "BytOffset": 44,
+          "Length": 4
+        },
+        {
+          "Name": "A5",
+          "BytOffset": 48,
+          "Length": 4
+        },
+        {
+          "Name": "A6",
+          "BytOffset": 52,
+          "Length": 4
+        }
+      ]
+    },
+    {
+      "VariableName": "Position",
+      "NameInRobot": "AXIS_ACT",
+      "Joints": [
+        {
+          "Name": "A1",
+          "BytOffset": 80,
+          "Length": 4
+        },
+        {
+          "Name": "A2",
+          "BytOffset": 84,
+          "Length": 4
+        },
+        {
+          "Name": "A3",
+          "BytOffset": 88,
+          "Length": 4
+        },
+        {
+          "Name": "A4",
+          "BytOffset": 92,
+          "Length": 4
+        },
+        {
+          "Name": "A5",
+          "BytOffset": 96,
+          "Length": 4
+        },
+        {
+          "Name": "A6",
+          "BytOffset": 100,
+          "Length": 4
+        }
+      ]
+    },
+    {
+      "VariableName": "Motor Temperature",
+      "NameInRobot": "MOT_TEMP",
+      "Joints": [
+        {
+          "Name": "A1",
+          "BytOffset": 104,
+          "Length": 4
+        },
+        {
+          "Name": "A2",
+          "BytOffset": 108,
+          "Length": 4
+        },
+        {
+          "Name": "A3",
+          "BytOffset": 112,
+          "Length": 4
+        },
+        {
+          "Name": "A4",
+          "BytOffset": 116,
+          "Length": 4
+        },
+        {
+          "Name": "A5",
+          "BytOffset": 120,
+          "Length": 4
+        },
+        {
+          "Name": "A6",
+          "BytOffset": 124,
+          "Length": 4
+        }
+      ]
+    },
+    {
+      "VariableName": "Axis Torque",
+      "NameInRobot": "TORQUE_AXIS_ACT",
+      "Joints": [
+        {
+          "Name": "A1",
+          "BytOffset": 128,
+          "Length": 4
+        },
+        {
+          "Name": "A2",
+          "BytOffset": 132,
+          "Length": 4
+        },
+        {
+          "Name": "A3",
+          "BytOffset": 136,
+          "Length": 4
+        },
+        {
+          "Name": "A4",
+          "BytOffset": 140,
+          "Length": 4
+        },
+        {
+          "Name": "A5",
+          "BytOffset": 144,
+          "Length": 4
+        },
+        {
+          "Name": "A6",
+          "BytOffset": 148,
+          "Length": 4
+        }
+      ]
+    }
+  ],
+  "ProfinetProperty": [
+    {
+      "Name": "ProgramNumber",
+      "BytOffset": 29,
+      "Length": 1
+    },
+    {
+      "Name": "Change",
+      "BytOffset": 28,
+      "Length": 1
+    }
+  ],
+  "Time": [
+    {
+      "Name": "Year",
+      "BytOffset": 0,
+      "Length": 2
+    },
+    {
+      "Name": "Month",
+      "BytOffset": 2,
+      "Length": 1
+    },
+    {
+      "Name": "Day",
+      "BytOffset": 3,
+      "Length": 1
+    },
+    {
+      "Name": "Hours",
+      "BytOffset": 4,
+      "Length": 1
+    },
+    {
+      "Name": "Minutes",
+      "BytOffset": 5,
+      "Length": 1
+    },
+    {
+      "Name": "Seconds",
+      "BytOffset": 6,
+      "Length": 1
+    },
+    {
+      "Name": "Milliseconds",
+      "BytOffset": 7,
+      "Length": 2
+    }
+  ]
+}

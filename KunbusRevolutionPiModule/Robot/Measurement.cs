@@ -5,6 +5,7 @@ namespace KunbusRevolutionPiModule.Robot
 {
     public class KunbusIoVariables : MeasuredVaribles
     {        
-        public List<ConfigurationProperty> ProfinetProperty = new List<ConfigurationProperty>();
+        public List<VariableComponent> ProfinetProperty = new List<VariableComponent>();
+        public List<VariableComponent> Time = new List<VariableComponent>();
     }
 }
