@@ -1,37 +1,37 @@
 {
   "Variables": [
     {
-      "VariableName": "Current",
-      "NameInRobot": "CURR_ACT",
+      "VariableName": "Position",
+      "NameInRobot": "AXIS_ACT",
       "Joints": [
         {
           "Name": "A1",
-          "BytOffset": 56,
+          "BytOffset": 80,
           "Length": 4
         },
         {
           "Name": "A2",
-          "BytOffset": 60,
+          "BytOffset": 84,
           "Length": 4
         },
         {
           "Name": "A3",
-          "BytOffset": 64,
+          "BytOffset": 88,
           "Length": 4
         },
         {
           "Name": "A4",
-          "BytOffset": 68,
+          "BytOffset": 92,
           "Length": 4
         },
         {
           "Name": "A5",
-          "BytOffset": 72,
+          "BytOffset": 96,
           "Length": 4
         },
         {
           "Name": "A6",
-          "BytOffset": 76,
+          "BytOffset": 100,
           "Length": 4
         }
       ]
@@ -73,37 +73,37 @@
       ]
     },
     {
-      "VariableName": "Position",
-      "NameInRobot": "AXIS_ACT",
+      "VariableName": "Current",
+      "NameInRobot": "CURR_ACT",
       "Joints": [
         {
           "Name": "A1",
-          "BytOffset": 80,
+          "BytOffset": 56,
           "Length": 4
         },
         {
           "Name": "A2",
-          "BytOffset": 84,
+          "BytOffset": 60,
           "Length": 4
         },
         {
           "Name": "A3",
-          "BytOffset": 88,
+          "BytOffset": 64,
           "Length": 4
         },
         {
           "Name": "A4",
-          "BytOffset": 92,
+          "BytOffset": 68,
           "Length": 4
         },
         {
           "Name": "A5",
-          "BytOffset": 96,
+          "BytOffset": 72,
           "Length": 4
         },
         {
           "Name": "A6",
-          "BytOffset": 100,
+          "BytOffset": 76,
           "Length": 4
         }
       ]
