@@ -21,7 +21,7 @@ namespace DatabaseModule.Models
             Measurements.Add(variable);
         }
 
-        private void SortList()
+        public void SortList()
         {
             foreach (var measurement in Measurements)
             { 

@@ -58,6 +58,7 @@ namespace DatabaseModule.MongoDB
                 }
                 SaveToFile(measuredData);
                 File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
+                Save();
             }
 
 
@@ -68,7 +69,7 @@ namespace DatabaseModule.MongoDB
             document.Remove("_id");
             if (Profinet)
             {
-                var measurement = JsonConvert.DeserializeObject<MeasuredVaribles>(document.ToJson());
+                var measurement = JsonConvert.DeserializeObject<MeasuredVariables>(document.ToJson());
                 SortedMeasurementProfinet.AddToList(measurement);
                 var values = measurement.GetMeasuredValues().ToArray();
                 ToCsvFile(measurement);
@@ -85,22 +86,68 @@ namespace DatabaseModule.MongoDB
         {
             if (Profinet)
             {
-
+                SaveProfinet();
             }
             else
             {
-
+                SaveEthernet();
             }
         }
+
+        private void SaveProfinet()
+        {
+            SortedMeasurementProfinet.SortList();
+            var sortedProfinet = SortedMeasurementProfinet.Dictionary;
+
+            foreach (var key in sortedProfinet.Keys)
+            {
+                PrintOneProgramProfinet(key, sortedProfinet[key]);
+            }
+        }
+
+        private void SaveEthernet()
+        {
+            SortedMeasurementEthernet.SortList();
+
+            var sortedEthernet = SortedMeasurementEthernet.Dictionary;
+
+            foreach (var key in sortedEthernet.Keys)
+            {
+                PrintOneProgramEthernet(key, sortedEthernet[key]);
+            }
+        }
+
+        private void PrintOneProgramProfinet(int programNumber, List<MeasuredVariables> measuredVariables)
+        {
+            var rows = new List<double[]>();
+            foreach (var measurement in measuredVariables)
+            {
+                rows.Add(measurement.GetMeasuredValues().ToArray());
+                ToCsvFile(measurement);
+            }
+            //ToMatFile(rows, programNumber);
+        }
+
+        private void PrintOneProgramEthernet(int programNumber, List<TcpRobot> measuredVariables)
+        {
+            var rows = new List<double[]>();
+            foreach (var measurement in measuredVariables)
+            {
+                rows.Add(measurement.FilePreparation().ToArray());
+                ToCsvFile(measurement);
+            }
+            //ToMatFile(rows, programNumber);
+        }
+
 
         private void SaveToFile(List<double[]> measuredData)
         {
             //ToMatFile(measuredData);
         }
 
-        //private void ToMatFile(List<double[]> measuredData)
+        //private void ToMatFile(List<double[]> measuredData, string name)
         //{
-        //    var mMatrix = new MLDouble("Measurement", measuredData.ToArray());
+        //    var mMatrix = new MLDouble(name, measuredData.ToArray());
         //    var mList = new List<MLArray>();
         //    mList.Add(mMatrix);
         //    var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
@@ -116,7 +163,7 @@ namespace DatabaseModule.MongoDB
             LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
 
-        private void ToCsvFile(MeasuredVaribles measuredData)
+        private void ToCsvFile(MeasuredVariables measuredData)
         {
             var dateTime = measuredData.SaveTime;
             var prNumber = (measuredData.ProgramNumber).ToString();
