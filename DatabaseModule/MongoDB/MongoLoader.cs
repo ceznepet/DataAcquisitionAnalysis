@@ -20,18 +20,22 @@ namespace DatabaseModule.MongoDB
         private IMongoDatabase Database { get; set; }
         private IMongoCollection<BsonDocument> Collection { get; set; }
         private bool Profinet { get; set; }
+        private bool Sorted { get; set; }
         private string Folder { get; set; }
         private string FileName { get; set; }
         private StringBuilder LocalStringBuilder { get; set; }
         private SortMeasurementProfinet SortedMeasurementProfinet { get; }
         private SortMeasurementEthernet SortedMeasurementEthernet { get; }
+        private List<double[]> MeasuredData { get; set; }
 
-        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder, string fileName)
+        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder, string fileName, bool sorted)
         {
             Profinet = int.Parse(profinet) == 1;
+            Sorted = sorted;
             Folder = folder;
             SortedMeasurementProfinet = new SortMeasurementProfinet();
             SortedMeasurementEthernet = new SortMeasurementEthernet();
+            MeasuredData = new List<double[]>();
 
             var client = new MongoClient(MongoUrl.Create(databaseLocation));
             Database = client.GetDatabase(database);
@@ -43,20 +47,20 @@ namespace DatabaseModule.MongoDB
 
         public async Task ReadData()
         {
-            using (IAsyncCursor<BsonDocument> cursor = await Collection.FindAsync(new BsonDocument()))
+            using (var cursor = await Collection.FindAsync(new BsonDocument()))
             {
                 var measuredData = new List<double[]>();
                 LocalStringBuilder = new StringBuilder();
                 while (await cursor.MoveNextAsync())
                 {
-                    IEnumerable<BsonDocument> batch = cursor.Current;
+                    var batch = cursor.Current;
 
-                    foreach (BsonDocument document in batch)
+                    foreach (var document in batch)
                     {
-                        measuredData.Add(BsonDocToList(document));
+                        BsonDocToList(document);
                     }
                 }
-                SaveToFile(measuredData);
+                //ToMatFile(measuredData);
                 File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
                 Save();
             }
@@ -64,22 +68,34 @@ namespace DatabaseModule.MongoDB
 
         }
 
-        private double[] BsonDocToList(BsonDocument document)
+        private void BsonDocToList(BsonDocument document)
         {
             document.Remove("_id");
             if (Profinet)
             {
                 var measurement = JsonConvert.DeserializeObject<MeasuredVariables>(document.ToJson());
-                SortedMeasurementProfinet.AddToList(measurement);
-                var values = measurement.GetMeasuredValues().ToArray();
-                ToCsvFile(measurement);
-                return values;
+                if (Sorted)
+                {
+                    SortedMeasurementProfinet.AddToList(measurement);
+                }
+                else
+                {
+                    MeasuredData.Add(measurement.GetMeasuredValues().ToArray());
+                    ToCsvFile(measurement);
+                }
             }
             var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
-            SortedMeasurementEthernet.AddToList(measuredData);
-            measuredData.ToList();
-            ToCsvFile(measuredData);
-            return measuredData.FilePreparation().ToArray();
+            if (Sorted)
+            {
+                SortedMeasurementEthernet.AddToList(measuredData);
+            }
+            else
+            {
+                measuredData.ToList();
+
+                ToCsvFile(measuredData);
+                MeasuredData.Add(measuredData.FilePreparation().ToArray());
+            }           
         }
 
         private void Save()
@@ -137,12 +153,6 @@ namespace DatabaseModule.MongoDB
                 ToCsvFile(measurement);
             }
             //ToMatFile(rows, programNumber);
-        }
-
-
-        private void SaveToFile(List<double[]> measuredData)
-        {
-            //ToMatFile(measuredData);
         }
 
         //private void ToMatFile(List<double[]> measuredData, string name)

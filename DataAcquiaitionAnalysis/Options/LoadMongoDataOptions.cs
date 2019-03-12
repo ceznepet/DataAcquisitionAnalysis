@@ -23,7 +23,11 @@ namespace DataAcquisitionAnalysis.Options
         [Option('f', "folder", HelpText = "Folder for saving the data from DB.", Required = true)]
         public string Folder { get; set; }
 
-        [Option('n', "filderName", HelpText = "Name of the output file, time is automaticly included.", Default = "measurement")]
+        [Option('n', "filderName", HelpText = "Name of the output file, time is automaticly included.",
+            Default = "measurement")]
         public string FilderName { get; set; }
+
+        [Option('s', "sorted", HelpText = "Sorted output data. Yes or No", Default = "Yes")]
+        public string Sorted { get; set; }
     }
 }

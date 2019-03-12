@@ -2,7 +2,7 @@
 
 namespace Common.Models
 {
-    public class MeasuredVaribles
+    public class MeasuredVariables
     {
         public string RobotTime { get; set; }
         public string SaveTime { get; set; }
