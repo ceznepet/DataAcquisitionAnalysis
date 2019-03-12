@@ -6,11 +6,15 @@
 
   <ItemGroup>
     <None Remove="Configuration\measureVariable.json" />
+    <None Remove="Configuration\measureVariable2.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Configuration\measureVariable2.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Configuration\measureVariable.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

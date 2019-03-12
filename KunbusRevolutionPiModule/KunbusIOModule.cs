@@ -25,7 +25,7 @@ namespace KunbusRevolutionPiModule
         private readonly VariableComponent _changeCycle;
         private readonly Thread _samplerThread;
         private Thread SaveThread;
-        private MeasuredVaribles ToSaveMeasurement;
+        private MeasuredVariables ToSaveMeasurement;
         private List<VariableComponent> Time;
         private readonly uint ChangeDetectionStatus = 0;
 
@@ -94,7 +94,7 @@ namespace KunbusRevolutionPiModule
         {
 
             ToSaveMeasurement = null;
-            ToSaveMeasurement = new MeasuredVaribles();
+            ToSaveMeasurement = new MeasuredVariables();
             GetDataRobotTime();
             var time = Time.ToDateTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var programNum = ReadKunbusInputs(MeasuredVariables.ProfinetProperty[0]);
