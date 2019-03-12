@@ -125,7 +125,9 @@ namespace KunbusRevolutionPiModule
                 else
                 {
                     component.Value = 0;
-                    component.Value = ReadKunbusInputs(component);
+                    var value = ReadKunbusInputs(component);
+                    Logger.Info(value);
+                    component.Value = value;
                 }
             }
         }
@@ -142,8 +144,8 @@ namespace KunbusRevolutionPiModule
         {
             var readData = new byte[kunbusIo.Length];
             var readBytes = KunbusRevolutionPiWrapper.piControlRead(kunbusIo.BytOffset,
-                kunbusIo.Length,
-                readData);
+                                                                    kunbusIo.Length,
+                                                                    readData);
 
             if (_config.BigEndian ^ BitConverter.IsLittleEndian)
             {
@@ -152,7 +154,6 @@ namespace KunbusRevolutionPiModule
 
             if (readBytes == kunbusIo.Length)
             {
-                Logger.Info("Read: {0}", readData[0]);                
                 return readData[0];
             }
 

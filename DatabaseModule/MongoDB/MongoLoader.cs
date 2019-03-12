@@ -23,14 +23,20 @@ namespace DatabaseModule.MongoDB
         private string Folder { get; set; }
         private string FileName { get; set; }
         private StringBuilder LocalStringBuilder { get; set; }
+        private SortMeasurementProfinet SortedMeasurementProfinet { get; }
+        private SortMeasurementEthernet SortedMeasurementEthernet { get; }
 
         public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder, string fileName)
         {
             Profinet = int.Parse(profinet) == 1;
             Folder = folder;
+            SortedMeasurementProfinet = new SortMeasurementProfinet();
+            SortedMeasurementEthernet = new SortMeasurementEthernet();
+
             var client = new MongoClient(MongoUrl.Create(databaseLocation));
             Database = client.GetDatabase(database);
             Collection = Database.GetCollection<BsonDocument>(document);
+
             var source = int.Parse(profinet) == 1 ? "_profinet_" : "_ethernet_";
             FileName = Folder + "/" + fileName + source + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
         }
@@ -63,15 +69,30 @@ namespace DatabaseModule.MongoDB
             if (Profinet)
             {
                 var measurement = JsonConvert.DeserializeObject<MeasuredVaribles>(document.ToJson());
+                SortedMeasurementProfinet.AddToList(measurement);
                 var values = measurement.GetMeasuredValues().ToArray();
                 ToCsvFile(measurement);
                 return values;
             }
             var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
+            SortedMeasurementEthernet.AddToList(measuredData);
             measuredData.ToList();
             ToCsvFile(measuredData);
             return measuredData.FilePreparation().ToArray();
         }
+
+        private void Save()
+        {
+            if (Profinet)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
         private void SaveToFile(List<double[]> measuredData)
         {
             //ToMatFile(measuredData);
