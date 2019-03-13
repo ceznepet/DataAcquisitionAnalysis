@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -36,6 +39,11 @@ namespace DatabaseModule.Extensions
             {
                 reader.Close();
             }
+        }
+
+        public static double[] ToDoubleArray(this string[] array)
+        {
+            return array.Select(element => double.Parse(element, CultureInfo.InvariantCulture)).ToArray();
         }
     }
 }

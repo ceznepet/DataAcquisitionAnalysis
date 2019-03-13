@@ -50,7 +50,6 @@ namespace DatabaseModule.MongoDB
         {
             using (var cursor = await Collection.FindAsync(new BsonDocument()))
             {
-                var measuredData = new List<double[]>();
                 LocalStringBuilder = new StringBuilder();
                 while (await cursor.MoveNextAsync())
                 {
@@ -97,8 +96,8 @@ namespace DatabaseModule.MongoDB
                 }
                 else
                 {
-                    ToCsvFile(measuredData);
                     MeasuredData.Add(measuredData.FilePreparation().ToArray());
+                    ToCsvFile(measuredData);
                 }
             }
         }
@@ -154,7 +153,9 @@ namespace DatabaseModule.MongoDB
             var rows = new List<double[]>();
             foreach (var measurement in measuredVariables)
             {
+                
                 var row = measurement.FilePreparation().ToArray();
+                measurement.Called = true;
                 rows.Add(row);
                 ToCsvFile(measurement);
             }
@@ -174,8 +175,7 @@ namespace DatabaseModule.MongoDB
             var dateTime = measuredData.Time.GetDate().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var prNumber = ((int)measuredData.ProgramNumber.Value).ToString();
             var begin = string.Join(", ", dateTime, prNumber);
-            var newLine = string.Join(", ", measuredData.FilePreparation().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            measuredData.Called = true;
+            var newLine = string.Join(", ", measuredData.FilePreparation().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());            
             LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
 

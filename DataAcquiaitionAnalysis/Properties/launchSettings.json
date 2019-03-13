@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "markov -f \"C:\\Data\\Measurement\\20190313_measurement\\profinet\\measurement_profinet_2019-03-13-13-29-32-261.csv\""
+      "commandLineArgs": "markov -f \"C:\\Data\\Measurement\\20190313_mes_2\\ethernet\\measurement_ethernet_2019-03-13-16-44-55-592.csv\""
     }
   }
 }
