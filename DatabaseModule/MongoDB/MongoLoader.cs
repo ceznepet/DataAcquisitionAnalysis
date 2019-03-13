@@ -1,6 +1,4 @@
-﻿using csmatio.io;
-using csmatio.types;
-using DatabaseModule.Models;
+﻿using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -11,7 +9,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using csmatio.io;
+using csmatio.types;
 using Common.Models;
+using NLog;
 
 namespace DatabaseModule.MongoDB
 {
@@ -60,12 +61,10 @@ namespace DatabaseModule.MongoDB
                         BsonDocToList(document);
                     }
                 }
-                //ToMatFile(measuredData);
-                File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
-                Save();
+                //ToMatFile(measuredData);                
             }
-
-
+            Save();
+            File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
         }
 
         private void BsonDocToList(BsonDocument document)
@@ -74,6 +73,10 @@ namespace DatabaseModule.MongoDB
             if (Profinet)
             {
                 var measurement = JsonConvert.DeserializeObject<MeasuredVariables>(document.ToJson());
+                if (measurement.Variables.Count == 0)
+                {
+                    return;
+                }
                 if (Sorted)
                 {
                     SortedMeasurementProfinet.AddToList(measurement);
@@ -84,18 +87,20 @@ namespace DatabaseModule.MongoDB
                     ToCsvFile(measurement);
                 }
             }
-            var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
-            if (Sorted)
-            {
-                SortedMeasurementEthernet.AddToList(measuredData);
-            }
             else
             {
+                var measuredData = JsonConvert.DeserializeObject<TcpRobot>(document.ToJson());
                 measuredData.ToList();
-
-                ToCsvFile(measuredData);
-                MeasuredData.Add(measuredData.FilePreparation().ToArray());
-            }           
+                if (Sorted)
+                {
+                    SortedMeasurementEthernet.AddToList(measuredData);
+                }
+                else
+                {
+                    ToCsvFile(measuredData);
+                    MeasuredData.Add(measuredData.FilePreparation().ToArray());
+                }
+            }
         }
 
         private void Save()
@@ -117,7 +122,7 @@ namespace DatabaseModule.MongoDB
 
             foreach (var key in sortedProfinet.Keys)
             {
-                PrintOneProgramProfinet(key, sortedProfinet[key]);
+                PrintOneProgramProfinet(key, sortedProfinet.First(data => data.Key == key).Value);
             }
         }
 
@@ -129,7 +134,7 @@ namespace DatabaseModule.MongoDB
 
             foreach (var key in sortedEthernet.Keys)
             {
-                PrintOneProgramEthernet(key, sortedEthernet[key]);
+                PrintOneProgramEthernet(key, sortedEthernet.First(data => data.Key == key).Value);
             }
         }
 
@@ -149,7 +154,8 @@ namespace DatabaseModule.MongoDB
             var rows = new List<double[]>();
             foreach (var measurement in measuredVariables)
             {
-                rows.Add(measurement.FilePreparation().ToArray());
+                var row = measurement.FilePreparation().ToArray();
+                rows.Add(row);
                 ToCsvFile(measurement);
             }
             ToMatFile(rows, programNumber.ToString());
@@ -157,10 +163,10 @@ namespace DatabaseModule.MongoDB
 
         private void ToMatFile(List<double[]> measuredData, string name)
         {
-            var mMatrix = new MLDouble(name, measuredData.ToArray());
+            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray());
             var mList = new List<MLArray>();
             mList.Add(mMatrix);
-            var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
+            var mFileWrite = new MatFileWriter(FileName +"_" + name + ".mat", mList, false);
         }
 
         private void ToCsvFile(TcpRobot measuredData)

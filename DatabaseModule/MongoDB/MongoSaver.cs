@@ -35,7 +35,11 @@ namespace DatabaseModule.MongoDB
             var packet = xml.XmlDeserialize<EthernetXmlSerialization>();
             var document = BsonDocument.Parse(packet.ToJson());
             //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
-
+            if (document == null)
+            {
+                _logger.Info("Document is empty!");
+                return;
+            }
             Collection.InsertOneAsync(document);
             _logger.Trace("Saving of the packet is done.");
         }
