@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accord.Math;
+using Accord.Math.Random;
+using Accord.Statistics.Analysis;
 using Accord.Statistics.Distributions.Fitting;
 using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Models.Markov;
@@ -11,7 +14,7 @@ namespace HiddenMarkovModel.Models
 {
     public class Learning
     {
-        private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Teacher {get; set; }
+        private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Teacher { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
         private IOrderedEnumerable<KeyValuePair<int, List<double[]>>> OrderedOperations { get; set; }
@@ -23,49 +26,83 @@ namespace HiddenMarkovModel.Models
 
         public void TeachModel()
         {
-            var sequences = new double[OrderedOperations.Count()][][];
-            var length = OrderedOperations.Count();
+            Generator.Seed = 0;
+            var dimension = 30;
+            //malo dat...
+            var length = 4; //OrderedOperations.Count();
+            var sequences = new double[length][][];
             var labels = new int[length];
             for (var i = 0; i < length; i++)
             {
-                sequences[i] = OrderedOperations.ElementAt(i).Value.Take(400).ToArray();
+                sequences[i] = OrderedOperations.ElementAt(i).Value.Take(1300).ToArray();
                 labels[i] = i;
             }
 
-            var initialDensity = new MultivariateNormalDistribution(30);
+            //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
-            Classifier = new HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>(
-                classes: length, topology: new Forward(2), initial: initialDensity);
+            var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
+            var priorM = new MultivariateNormalDistribution(dimension: dimension);
 
-            Teacher = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>(Classifier)
+            Teacher = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
             {
-                // Train each model until the log-likelihood changes less than 0.0001
-                Learner = modelIndex => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>(Classifier.Models[modelIndex])
+                Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Tolerance = 0.0001,
-                    Iterations = 0,
+                    Topology = new Forward(5),
+
+                    Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
+
+                    Tolerance = 1e-6,
+                    MaxIterations = 0,
 
                     FittingOptions = new NormalOptions()
                     {
-                        Diagonal = true,      // only diagonal covariance matrices
-                        Regularization = 1e-5 // avoid non-positive definite errors
+                        Diagonal = true,
+                        Regularization = 1e-6
                     }
                 }
             };
+            //Teacher.ParallelOptions.MaxDegreeOfParallelism = 1;
+            Classifier = Teacher.Learn(sequences, labels);
 
-            Teacher.Learn(sequences, labels);
+            var trainPredicted = Classifier.Decide(sequences);
 
-            double likelihood, likelihood2;
+            var m1 = new GeneralConfusionMatrix(predicted: trainPredicted, expected: labels);
+            var trainAcc = m1.Accuracy;
 
-            var c1 = Classifier.Decide(sequences[0]);
-            likelihood = Classifier.Probability(sequences[0]);
-            
+            Console.WriteLine("Check of performance: {0}", trainAcc);
 
-            // Try to classify the second sequence (output should be 1)
-            var c2 = Classifier.Decide(OrderedOperations.ElementAt(1).Value.Skip(300).Take(300).ToArray());
-            likelihood2 = Classifier.Probability(OrderedOperations.ElementAt(1).Value.Skip(300).Take(300).ToArray());
+            var testData = new double[length][][];
+            var testOutputs = new int[length];
+            for (var i = 0; i < length; i++)
+            {
+                testData[i] = OrderedOperations.ElementAt(i).Value.Skip(1300).Take(50).ToArray();
+                testOutputs[i] = i;
+            }
 
-            Console.WriteLine("C1: {0} and is {1}, C2: {2} and is {3}", likelihood, c1, likelihood2, c2);
+            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+
+            var testPredict = Classifier.Decide(testData);
+
+            var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
+            var trainAccTest = m2.Accuracy;
+            Console.WriteLine("Check of performance: {0}", trainAccTest);
+
+        }
+
+        private double[][] ReduceDimension(int dimension, double[][] data)
+        {
+
+            var pca = new PrincipalComponentAnalysis()
+            {
+                Method = PrincipalComponentMethod.Standardize,
+                Whiten = false
+            };
+
+            var transform = pca.Learn(data);
+
+            pca.NumberOfOutputs = dimension;
+
+            return pca.Transform(data);
         }
     }
 }
