@@ -126,7 +126,6 @@ namespace KunbusRevolutionPiModule
                 {
                     component.Value = 0;
                     var value = ReadKunbusInputs(component);
-                    Logger.Info(value);
                     component.Value = value;
                 }
             }

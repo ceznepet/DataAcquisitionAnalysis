@@ -1,5 +1,5 @@
-﻿//using csmatio.io;
-//using csmatio.types;
+﻿using csmatio.io;
+using csmatio.types;
 using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -141,7 +141,7 @@ namespace DatabaseModule.MongoDB
                 rows.Add(measurement.GetMeasuredValues().ToArray());
                 ToCsvFile(measurement);
             }
-            //ToMatFile(rows, programNumber);
+            ToMatFile(rows, programNumber.ToString());
         }
 
         private void PrintOneProgramEthernet(int programNumber, List<TcpRobot> measuredVariables)
@@ -152,16 +152,16 @@ namespace DatabaseModule.MongoDB
                 rows.Add(measurement.FilePreparation().ToArray());
                 ToCsvFile(measurement);
             }
-            //ToMatFile(rows, programNumber);
+            ToMatFile(rows, programNumber.ToString());
         }
 
-        //private void ToMatFile(List<double[]> measuredData, string name)
-        //{
-        //    var mMatrix = new MLDouble(name, measuredData.ToArray());
-        //    var mList = new List<MLArray>();
-        //    mList.Add(mMatrix);
-        //    var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
-        //}
+        private void ToMatFile(List<double[]> measuredData, string name)
+        {
+            var mMatrix = new MLDouble(name, measuredData.ToArray());
+            var mList = new List<MLArray>();
+            mList.Add(mMatrix);
+            var mFileWrite = new MatFileWriter(FileName + ".mat", mList, false);
+        }
 
         private void ToCsvFile(TcpRobot measuredData)
         {
