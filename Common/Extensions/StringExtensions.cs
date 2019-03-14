@@ -41,9 +41,9 @@ namespace DatabaseModule.Extensions
             }
         }
 
-        public static double[] ToDoubleArray(this string[] array)
+        public static double[] ToDoubleArray(this string[] array, int elements)
         {
-            return array.Select(element => double.Parse(element, CultureInfo.InvariantCulture)).ToArray();
+            return array.Select(element => double.Parse(element, CultureInfo.InvariantCulture)).Take(elements).ToArray();
         }
     }
 }

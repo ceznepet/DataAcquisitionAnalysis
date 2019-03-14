@@ -43,7 +43,7 @@ namespace HiddenMarkovModel
                     ProgramNumbers.Add(programNumber);
                 }
 
-                Dictionary[programNumber].Add(lis.ToDoubleArray());
+                Dictionary[programNumber].Add(lis.ToDoubleArray(6));
             }
         }
 

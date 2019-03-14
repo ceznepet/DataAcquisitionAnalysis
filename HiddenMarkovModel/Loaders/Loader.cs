@@ -10,28 +10,33 @@ namespace HiddenMarkovModel.Loaders
 
         public static DataTable LoadCSV(string strFilePath)
         {
-            var streamReader = new StreamReader(strFilePath);
-            var headers = streamReader.ReadLine()?.Split(',');
-            var dataTable = new DataTable();
-            int i = 1;
-            foreach (string header in headers)
+            using (var streamReader = new StreamReader(strFilePath))
             {
-                dataTable.Columns.Add(i.ToString());
-                i++;
-            }
-            while (!streamReader.EndOfStream)
-            {
-                var rows = Regex.Split(streamReader.ReadLine() ?? 
-                                       throw new InvalidOperationException(),
-                                ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                var dataRow = dataTable.NewRow();
-                for (i = 0; i < headers.Length; i++)
+                var headers = streamReader.ReadLine()?.Split(',');
+                var dataTable = new DataTable();
+                int i = 1;
+                foreach (string header in headers)
                 {
-                    dataRow[i] = rows[i];
+                    dataTable.Columns.Add(i.ToString());
+                    i++;
                 }
-                dataTable.Rows.Add(dataRow);
+
+                while (!streamReader.EndOfStream)
+                {
+                    var rows = Regex.Split(streamReader.ReadLine() ??
+                                           throw new InvalidOperationException(),
+                        ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                    var dataRow = dataTable.NewRow();
+                    for (i = 0; i < headers.Length; i++)
+                    {
+                        dataRow[i] = rows[i];
+                    }
+
+                    dataTable.Rows.Add(dataRow);
+                }
+
+                return dataTable;
             }
-            return dataTable;
         }
 
 
