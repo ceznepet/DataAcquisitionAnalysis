@@ -43,7 +43,7 @@ namespace HiddenMarkovModel
                     ProgramNumbers.Add(programNumber);
                 }
 
-                Dictionary[programNumber].Add(lis.ToDoubleArray(6));
+                Dictionary[programNumber].Add(lis.ToDoubleArray(12));
             }
         }
 
@@ -51,7 +51,7 @@ namespace HiddenMarkovModel
         {
             var sortedDict = from entry in Dictionary orderby entry.Key ascending select entry;            
             Teacher = new Learning(sortedDict);
-            Teacher.TeachModel();
+            Teacher.TeachModel(12);
             }
     }
 }

@@ -70,7 +70,8 @@ namespace KunbusRevolutionPiModule
         {
             while (true)
             {
-                Thread.Sleep(_config.Period);
+                //TODO: Otestovat jestli to ma vliv na sber dat...
+                //Thread.Sleep(_config.Period);
                 
                 if (!DeviceActive) continue;
                 if (DataChange(_changeCycle))

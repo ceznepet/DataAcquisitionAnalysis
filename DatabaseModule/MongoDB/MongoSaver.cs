@@ -40,7 +40,7 @@ namespace DatabaseModule.MongoDB
                 _logger.Info("Document is empty!");
                 return;
             }
-            Collection.InsertOneAsync(document);
+            Collection.InsertOne(document);
             _logger.Trace("Saving of the packet is done.");
         }
 
