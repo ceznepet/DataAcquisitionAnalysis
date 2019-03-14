@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Accord.Math;
@@ -9,6 +9,8 @@ using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
+using Common.Logging;
+using NLog;
 
 namespace HiddenMarkovModel.Models
 {
@@ -18,6 +20,7 @@ namespace HiddenMarkovModel.Models
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
         private IOrderedEnumerable<KeyValuePair<int, List<double[]>>> OrderedOperations { get; set; }
+        private static readonly Logger Logger = LogManager.GetLogger("Teaching");
 
         public Learning(IOrderedEnumerable<KeyValuePair<int, List<double[]>>> orderedOperations)
         {
