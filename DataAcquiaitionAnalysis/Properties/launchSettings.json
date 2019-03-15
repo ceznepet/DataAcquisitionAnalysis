@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "mongo -c \"Mes_20190315_p_5\" -f \"C:\\Data\\Measurement_20190315_2\" -p 1 -s \"Yes\""
+      "commandLineArgs": "mongo -c \"Mes_20190315_p_5\" -f \"C:\\Data\\Measurement_20190315_2\"  -s \"No\""
     }
   }
 }

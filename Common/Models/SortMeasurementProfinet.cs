@@ -44,5 +44,10 @@ namespace Common.Models
                 Dictionary[key].Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
             }
         }
+
+        public void SortMeasurement()
+        {
+            Measurements.Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
+        }
     }
 }

@@ -48,7 +48,7 @@ namespace DatabaseModule.Extensions
 
         public static double TimeInSecond(this string time)
         {
-            return DateTime.Parse(time).ToUniversalTime().Subtract(
+            return DateTime.ParseExact(time, "yyyy-MM-dd-HH-mm-ss-FFF", CultureInfo.InvariantCulture).ToUniversalTime().Subtract(
                 new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             ).TotalMilliseconds;
         }

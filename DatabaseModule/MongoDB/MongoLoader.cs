@@ -79,17 +79,16 @@ namespace DatabaseModule.MongoDB
             {
                 var measurement = JsonConvert.DeserializeObject<MeasuredVariables>(document.ToJson());
                 if (measurement.Variables.Count == 0) return;
-                if (Sorted)
-                {
-                    SortedMeasurementProfinet.AddToList(measurement);
-                }
-                else
+                if (!Sorted)
                 {
                     var time = measurement.SaveTime.TimeInSecond();
+                    var prNumber = (double)measurement.ProgramNumber;
                     var data = measurement.GetMeasuredValues().ToList();
                     data.Insert(0, time);
-                    MeasuredData.Add(data.ToArray());
+                    data.Insert(1, prNumber);
+                    MeasuredData.Add(data.ToArray());                    
                 }
+                SortedMeasurementProfinet.AddToList(measurement);
             }
             else
             {
@@ -122,7 +121,12 @@ namespace DatabaseModule.MongoDB
             }
             else
             {
-
+                SortedMeasurementProfinet.SortMeasurement();
+                foreach (var mesurement in SortedMeasurementProfinet.Measurements)
+                {
+                    ToCsvFile(mesurement);
+                }
+                MeasuredData.Sort((x, y) => x[0].CompareTo(y[0]));
                 ToMatFile(MeasuredData, "0");
             }
         }
