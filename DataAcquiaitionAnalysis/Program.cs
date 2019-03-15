@@ -40,9 +40,11 @@ namespace DataAcquisitionAnalysis
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
             var sorted = options.Sorted == "Yes";
+            var byProduct = options.ByProduct == "Yes";
             Logger.Info("Loading of data from DB started.");
             MongoDbCall.LoadDataAndSave(options.DatabaseLocation, options.Database, options.Document,
-                                        options.Profinet, options.Folder, options.FilderName, sorted);
+                                        options.Profinet, options.Folder, options.FilderName, sorted,
+                                        byProduct);
             return 0;
         }
 

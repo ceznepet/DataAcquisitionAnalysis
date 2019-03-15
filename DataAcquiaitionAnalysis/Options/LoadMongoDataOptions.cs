@@ -29,5 +29,8 @@ namespace DataAcquisitionAnalysis.Options
 
         [Option('s', "sorted", HelpText = "Sorted output data. Yes or No", Default = "Yes")]
         public string Sorted { get; set; }
+
+        [Option('b', "byproduct", HelpText = "Sorted output data by product. Yes or No", Default = "Yes")]
+        public string ByProduct { get; set; }
     }
 }

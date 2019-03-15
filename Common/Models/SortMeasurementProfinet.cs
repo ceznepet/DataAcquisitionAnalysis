@@ -49,5 +49,29 @@ namespace Common.Models
         {
             Measurements.Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
         }
+
+        public void SortByProduct()
+        {
+            var count = 0;
+            var hit = false;
+            Dictionary.Add(count, new List<MeasuredVariables>());
+            foreach (var measurement in Measurements)
+            {
+                var programNumber = measurement.ProgramNumber;
+                if (programNumber % 22 == 0 && !hit)
+                {
+                    count++;
+                    Dictionary.Add(count, new List<MeasuredVariables>());
+                    hit = true;
+                }
+
+                if (programNumber == 1 && hit)
+                {
+                    hit = false;
+                }
+                Dictionary[count].Add(measurement);
+            }
+            SortTime();
+        }
     }
 }

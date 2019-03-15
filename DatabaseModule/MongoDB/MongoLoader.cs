@@ -21,11 +21,12 @@ namespace DatabaseModule.MongoDB
     public class MongoLoader
     {
         public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder,
-            string fileName, bool sorted)
+            string fileName, bool sorted, bool byProduct)
         {
             Profinet = int.Parse(profinet) == 1;
             Sorted = sorted;
             Folder = folder;
+            ByProduct = byProduct;
             SortedMeasurementProfinet = new SortMeasurementProfinet();
             SortedMeasurementEthernet = new SortMeasurementEthernet();
             MeasuredData = new List<double[]>();
@@ -42,6 +43,7 @@ namespace DatabaseModule.MongoDB
         private IMongoCollection<BsonDocument> Collection { get; }
         private bool Profinet { get; }
         private bool Sorted { get; }
+        private bool ByProduct { get; }
         private string Folder { get; }
         private string FileName { get; }
         private StringBuilder LocalStringBuilder { get; set; }
@@ -133,7 +135,13 @@ namespace DatabaseModule.MongoDB
 
         private void SaveProfinet()
         {
-            SortedMeasurementProfinet.SortList();
+            if (ByProduct)
+            {
+                SortedMeasurementProfinet.SortByProduct();
+            }else
+            {
+                SortedMeasurementProfinet.SortList();
+            }
             var sortedProfinet = SortedMeasurementProfinet.Dictionary;
 
             foreach (var key in sortedProfinet.Keys)
@@ -159,7 +167,12 @@ namespace DatabaseModule.MongoDB
             var rows = new List<double[]>();
             foreach (var measurement in measuredVariables)
             {
-                rows.Add(measurement.GetMeasuredValues().ToArray());
+                var time = measurement.SaveTime.TimeInSecond();
+                var prNumber = (double)measurement.ProgramNumber;
+                var data = measurement.GetMeasuredValues().ToList();
+                data.Insert(0, time);
+                data.Insert(1, prNumber);
+                rows.Add(data.ToArray());
                 ToCsvFile(measurement);
             }
 
