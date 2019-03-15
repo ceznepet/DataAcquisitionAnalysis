@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accord.Math;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -8,12 +9,12 @@ using System.Threading.Tasks;
 using csmatio.io;
 using csmatio.types;
 using Common.Models;
+using DatabaseModule.Extensions;
 using DatabaseModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using NLog;
-using NLog.Fluent;
 
 namespace DatabaseModule.MongoDB
 {
@@ -63,11 +64,12 @@ namespace DatabaseModule.MongoDB
                         BsonDocToList(document);
                     }
                 }
+
+                Logger.Info("Data are loaded from databese.");
+                Save();
+                File.WriteAllText(FileName + ".csv", LocalStringBuilder.ToString());
+                Logger.Info("All data are saved into files");
             }
-            Logger.Info("Data are loaded from databese.");
-            Save();
-            File.WriteAllText(FileName + ".csv", LocalStringBuilder.ToString());
-            Logger.Info("All data are saved into files");
         }
 
         private void BsonDocToList(BsonDocument document)
@@ -83,8 +85,10 @@ namespace DatabaseModule.MongoDB
                 }
                 else
                 {
-                    MeasuredData.Add(measurement.GetMeasuredValues().ToArray());
-                    ToCsvFile(measurement);
+                    var time = measurement.SaveTime.TimeInSecond();
+                    var data = measurement.GetMeasuredValues().ToList();
+                    data.Insert(0, time);
+                    MeasuredData.Add(data.ToArray());
                 }
             }
             else
@@ -105,13 +109,21 @@ namespace DatabaseModule.MongoDB
 
         private void Save()
         {
-            if (Profinet)
+            if(Sorted)
             {
-                SaveProfinet();
+                if (Profinet)
+                {
+                    SaveProfinet();
+                }
+                else
+                {
+                    SaveEthernet();
+                }
             }
             else
             {
-                SaveEthernet();
+
+                ToMatFile(MeasuredData, "0");
             }
         }
 
@@ -166,7 +178,7 @@ namespace DatabaseModule.MongoDB
 
         private void ToMatFile(List<double[]> measuredData, string name)
         {
-            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray());
+            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray().Transpose());
             var mList = new List<MLArray>();
             mList.Add(mMatrix);
             var fill = int.Parse(name) < 10 ? "000" : "00";

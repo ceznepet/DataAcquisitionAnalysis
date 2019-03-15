@@ -17,7 +17,7 @@ namespace DataAcquisitionAnalysis.Options
         [Option('c', "document", HelpText = "Name of document.", Required = true)]
         public string Document { get; set; }
 
-        [Option('p', "profinet", HelpText = "Is used profinet communication? 0 - no, 1 - yes.", Default = "0")]
+        [Option('p', "profinet", HelpText = "Is used profinet communication? 0 - no, 1 - yes.", Default = "1")]
         public string Profinet { get; set; }
 
         [Option('f', "folder", HelpText = "Folder for saving the data from DB.", Required = true)]

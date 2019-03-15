@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Common.Models
@@ -33,7 +34,15 @@ namespace Common.Models
                 }
                 Dictionary[programNumber].Add(measurement);
             }
+            SortTime();
         }
 
+        private void SortTime()
+        {
+            foreach (var key in Dictionary.Keys)
+            {
+                Dictionary[key].Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
+            }
+        }
     }
 }

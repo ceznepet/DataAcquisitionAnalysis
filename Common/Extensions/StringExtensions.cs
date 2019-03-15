@@ -45,5 +45,12 @@ namespace DatabaseModule.Extensions
         {
             return array.Select(element => double.Parse(element, CultureInfo.InvariantCulture)).Take(elements).ToArray();
         }
+
+        public static double TimeInSecond(this string time)
+        {
+            return DateTime.Parse(time).ToUniversalTime().Subtract(
+                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            ).TotalMilliseconds;
+        }
     }
 }

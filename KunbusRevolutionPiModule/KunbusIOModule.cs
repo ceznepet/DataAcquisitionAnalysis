@@ -30,12 +30,13 @@ namespace KunbusRevolutionPiModule
         private readonly uint ChangeDetectionStatus = 0;
 
         public KunbusIOModule(bool endian, string pathToConfiguration,
-            string databaseLocation, string database, string document)
+            string databaseLocation, string database, string document,
+            int period)
         {       
             MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
             Time = MeasuredVariables.Time;
             Saver = MongoDbCall.GetSaverToMongoDb(databaseLocation, database, document);
-            _config = new ProfinetIOConfig {Period = 4, BigEndian = endian};
+            _config = new ProfinetIOConfig {Period = period, BigEndian = endian};
             _changeCycle = MeasuredVariables.ProfinetProperty[1];
             try
             {
@@ -70,14 +71,19 @@ namespace KunbusRevolutionPiModule
         {
             while (true)
             {
-                //TODO: Otestovat jestli to ma vliv na sber dat...
-                //Thread.Sleep(_config.Period);
-                
+                Thread.Sleep(_config.Period);
+
                 if (!DeviceActive) continue;
-                if (DataChange(_changeCycle))
+
+                try
                 {
                     ReadVariablesFromInputs();
                 }
+                catch (OutOfMemoryException exception)
+                {
+                    Logger.Error("Out of memory!");
+                }
+                
             }
         }
 

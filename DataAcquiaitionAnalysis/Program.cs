@@ -51,7 +51,8 @@ namespace DataAcquisitionAnalysis
             Logger.Info("Kunbus started.");
             var endian = options.BigEndian == "1";
             var kunbus = new KunbusIOModule(endian, options.ConfigurationFile,
-                                          options.DatabaseLocation, options.Database, options.Document);
+                                          options.DatabaseLocation, options.Database, options.Document,
+                                          options.Period);
             return 0;
         }
 
