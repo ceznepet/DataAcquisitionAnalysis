@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
-using Accord.Math;
 using HiddenMarkovModel.Loaders;
-using Accord.Statistics.Analysis;
-using Accord.Statistics.Models.Regression.Linear;
 using DatabaseModule.Extensions;
 using HiddenMarkovModel.Models;
-using NLog;
 
 namespace HiddenMarkovModel
 {
@@ -43,15 +38,15 @@ namespace HiddenMarkovModel
                     ProgramNumbers.Add(programNumber);
                 }
 
-                Dictionary[programNumber].Add(lis.ToDoubleArray(12));
+                Dictionary[programNumber].Add(lis.ToDoubleArray(24));
             }
         }
 
         private void SortList()
         {
             var sortedDict = from entry in Dictionary orderby entry.Key ascending select entry;            
-            Teacher = new Learning(sortedDict);
-            Teacher.TeachModel(12);
-            }
+            Learning.StartTeaching(sortedDict, 24);
+
+        }
     }
 }

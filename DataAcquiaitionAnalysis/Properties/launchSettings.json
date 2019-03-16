@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "mongo -c \"Mes_20190315_p_5\" -f \"C:\\Data\\Measurement_20190315_2\"  "
+      "commandLineArgs": "markov -f \"C:\\Data\\Measurement\\20190315\\1\\measurement_profinet_2019-03-15-18-16-13.csv\"  "
     }
   }
 }

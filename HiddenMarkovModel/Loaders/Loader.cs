@@ -2,14 +2,16 @@
 using System.Data;
 using System.IO;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace HiddenMarkovModel.Loaders
 {
     public class Loader
     {
-
+        private static readonly Logger Logger = LogManager.GetLogger("Loader");
         public static DataTable LoadCSV(string strFilePath)
         {
+            Logger.Info("Start loading data...");
             using (var streamReader = new StreamReader(strFilePath))
             {
                 var headers = streamReader.ReadLine()?.Split(',');
@@ -34,7 +36,7 @@ namespace HiddenMarkovModel.Loaders
 
                     dataTable.Rows.Add(dataRow);
                 }
-
+                Logger.Info("Loading is succesfully done...");
                 return dataTable;
             }
         }
