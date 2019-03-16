@@ -38,14 +38,14 @@ namespace HiddenMarkovModel
                     ProgramNumbers.Add(programNumber);
                 }
 
-                Dictionary[programNumber].Add(lis.ToDoubleArray(24));
+                Dictionary[programNumber].Add(lis.ToDoubleArray(18));
             }
         }
 
         private void SortList()
         {
             var sortedDict = from entry in Dictionary orderby entry.Key ascending select entry;            
-            Learning.StartTeaching(sortedDict, 24);
+            Learning.StartTeaching(sortedDict, 18);
 
         }
     }

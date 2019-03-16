@@ -38,6 +38,7 @@ namespace HiddenMarkovModel.Models
             Generator.Seed = 0;
 
             var length = OrderedOperations.Count();
+            var states = dimension;
             var sequences = new double[length][][];
             var labels = new int[length];
             for (var i = 0; i < length; i++)
@@ -55,12 +56,12 @@ namespace HiddenMarkovModel.Models
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Ergodic(dimension),
+                    Topology = new Ergodic(states),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
-                    Tolerance = 1e-4,
-                    MaxIterations = 100,
+                    Tolerance = 1e-6,
+                    MaxIterations = 0,
 
                     FittingOptions = new NormalOptions()
                     {
@@ -70,7 +71,9 @@ namespace HiddenMarkovModel.Models
                     }
                 }
             };
-            //Learner.ParallelOptions.MaxDegreeOfParallelism = 1;
+
+            Learner.ParallelOptions.MaxDegreeOfParallelism = 10;
+
             Classifier = Learner.Learn(sequences, labels);
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);

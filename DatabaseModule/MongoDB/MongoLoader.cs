@@ -56,7 +56,7 @@ namespace DatabaseModule.MongoDB
         {
             using (var cursor = await Collection.FindAsync(new BsonDocument()))
             {
-                LocalStringBuilder = new StringBuilder();
+                //LocalStringBuilder = new StringBuilder();
                 while (cursor.MoveNext())
                 {
                     var batch = cursor.Current;
@@ -69,7 +69,7 @@ namespace DatabaseModule.MongoDB
 
                 Logger.Info("Data are loaded from databese.");
                 Save();
-                File.WriteAllText(FileName + ".csv", LocalStringBuilder.ToString());
+                //File.WriteAllText(FileName + ".csv", LocalStringBuilder.ToString());
                 Logger.Info("All data are saved into files");
             }
         }
@@ -211,7 +211,8 @@ namespace DatabaseModule.MongoDB
             var newLine = string.Join(", ",
                                       measuredData.FilePreparation().ToArray()
                                       .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            LocalStringBuilder.AppendLine(begin + ", " + newLine);
+            File.AppendAllText(FileName + ".csv", begin + ", " + newLine);
+            //LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
 
         private void ToCsvFile(MeasuredVariables measuredData)
@@ -222,7 +223,8 @@ namespace DatabaseModule.MongoDB
             var newLine = string.Join(", ",
                                       measuredData.GetMeasuredValues().ToArray()
                                       .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            LocalStringBuilder.AppendLine(begin + ", " + newLine);
+            File.AppendAllText(FileName + ".csv", begin + ", " +newLine);
+            //LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
     }
 }
