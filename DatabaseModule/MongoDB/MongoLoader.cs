@@ -1,7 +1,4 @@
-﻿using DatabaseModule.Models;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using Newtonsoft.Json;
+﻿using Accord.Math;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,28 +9,24 @@ using System.Threading.Tasks;
 using csmatio.io;
 using csmatio.types;
 using Common.Models;
+using DatabaseModule.Extensions;
+using DatabaseModule.Models;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Newtonsoft.Json;
 using NLog;
 
 namespace DatabaseModule.MongoDB
 {
     public class MongoLoader
     {
-        private IMongoDatabase Database { get; set; }
-        private IMongoCollection<BsonDocument> Collection { get; set; }
-        private bool Profinet { get; set; }
-        private bool Sorted { get; set; }
-        private string Folder { get; set; }
-        private string FileName { get; set; }
-        private StringBuilder LocalStringBuilder { get; set; }
-        private SortMeasurementProfinet SortedMeasurementProfinet { get; }
-        private SortMeasurementEthernet SortedMeasurementEthernet { get; }
-        private List<double[]> MeasuredData { get; set; }
-
-        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder, string fileName, bool sorted)
+        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder,
+            string fileName, bool sorted, bool byProduct)
         {
             Profinet = int.Parse(profinet) == 1;
             Sorted = sorted;
             Folder = folder;
+            ByProduct = byProduct;
             SortedMeasurementProfinet = new SortMeasurementProfinet();
             SortedMeasurementEthernet = new SortMeasurementEthernet();
             MeasuredData = new List<double[]>();
@@ -43,15 +36,28 @@ namespace DatabaseModule.MongoDB
             Collection = Database.GetCollection<BsonDocument>(document);
 
             var source = int.Parse(profinet) == 1 ? "_profinet_" : "_ethernet_";
-            FileName = Folder + "/" + fileName + source + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss-FFF");
+            FileName = Folder + "/" + fileName + source + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
         }
+
+        private IMongoDatabase Database { get; }
+        private IMongoCollection<BsonDocument> Collection { get; }
+        private bool Profinet { get; }
+        private bool Sorted { get; }
+        private bool ByProduct { get; }
+        private string Folder { get; }
+        private string FileName { get; }
+        private StringBuilder LocalStringBuilder { get; set; }
+        private SortMeasurementProfinet SortedMeasurementProfinet { get; }
+        private SortMeasurementEthernet SortedMeasurementEthernet { get; }
+        private List<double[]> MeasuredData { get; }
+        private static readonly Logger Logger = LogManager.GetLogger("File saving");
 
         public async Task ReadData()
         {
             using (var cursor = await Collection.FindAsync(new BsonDocument()))
             {
-                LocalStringBuilder = new StringBuilder();
-                while (await cursor.MoveNextAsync())
+                //LocalStringBuilder = new StringBuilder();
+                while (cursor.MoveNext())
                 {
                     var batch = cursor.Current;
 
@@ -60,10 +66,12 @@ namespace DatabaseModule.MongoDB
                         BsonDocToList(document);
                     }
                 }
-                //ToMatFile(measuredData);                
+
+                Logger.Info("Data are loaded from databese.");
+                Save();
+                //File.WriteAllText(FileName + ".csv", LocalStringBuilder.ToString());
+                Logger.Info("All data are saved into files");
             }
-            Save();
-            File.WriteAllTextAsync(FileName + ".csv", LocalStringBuilder.ToString()).Wait();
         }
 
         private void BsonDocToList(BsonDocument document)
@@ -72,19 +80,17 @@ namespace DatabaseModule.MongoDB
             if (Profinet)
             {
                 var measurement = JsonConvert.DeserializeObject<MeasuredVariables>(document.ToJson());
-                if (measurement.Variables.Count == 0)
+                if (measurement.Variables.Count == 0) return;
+                if (!Sorted)
                 {
-                    return;
+                    var time = measurement.SaveTime.TimeInSecond();
+                    var prNumber = (double)measurement.ProgramNumber;
+                    var data = measurement.GetMeasuredValues().ToList();
+                    data.Insert(0, time);
+                    data.Insert(1, prNumber);
+                    MeasuredData.Add(data.ToArray());                    
                 }
-                if (Sorted)
-                {
-                    SortedMeasurementProfinet.AddToList(measurement);
-                }
-                else
-                {
-                    MeasuredData.Add(measurement.GetMeasuredValues().ToArray());
-                    ToCsvFile(measurement);
-                }
+                SortedMeasurementProfinet.AddToList(measurement);
             }
             else
             {
@@ -104,19 +110,38 @@ namespace DatabaseModule.MongoDB
 
         private void Save()
         {
-            if (Profinet)
+            if(Sorted)
             {
-                SaveProfinet();
+                if (Profinet)
+                {
+                    SaveProfinet();
+                }
+                else
+                {
+                    SaveEthernet();
+                }
             }
             else
             {
-                SaveEthernet();
+                SortedMeasurementProfinet.SortMeasurement();
+                foreach (var mesurement in SortedMeasurementProfinet.Measurements)
+                {
+                    ToCsvFile(mesurement);
+                }
+                MeasuredData.Sort((x, y) => x[0].CompareTo(y[0]));
+                ToMatFile(MeasuredData, "0");
             }
         }
 
         private void SaveProfinet()
         {
-            SortedMeasurementProfinet.SortList();
+            if (ByProduct)
+            {
+                SortedMeasurementProfinet.SortByProduct();
+            }else
+            {
+                SortedMeasurementProfinet.SortList();
+            }
             var sortedProfinet = SortedMeasurementProfinet.Dictionary;
 
             foreach (var key in sortedProfinet.Keys)
@@ -142,9 +167,15 @@ namespace DatabaseModule.MongoDB
             var rows = new List<double[]>();
             foreach (var measurement in measuredVariables)
             {
-                rows.Add(measurement.GetMeasuredValues().ToArray());
+                var time = measurement.SaveTime.TimeInSecond();
+                var prNumber = (double)measurement.ProgramNumber;
+                var data = measurement.GetMeasuredValues().ToList();
+                data.Insert(0, time);
+                data.Insert(1, prNumber);
+                rows.Add(data.ToArray());
                 ToCsvFile(measurement);
             }
+
             ToMatFile(rows, programNumber.ToString());
         }
 
@@ -153,21 +184,23 @@ namespace DatabaseModule.MongoDB
             var rows = new List<double[]>();
             foreach (var measurement in measuredVariables)
             {
-                
                 var row = measurement.FilePreparation().ToArray();
                 measurement.Called = true;
                 rows.Add(row);
                 ToCsvFile(measurement);
             }
+
             ToMatFile(rows, programNumber.ToString());
         }
 
         private void ToMatFile(List<double[]> measuredData, string name)
         {
-            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray());
+            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray().Transpose());
             var mList = new List<MLArray>();
             mList.Add(mMatrix);
-            var mFileWrite = new MatFileWriter(FileName +"_" + name + ".mat", mList, false);
+            var fill = int.Parse(name) < 10 ? "000" : "00";
+
+            var mFileWrite = new MatFileWriter(FileName + "_op_" + fill + name + ".mat", mList, false);
         }
 
         private void ToCsvFile(TcpRobot measuredData)
@@ -175,17 +208,23 @@ namespace DatabaseModule.MongoDB
             var dateTime = measuredData.Time.GetDate().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var prNumber = ((int)measuredData.ProgramNumber.Value).ToString();
             var begin = string.Join(", ", dateTime, prNumber);
-            var newLine = string.Join(", ", measuredData.FilePreparation().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());            
-            LocalStringBuilder.AppendLine(begin + ", " + newLine);
+            var newLine = string.Join(", ",
+                                      measuredData.FilePreparation().ToArray()
+                                      .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
+            File.AppendAllText(FileName + ".csv", begin + ", " + newLine);
+            //LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
 
         private void ToCsvFile(MeasuredVariables measuredData)
         {
             var dateTime = measuredData.SaveTime;
-            var prNumber = (measuredData.ProgramNumber).ToString();
+            var prNumber = measuredData.ProgramNumber.ToString();
             var begin = string.Join(", ", dateTime, prNumber);
-            var newLine = string.Join(", ", measuredData.GetMeasuredValues().ToArray().Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            LocalStringBuilder.AppendLine(begin + ", " + newLine);
+            var newLine = string.Join(", ",
+                                      measuredData.GetMeasuredValues().ToArray()
+                                      .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
+            File.AppendAllText(FileName + ".csv", begin + ", " +newLine);
+            //LocalStringBuilder.AppendLine(begin + ", " + newLine);
         }
     }
 }

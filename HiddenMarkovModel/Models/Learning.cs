@@ -17,48 +17,46 @@ namespace HiddenMarkovModel.Models
 {
     public class Learning
     {
-        private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Teacher { get; set; }
+        private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
         private IOrderedEnumerable<KeyValuePair<int, List<double[]>>> OrderedOperations { get; set; }
-        private static readonly Logger Logger = LogManager.GetLogger("Teaching");
+        private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
         public Learning(IOrderedEnumerable<KeyValuePair<int, List<double[]>>> orderedOperations)
         {
             OrderedOperations = orderedOperations;
         }
 
+        public static void StartTeaching(IOrderedEnumerable<KeyValuePair<int, List<double[]>>> orderedOperations, int dimension)
+        {
+            new Learning(orderedOperations).TeachModel(dimension);
+        }
+
         public void TeachModel(int dimension)
         {
             Generator.Seed = 0;
-            //malo dat...
-            var length = 10; //OrderedOperations.Count();
+
+            var length = OrderedOperations.Count();
+            var states = dimension;
             var sequences = new double[length][][];
             var labels = new int[length];
             for (var i = 0; i < length; i++)
             {
-                sequences[i] = OrderedOperations.ElementAt(i).Value.ToArray();
-                if (i % 2 == 0)
-                {
-                    labels[i] = 0;
-                }
-                else
-                {
-                    labels[i] = 1;
-                }
-                //labels[i] = i;
+                sequences[i] = OrderedOperations.ElementAt(i).Value.Take(5000).ToArray();
+                labels[i] = i;
             }
 
             //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
-
-            Teacher = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
+            Logger.Info("Preparation of model...");
+            Learner = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Ergodic(2),
+                    Topology = new Ergodic(states),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
@@ -73,8 +71,6 @@ namespace HiddenMarkovModel.Models
                     }
                 }
             };
-            //Teacher.ParallelOptions.MaxDegreeOfParallelism = 1;
-            Classifier = Teacher.Learn(sequences, labels);
 
             Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
@@ -85,26 +81,15 @@ namespace HiddenMarkovModel.Models
             var m1 = new GeneralConfusionMatrix(predicted: trainPredicted, expected: labels);
             var trainAcc = m1.Accuracy;
 
-            Console.WriteLine("Check of performance: {0}", trainAcc);
+            Logger.Info("Check of performance: {0}", trainAcc);
 
             var testData = new double[length][][];
             var testOutputs = new int[length];
             var k = 0;
-            for (var i = 10; i < 10 + length; i++)
+            for (var i = 0; i < length; i++)
             {
-                testData[k] = OrderedOperations.ElementAt(i).Value.ToArray();
-                Logger.Debug(i);
-                if (i % 2 == 0)
-                {
-                    testOutputs[k] = 0;
-                }
-                else
-                {
-                    testOutputs[k] = 1;
-                }
-
-                k++;
-                //testOutputs[i] = i;
+                testData[i] = OrderedOperations.ElementAt(i).Value.Skip(5000).Take(100).ToArray();
+                testOutputs[i] = i;
             }
 
             //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
@@ -113,7 +98,7 @@ namespace HiddenMarkovModel.Models
 
             var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
             var trainAccTest = m2.Accuracy;
-            Console.WriteLine("Check of performance: {0}", trainAccTest);
+            Logger.Info("Check of performance: {0}", trainAccTest);
 
         }
 

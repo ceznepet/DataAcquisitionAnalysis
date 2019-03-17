@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Common.Models
@@ -33,7 +34,44 @@ namespace Common.Models
                 }
                 Dictionary[programNumber].Add(measurement);
             }
+            SortTime();
         }
 
+        private void SortTime()
+        {
+            foreach (var key in Dictionary.Keys)
+            {
+                Dictionary[key].Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
+            }
+        }
+
+        public void SortMeasurement()
+        {
+            Measurements.Sort((x, y) => String.Compare(x.SaveTime, y.SaveTime, StringComparison.Ordinal));
+        }
+
+        public void SortByProduct()
+        {
+            var count = 0;
+            var hit = false;
+            Dictionary.Add(count, new List<MeasuredVariables>());
+            foreach (var measurement in Measurements)
+            {
+                var programNumber = measurement.ProgramNumber;
+                if (programNumber % 22 == 0 && !hit)
+                {
+                    count++;
+                    Dictionary.Add(count, new List<MeasuredVariables>());
+                    hit = true;
+                }
+
+                if (programNumber == 1 && hit)
+                {
+                    hit = false;
+                }
+                Dictionary[count].Add(measurement);
+            }
+            SortTime();
+        }
     }
 }

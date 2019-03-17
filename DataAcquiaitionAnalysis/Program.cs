@@ -40,9 +40,11 @@ namespace DataAcquisitionAnalysis
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
             var sorted = options.Sorted == "Yes";
+            var byProduct = options.ByProduct == "Yes";
             Logger.Info("Loading of data from DB started.");
             MongoDbCall.LoadDataAndSave(options.DatabaseLocation, options.Database, options.Document,
-                                        options.Profinet, options.Folder, options.FilderName, sorted);
+                                        options.Profinet, options.Folder, options.FilderName, sorted,
+                                        byProduct);
             return 0;
         }
 
@@ -51,13 +53,14 @@ namespace DataAcquisitionAnalysis
             Logger.Info("Kunbus started.");
             var endian = options.BigEndian == "1";
             var kunbus = new KunbusIOModule(endian, options.ConfigurationFile,
-                                          options.DatabaseLocation, options.Database, options.Document);
+                                          options.DatabaseLocation, options.Database, options.Document,
+                                          options.Period);
             return 0;
         }
 
         public static int MarkovModel(MarkovOptions options)
         {
-            Logger.Info("Start fo learning the markov model.");
+            Logger.Info("Start of learning the markov model.");
             var model = new MarkovModel(options.FilePath);
             return 0;
         }

@@ -19,5 +19,8 @@ namespace DataAcquisitionAnalysis.Options
 
         [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://10.35.91.210:27017")]
         public string DatabaseLocation { get; set; }
+
+        [Option('p', "period", HelpText = "Period of reading the I/O", Default = 1)]
+        public int Period { get; set; }
     }
 }
