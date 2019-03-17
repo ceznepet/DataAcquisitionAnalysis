@@ -76,6 +76,10 @@ namespace HiddenMarkovModel.Models
             //Teacher.ParallelOptions.MaxDegreeOfParallelism = 1;
             Classifier = Teacher.Learn(sequences, labels);
 
+            Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
+
+            Classifier = Learner.Learn(sequences, labels);
+            Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
 
             var m1 = new GeneralConfusionMatrix(predicted: trainPredicted, expected: labels);

@@ -39,7 +39,10 @@ namespace HiddenMarkovModel.Loaders
             }
         }
 
+        public static void LoadPrograms(string path)
+        {
 
+        }
 
     }
 }
