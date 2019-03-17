@@ -61,7 +61,7 @@ namespace DataAcquisitionAnalysis
         public static int MarkovModel(MarkovOptions options)
         {
             Logger.Info("Start of learning the markov model.");
-            var model = new MarkovModel(options.FilePath);
+            var model = new MarkovModel(options.TrainFolderPath, options.TestFolderPath);
             return 0;
         }
     }
