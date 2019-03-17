@@ -68,14 +68,14 @@ namespace HiddenMarkovModel.Models
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
-                    Tolerance = 1e-6,
-                    MaxIterations = 1000,
+                    Tolerance = 1e-10,
+                    MaxIterations = 0,
 
                     FittingOptions = new NormalOptions()
                     {
                         Diagonal = true,
-                       // Robust = true,
-                        Regularization = 1e-6
+                        //Robust = true,
+                        Regularization = 1e-10
                     }
                 }
             };
@@ -93,7 +93,6 @@ namespace HiddenMarkovModel.Models
 
             var testData = new double[length][][];
             var testOutputs = new int[length];
-            var k = 0;
             for (var i = 1; i <= length; i++)
             {
                 testData[i - 1] = TestData[i].ToArray();
