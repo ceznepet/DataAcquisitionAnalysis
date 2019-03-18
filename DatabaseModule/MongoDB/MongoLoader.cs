@@ -6,8 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using csmatio.io;
-using csmatio.types;
+//using csmatio.io;
+//using csmatio.types;
 using Common.Models;
 using DatabaseModule.Extensions;
 using DatabaseModule.Models;
@@ -195,12 +195,12 @@ namespace DatabaseModule.MongoDB
 
         private void ToMatFile(List<double[]> measuredData, string name)
         {
-            var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray().Transpose());
-            var mList = new List<MLArray>();
-            mList.Add(mMatrix);
-            var fill = int.Parse(name) < 10 ? "000" : "00";
+            //var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray().Transpose());
+            //var mList = new List<MLArray>();
+            //mList.Add(mMatrix);
+            //var fill = int.Parse(name) < 10 ? "000" : "00";
 
-            var mFileWrite = new MatFileWriter(FileName + "_op_" + fill + name + ".mat", mList, false);
+            //var mFileWrite = new MatFileWriter(FileName + "_op_" + fill + name + ".mat", mList, false);
         }
 
         private void ToCsvFile(TcpRobot measuredData)

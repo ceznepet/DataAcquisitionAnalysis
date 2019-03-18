@@ -8,7 +8,7 @@ using KunbusRevolutionPiModule.Robot;
 using Newtonsoft.Json;
 using TcpCommunication.TcpClientDAA;
 using Common.Logging;
-using HiddenMarkovModel;
+using HMModel;
 using NLog;
 
 namespace DataAcquisitionAnalysis

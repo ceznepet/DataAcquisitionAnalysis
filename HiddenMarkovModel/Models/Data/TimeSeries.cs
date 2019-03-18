@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HiddenMarkovModel.Models.Data
+namespace HMModel.Models.Data
 {
     public class TimeSeries
     {

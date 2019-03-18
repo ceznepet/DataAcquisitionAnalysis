@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data;
-using HiddenMarkovModel.Loaders;
+using HMModel.Loaders;
 using DatabaseModule.Extensions;
-using HiddenMarkovModel.Models;
+using HMModel.Models;
 using NLog;
 
-namespace HiddenMarkovModel
+namespace HMModel
 {
     public class MarkovModel
     {
@@ -14,12 +14,12 @@ namespace HiddenMarkovModel
 
         public MarkovModel(string trainFolder, string testFolder)
         {
-
+            var take = 6;
             Logger.Info("Start loading data...");
-            var train = Loader.LoadPrograms(trainFolder);
-            var test = Loader.LoadPrograms(testFolder);
+            var train = Loader.LoadPrograms(trainFolder, take);
+            var test = Loader.LoadPrograms(testFolder, take);
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(train, test, 6);
+            Learning.StartTeaching(train, test, take);
         }
 
     }

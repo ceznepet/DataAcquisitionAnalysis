@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Accord.Statistics.Analysis;
 using Accord.Statistics.Models.Regression.Linear;
-using HiddenMarkovModel.Loaders;
+using HMModel.Loaders;
 
-namespace HiddenMarkovModel.TableProcessing
+namespace HMModel.TableProcessing
 {
     public class TestbedProcessing
     {

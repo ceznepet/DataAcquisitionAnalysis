@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Accord.Math;
@@ -6,14 +5,12 @@ using Accord.Math.Random;
 using Accord.Statistics.Analysis;
 using Accord.Statistics.Distributions.Fitting;
 using Accord.Statistics.Distributions.Multivariate;
-using Accord.Statistics.Kernels;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
-using Common.Logging;
 using NLog;
 
-namespace HiddenMarkovModel.Models
+namespace HMModel.Models
 {
     public class Learning
     {
@@ -52,10 +49,10 @@ namespace HiddenMarkovModel.Models
             labels[length] = 0;
             sequences[length] = new double[][]
             {
-                new double[]{0, 0, 0, 0, 0, 0}
+                Enumerable.Repeat(0.0, dimension).ToArray()
             };
 
-            //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
+            sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
@@ -68,19 +65,19 @@ namespace HiddenMarkovModel.Models
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
-                    Tolerance = 1e-10,
+                    Tolerance = 1e-6,
                     MaxIterations = 0,
 
                     FittingOptions = new NormalOptions()
                     {
                         Diagonal = true,
                         //Robust = true,
-                        Regularization = 1e-10
+                        Regularization = 1e-6
                     }
                 }
             };
 
-            Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
+            Learner.ParallelOptions.MaxDegreeOfParallelism = 2;
 
             Classifier = Learner.Learn(sequences, labels);
             Logger.Debug("End of Learning phase...");
@@ -99,7 +96,7 @@ namespace HiddenMarkovModel.Models
                 testOutputs[i - 1] = i;
             }
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var testPredict = Classifier.Decide(testData);
 

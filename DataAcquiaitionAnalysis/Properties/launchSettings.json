@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "markov -f \"C:\\Data\\DataSet_20190315\\TrainData\" -t \"C:\\Data\\DataSet_20190315\\TestData\"  "
+      "commandLineArgs": "markov -f \"C:\\Users\\petrc\\Downloads\\DataSet_20190315-20190318T113019Z-001\\DataSet_20190315\\TrainData\" -t \"C:\\Users\\petrc\\Downloads\\DataSet_20190315-20190318T113019Z-001\\DataSet_20190315\\TestData\"  "
     }
   }
 }

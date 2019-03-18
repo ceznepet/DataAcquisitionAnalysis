@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Accord.IO;
 using Accord.Math;
-using HiddenMarkovModel.Models.Data;
+using HMModel.Models.Data;
 using NLog;
 
-namespace HiddenMarkovModel.Loaders
+namespace HMModel.Loaders
 {
     public class Loader
     {
@@ -45,7 +45,7 @@ namespace HiddenMarkovModel.Loaders
             }
         }
 
-        public static Dictionary<int, List<double[]>> LoadPrograms(string path)
+        public static Dictionary<int, List<double[]>> LoadPrograms(string path, int take)
         {
             var directories = new List<DirectoryInfo>();
             var files = new List<FileInfo>();
@@ -71,10 +71,10 @@ namespace HiddenMarkovModel.Loaders
             {
                 throw new Exception("There are no *.mat files in that directory");
             }
-            return ToDictionary(files.Select(file => LoadDataFromMat(file.FullName)).SelectMany(lists => lists));
+            return ToDictionary(files.Select(file => LoadDataFromMat(file.FullName, take)).SelectMany(lists => lists), take);
         }
 
-        private static List<TimeSeries> LoadDataFromMat(string fileName)
+        private static List<TimeSeries> LoadDataFromMat(string fileName, int take)
         {
             var matReader = new MatReader(fileName);
             var names = matReader.FieldNames;
@@ -82,7 +82,7 @@ namespace HiddenMarkovModel.Loaders
             return data.Select(row => new TimeSeries(row, Path.GetFileName(Path.GetDirectoryName(fileName)))).ToList();
         }
 
-        private static Dictionary<int, List<double[]>> ToDictionary(IEnumerable<TimeSeries> series)
+        private static Dictionary<int, List<double[]>> ToDictionary(IEnumerable<TimeSeries> series, int take)
         {
             var programs = new HashSet<string>();
             var dictionary = new Dictionary<int, List<double[]>>();
@@ -97,7 +97,7 @@ namespace HiddenMarkovModel.Loaders
                     programs.Add(name);
                 }
 
-                dictionary[opCounter].Add(serie.Data);
+                dictionary[opCounter].Add(serie.Data.Take(take).ToArray());
             }
 
             return dictionary;
