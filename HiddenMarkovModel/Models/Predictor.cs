@@ -4,6 +4,7 @@ using Accord.Math;
 using System.Linq;
 using Accord.Statistics.Distributions.Univariate;
 using System.Collections.Generic;
+using NLog;
 
 namespace HMModel.Models
 {
@@ -11,6 +12,7 @@ namespace HMModel.Models
     {
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Continues { get; set; }
         private HiddenMarkovModel<GeneralDiscreteDistribution, double> Discrete { get; set; }
+        private static readonly Logger Logger = LogManager.GetLogger("Classification");
 
         public Predictor(HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> continues)
         {
@@ -54,6 +56,7 @@ namespace HMModel.Models
             var predict = Continues.Probabilities(emission.ToJagged());
 
             var state = Discrete.Decide(predict);
+            Logger.Info("Operation is: {}.", state);
         }
     }
 }
