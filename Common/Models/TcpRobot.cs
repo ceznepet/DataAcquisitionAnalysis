@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DatabaseModule.Models
+namespace Common.Models
 {
     public class TcpRobot
     {

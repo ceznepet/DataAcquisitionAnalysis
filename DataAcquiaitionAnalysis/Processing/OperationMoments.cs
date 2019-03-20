@@ -1,30 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DataAcquisitionAnalysis.Processing
 {
     public class OperationMoments
     {
-        public  List<StatisticalMoments> StatisticalMomentses { get; set; }
+        public List<StatisticalMoments> StatisticalMoments { get; set; }
+        public int OperationNumber { get; set; }
 
-        public StatisticalMoments VelocityA1 { get; set; }
-        public StatisticalMoments VelocityA2 { get; set; }
-        public StatisticalMoments VelocityA3 { get; set; }
-        public StatisticalMoments VelocityA4 { get; set; }
-        public StatisticalMoments VelocityA5 { get; set; }
-        public StatisticalMoments VelocityA6 { get; set; }
-        public StatisticalMoments CurrentA1 { get; set; }
-        public StatisticalMoments CurrentA2 { get; set; }
-        public StatisticalMoments CurrentA3 { get; set; }
-        public StatisticalMoments CurrentA4 { get; set; }
-        public StatisticalMoments CurrentA5 { get; set; }
-        public StatisticalMoments CurrentA6 { get; set; }
-
-
-        public OperationMoments()
+        public OperationMoments(int operationNumber, int size)
         {
-            StatisticalMomentses = new List<StatisticalMoments>();
+            OperationNumber = operationNumber;
+
+            StatisticalMoments = new List<StatisticalMoments>(size);
+            for (var i = 0; i < size; i++)
+            {
+                StatisticalMoments.Add(new StatisticalMoments());
+            }
+        }
+
+        public void AddData(double[] values)
+        {
+            var i = 2;
+            foreach (var variable in StatisticalMoments)
+            {
+                variable.Values.Add(values[i]);
+                i++;
+            }
+        }
+
+        public void ComputeMoments()
+        {
+            foreach (var variable in StatisticalMoments)
+            {
+                variable.ComputeMoments();
+            }
         }
 
     }

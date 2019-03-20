@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Accord;
+using Accord.Math;
+using Accord.Statistics;
 
 namespace DataAcquisitionAnalysis.Processing
 {
     public class StatisticalMoments
     {
-        private string OperationName { get; set; }
-        public List<double> Moments { get; set; }
+        public List<double> Values { get; set; }
+        public double FirstMoment { get; set; }
+        public double SecondMoment { get; set; }
+        public double ThirdMoment { get; set; }
 
-        public StatisticalMoments(string operationName)
+        public StatisticalMoments()
         {
-            OperationName = operationName;
-            Moments = new List<double>();
+            Values = new List<double>();
+        }
+
+        public void ComputeMoments()
+        {
+            FirstMoment = Values.ToArray().Mean();
+            SecondMoment = Values.ToArray().Variance();
+            ThirdMoment = Values.ToArray().Skewness();
         }
     }
 }

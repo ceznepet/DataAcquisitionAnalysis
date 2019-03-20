@@ -23,20 +23,27 @@ namespace DataAcquisitionAnalysis.Processing
             Folder = folder;
             var data = MatLoaders.LoadPrograms(folder, (int)ParsingLength.TakeTwelve,
                                           (int)ParsingLength.WithOperation, true);
-            ComputeMoments(data);
+            ComputeMoments(data, ParsingLength.TakeTwelve);
         }
 
-        private void ComputeMoments(Dictionary<int, List<double[]>> data)
+        private void ComputeMoments(Dictionary<int, List<double[]>> data, ParsingLength size)
         {
+            var momemts = new List<OperationMoments>();
             foreach (var product in data)
             {
-                var operation = (int)product.Value[0][2];
+                var programNumber = (int)product.Value[0][1];
+                var currentOperation = new OperationMoments(programNumber, (int)size);
                 foreach (var value in product.Value)
                 {
-                    if (operation != (int)value[2])
+                    if (programNumber != (int)value[1])
                     {
-
+                        currentOperation.ComputeMoments();
+                        momemts.Add(currentOperation);
+                        programNumber = (int) value[1];
+                        currentOperation = new OperationMoments(programNumber, (int) size);
                     }
+                    currentOperation.AddData(value);
+
                 }
             }
         }
