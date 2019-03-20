@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Common.Loaders;
+using Common.Savers;
 
 namespace DataAcquisitionAnalysis.Processing
 {
@@ -42,8 +43,8 @@ namespace DataAcquisitionAnalysis.Processing
                     {
                         currentOperation.ComputeMoments();
                         Moments.Add(currentOperation);
-                        programNumber = (int) value[1];
-                        currentOperation = new OperationMoments(programNumber, (int) size);
+                        programNumber = (int)value[1];
+                        currentOperation = new OperationMoments(programNumber, (int)size);
                     }
                     currentOperation.AddData(value);
 
@@ -56,6 +57,7 @@ namespace DataAcquisitionAnalysis.Processing
 
         private void PrintMoments()
         {
+            CsvSavers.ToCsvFile("timestamp,opnum,vel_A1_m1,vel_A1_m2,vel_A1_m3,vel_A2_m1,vel_A2_m2,vel_A2_m3,vel_A3_m1,vel_A3_m2,vel_A3_m3,vel_A4_m1,vel_A4_m2,vel_A4_m3,vel_A5_m1,vel_A5_m2,vel_A5_m3,vel_A6_m1,vel_A6_m2,vel_A6_m3,cur_A1_m1,cur_A1_m2,cur_A1_m3,cur_A2_m1,cur_A2_m2,cur_A2_m3,cur_A3_m1,cur_A3_m2,cur_A3_m3,cur_A4_m1,cur_A4_m2,cur_A4_m3,cur_A5_m1,cur_A5_m2,cur_A5_m3,cur_A6_m1,cur_A6_m2,cur_A6_m3", SaveFile);
             foreach (var row in Moments)
             {
                 row.PrintMoments(SaveFile);

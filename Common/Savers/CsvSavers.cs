@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Common.Models;
@@ -32,10 +33,16 @@ namespace Common.Savers
         public static void ToCsvFile(double[] measuredData, int operationNumber, string fileName)
         {
             var prNumber = operationNumber.ToString();
+            var time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             var newLine = string.Join(", ", measuredData
                           .Select(element => element.ToString(CultureInfo.InvariantCulture))
                           .ToArray());
-            File.AppendAllText(fileName + ".csv", prNumber + ", " + newLine + "\n");
+            File.AppendAllText(fileName + ".csv", time + ", " + prNumber + ", " + newLine + "\n");
+        }
+
+        public static void ToCsvFile(string measuredData, string fileName)
+        {
+            File.AppendAllText(fileName + ".csv",  measuredData + "\n");
         }
     }
 }
