@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KunbusRevolutionPiModule", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{53F533B6-AC10-49E2-8763-E4484A12B664}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiddenMarkovModel", "HiddenMarkovModel\HiddenMarkovModel.csproj", "{DB7277FD-9D6A-4623-A5B4-7228442CB0FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HMModel", "HiddenMarkovModel\HMModel.csproj", "{DB7277FD-9D6A-4623-A5B4-7228442CB0FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

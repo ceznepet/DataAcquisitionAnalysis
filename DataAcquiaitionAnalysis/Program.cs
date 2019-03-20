@@ -8,6 +8,7 @@ using KunbusRevolutionPiModule.Robot;
 using Newtonsoft.Json;
 using TcpCommunication.TcpClientDAA;
 using Common.Logging;
+using DataAcquisitionAnalysis.Processing;
 using HMModel;
 using NLog;
 
@@ -20,11 +21,12 @@ namespace DataAcquisitionAnalysis
         {
             LoggerSetUp.SetUpLogger();
             Parser.Default
-                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions>(args)
+                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions, DataProcessingOptions>(args)
                 .MapResult((TcpSocketSaveOptions options) => PacketSaver(options),
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
                     (KunbusOptions options) => KunbusModule(options),
                     (MarkovOptions options) => MarkovModel(options),
+                    (DataProcessingOptions options) => DataProcessing(options),
                     errs => 1);
         }
 
@@ -62,6 +64,13 @@ namespace DataAcquisitionAnalysis
         {
             Logger.Info("Start of learning the markov model.");
             var model = new MarkovModel(options.TrainFolderPath, options.TestFolderPath);
+            return 0;
+        }
+
+        public static int DataProcessing(DataProcessingOptions options)
+        {
+            Logger.Info("Start of learning the markov model.");
+            var processing = new DataProcessing(options.Folder);
             return 0;
         }
     }

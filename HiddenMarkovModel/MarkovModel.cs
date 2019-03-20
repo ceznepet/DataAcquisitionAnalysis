@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Data;
-using HMModel.Loaders;
-using DatabaseModule.Extensions;
+﻿using Common.Loaders;
 using HMModel.Models;
 using NLog;
 
@@ -14,10 +10,12 @@ namespace HMModel
 
         public MarkovModel(string trainFolder, string testFolder)
         {
-            var take = 6;
+            const int take = 6;
+            const int skip = 0;
+            const bool product = false;
             Logger.Info("Start loading data...");
-            var train = Loader.LoadPrograms(trainFolder, take);
-            var test = Loader.LoadPrograms(testFolder, take);
+            var train = MatLoaders.LoadPrograms(trainFolder, take, skip, product);
+            var test = MatLoaders.LoadPrograms(testFolder, take, skip, product);
             Logger.Info("Loading is succesfully done...");
             Learning.StartTeaching(train, test, take);
         }

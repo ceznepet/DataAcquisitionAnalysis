@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace HMModel.Models.Data
+namespace Common.Models
 {
     public class TimeSeries
     {
