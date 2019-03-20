@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Common.Savers;
 
 namespace DataAcquisitionAnalysis.Processing
 {
@@ -34,6 +36,18 @@ namespace DataAcquisitionAnalysis.Processing
             {
                 variable.ComputeMoments();
             }
+        }
+
+        public void PrintMoments(string fileName)
+        {
+            var printArray = new List<double>(StatisticalMoments.Count * 3);
+            foreach (var variable in StatisticalMoments)
+            {
+                printArray.Add(variable.FirstMoment);
+                printArray.Add(variable.SecondMoment);
+                printArray.Add(variable.ThirdMoment);
+            }
+            CsvSavers.ToCsvFile(printArray.ToArray(), OperationNumber, fileName);           
         }
 
     }

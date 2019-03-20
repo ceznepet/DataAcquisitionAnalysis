@@ -15,20 +15,23 @@ namespace DataAcquisitionAnalysis.Processing
     public class DataProcessing
     {
 
-        private string Folder { get; set; }
+        private string Folder { get; }
+        private string SaveFile { get; }
+        private List<OperationMoments> Moments { get; }
 
-
-        public DataProcessing(string folder)
+        public DataProcessing(string folder, string saveFile)
         {
             Folder = folder;
-            var data = MatLoaders.LoadPrograms(folder, (int)ParsingLength.TakeTwelve,
+            SaveFile = saveFile + @"\moments";
+            Moments = new List<OperationMoments>();
+            var data = MatLoaders.LoadPrograms(Folder, (int)ParsingLength.TakeTwelve,
                                           (int)ParsingLength.WithOperation, true);
             ComputeMoments(data, ParsingLength.TakeTwelve);
+            PrintMoments();
         }
 
         private void ComputeMoments(Dictionary<int, List<double[]>> data, ParsingLength size)
         {
-            var momemts = new List<OperationMoments>();
             foreach (var product in data)
             {
                 var programNumber = (int)product.Value[0][1];
@@ -38,13 +41,24 @@ namespace DataAcquisitionAnalysis.Processing
                     if (programNumber != (int)value[1])
                     {
                         currentOperation.ComputeMoments();
-                        momemts.Add(currentOperation);
+                        Moments.Add(currentOperation);
                         programNumber = (int) value[1];
                         currentOperation = new OperationMoments(programNumber, (int) size);
                     }
                     currentOperation.AddData(value);
 
                 }
+                currentOperation.ComputeMoments();
+                Moments.Add(currentOperation);
+            }
+        }
+
+
+        private void PrintMoments()
+        {
+            foreach (var row in Moments)
+            {
+                row.PrintMoments(SaveFile);
             }
         }
 

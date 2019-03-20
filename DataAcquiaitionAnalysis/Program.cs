@@ -70,7 +70,7 @@ namespace DataAcquisitionAnalysis
         public static int DataProcessing(DataProcessingOptions options)
         {
             Logger.Info("Start of learning the markov model.");
-            var processing = new DataProcessing(options.Folder);
+            var processing = new DataProcessing(options.Folder, options.SaveFile);
             return 0;
         }
     }

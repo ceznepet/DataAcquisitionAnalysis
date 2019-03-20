@@ -12,7 +12,7 @@ namespace Common.Savers
             var mMatrix = new MLDouble("Operation_" + name, measuredData.ToArray().Transpose());
             var mList = new List<MLArray>();
             mList.Add(mMatrix);
-            var fill = int.Parse(name) < 10 ? "000" : "00";
+            var fill = int.Parse(name) < 10 ? "000" : int.Parse(name) < 100 ? "00" : "0";
 
             var mFileWrite = new MatFileWriter(fileName + "_op_" + fill + name + ".mat", mList, false);
         }

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Common.Models;
-using DatabaseModule.Models;
 
 namespace Common.Savers
 {
@@ -14,7 +10,7 @@ namespace Common.Savers
         public static void ToCsvFile(TcpRobot measuredData, string fileName)
         {
             var dateTime = measuredData.Time.GetDate().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
-            var prNumber = ((int)measuredData.ProgramNumber.Value).ToString();
+            var prNumber = ((int) measuredData.ProgramNumber.Value).ToString();
             var begin = string.Join(", ", dateTime, prNumber);
             var newLine = string.Join(", ",
                 measuredData.FilePreparation().ToArray()
@@ -31,6 +27,15 @@ namespace Common.Savers
                 measuredData.GetMeasuredValues().ToArray()
                     .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
             File.AppendAllText(fileName + ".csv", begin + ", " + newLine);
+        }
+
+        public static void ToCsvFile(double[] measuredData, int operationNumber, string fileName)
+        {
+            var prNumber = operationNumber.ToString();
+            var newLine = string.Join(", ", measuredData
+                          .Select(element => element.ToString(CultureInfo.InvariantCulture))
+                          .ToArray());
+            File.AppendAllText(fileName + ".csv", prNumber + ", " + newLine + "\n");
         }
     }
 }

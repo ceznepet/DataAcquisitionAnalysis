@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "data -f \"C:\\Data\\Measurement\\20190315\\1\\by_product\""
+      "commandLineArgs": "data -f \"C:\\Data\\Measurement\\20190316\\1\\by_product\" -s \"C:\\Data\\Measurement\\20190316\\1\""
     }
   }
 }
