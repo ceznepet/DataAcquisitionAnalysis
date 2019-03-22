@@ -13,6 +13,8 @@ using Accord.Statistics.Kernels;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
+using Common.Models;
+using MongoDB.Bson;
 using NLog;
 
 namespace HMModel.Models
@@ -24,6 +26,7 @@ namespace HMModel.Models
         private MultivariateNormalDistribution InitialDistribution { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
+        private List<Operation> Data { get; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
         public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData)
@@ -32,31 +35,42 @@ namespace HMModel.Models
             TestData = testData;
         }
 
-        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension)
+        public Learning(IEnumerable<Operation> trainData, int skip, int take)
         {
-            new Learning(trainData, testData).TeachModel(dimension);
+            var operations = trainData.ToList();
+            foreach (var data in operations)
+            {
+                data.Data = data.Data.Select(element => element.Skip(skip).Take(take).ToArray()).ToArray();
+            }
+
+            Data = operations;
+
         }
 
-        public void TeachModel(int dimension)
+        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension)
+        {
+            new Learning(trainData, testData).TeachModel(dimension, false);
+        }
+
+        public static void StartTeaching(IEnumerable<Operation> trainData, int skip, int take)
+        {
+            new Learning(trainData, skip, take).TeachModel(take, true);
+        }
+
+        public void TeachModel(int dimension, bool operation)
         {
             Generator.Seed = 0;
 
             var length = TrainData.Count();
             var states = dimension;
-            var sequences = new double[length + 1][][];
-            var labels = new int[length + 1];
-            for (var i = 1; i <= length; i++)
-            {
-                sequences[i - 1] = TrainData[i].ToArray();
-                labels[i - 1] = i;
-            }
+            var sequences = ToSequence(operation);
+            var labels = GetLabels(operation);
 
             labels[length] = 0;
             sequences[length] = new double[][]
             {
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
-            var inputs = new double[length][];
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
@@ -121,6 +135,39 @@ namespace HMModel.Models
             Logger.Info("Training error pooled variance: {}", trainingErrorPooledVar);
             Logger.Info("Validation error pooled variance: {}", validationErrorPooledVar);
             Logger.Info("General confusion matrix accuracy: {}", accuracy);
+        }
+
+        private double[][][] ToSequence(bool operation)
+        {
+            if (operation)
+            {
+                return Data.Select(element => element.Data).ToArray();
+            }
+            var length = TrainData.Count();
+            var sequences = new double[length + 1][][];
+            for (var i = 1; i <= length; i++)
+            {
+                sequences[i - 1] = TrainData[i].ToArray();
+            }
+
+            return sequences;
+        }
+
+        private int[] GetLabels(bool operation)
+        {
+            if (operation)
+            {
+                return Data.Select(element => int.Parse(element.Name)).ToArray();
+            }
+
+            var length = TrainData.Count();
+            var labels = new int[length + 1];
+            for (var i = 1; i <= length; i++)
+            {
+                labels[i - 1] = i;
+            }
+
+            return labels;
         }
     }
 }

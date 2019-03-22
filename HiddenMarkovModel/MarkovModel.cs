@@ -14,10 +14,10 @@ namespace HMModel
             const int skip = 0;
             const bool product = false;
             Logger.Info("Start loading data...");
-            var train = MatLoaders.LoadPrograms(trainFolder, take, skip, product);
-            var test = MatLoaders.LoadPrograms(testFolder, take, skip, product);
+            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, product);
+            var test = MatLoaders.LoadProgramsAsTimeSeries(testFolder,  product);
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(train, test, take);
+            Learning.StartTeaching(train, skip, take);
         }
 
     }
