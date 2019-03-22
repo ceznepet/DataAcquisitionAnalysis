@@ -1,10 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using Accord.MachineLearning;
+using Accord.MachineLearning.Performance;
 using Accord.Math;
+using Accord.Math.Optimization.Losses;
 using Accord.Math.Random;
 using Accord.Statistics.Analysis;
 using Accord.Statistics.Distributions.Fitting;
 using Accord.Statistics.Distributions.Multivariate;
+using Accord.Statistics.Distributions.Univariate;
+using Accord.Statistics.Kernels;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
@@ -51,75 +56,71 @@ namespace HMModel.Models
             {
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
-
+            var inputs = new double[length][];
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
-            Learner = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
-            {
-                Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
+
+            var crossvalidation =
+                new CrossValidation<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>, double[][]>
                 {
-                    Topology = new Ergodic(states),
-
-                    Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
-
-                    Tolerance = 1e-6,
-                    MaxIterations = 0,
-
-                    FittingOptions = new NormalOptions()
+                    K = 3, // Use 3 folds in cross-validation
+                    Learner = (s) => new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
                     {
-                        Diagonal = true,
-                        //Robust = true,
-                        Regularization = 1e-6
-                    }
-                }
-            };
+                        Learner = (p) =>
+                            new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
+                            {
+                                Topology = new Ergodic(states),
+                                Emissions = (j) =>
+                                    new MultivariateNormalDistribution(mean: priorM.Generate(),
+                                        covariance: priorC.Generate()),
+                                Tolerance = 1e-6,
+                                MaxIterations = 0,
+                                FittingOptions = new NormalOptions()
+                                {
+                                    Diagonal = true,
+                                    //Robust = true,
+                                    Regularization = 1e-6
+                                }
+                            }
+                    },
+                    Loss = (expected, actual, p) =>
+                    {
+                        var cm = new GeneralConfusionMatrix(classes: p.Model.NumberOfClasses, expected: expected,
+                            predicted: actual);
+                        p.Variance = cm.Variance;
+                        return p.Value = cm.Kappa;
+                    },
+                    Stratify = false,
+                    ParallelOptions = {MaxDegreeOfParallelism = 1},
+                };
 
-            Learner.ParallelOptions.MaxDegreeOfParallelism = 2;
+            var result = crossvalidation.Learn(sequences, labels);
 
-            Classifier = Learner.Learn(sequences, labels);
-            Logger.Debug("End of Learning phase...");
-            var trainPredicted = Classifier.Decide(sequences);
+            Logger.Info("Cross-Validation done...");
+            // If desired, compute an aggregate confusion matrix for the validation sets:
+            var gcm = result.ToConfusionMatrix(sequences, labels);
 
-            var m1 = new GeneralConfusionMatrix(predicted: trainPredicted, expected: labels);
-            var trainAcc = m1.Accuracy;
+            // Finally, access the measured performance.
+            var trainingErrors = result.Training.Mean;
+            var validationErrors = result.Validation.Mean;
 
-            Logger.Info("Check of performance: {0}", trainAcc);
+            var trainingErrorVar = result.Training.Variance;
+            var validationErrorVar = result.Validation.Variance;
 
-            var testData = new double[length][][];
-            var testOutputs = new int[length];
-            for (var i = 1; i <= length; i++)
-            {
-                testData[i - 1] = TestData[i].ToArray();
-                testOutputs[i - 1] = i;
-            }
+            var trainingErrorPooledVar = result.Training.PooledVariance;
+            var validationErrorPooledVar = result.Validation.PooledVariance;
 
-            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
-
-            var testPredict = Classifier.Decide(testData);
-
-            var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
-            var trainAccTest = m2.Accuracy;
-            Logger.Info("Check of performance: {0}", trainAccTest);
-
-        }
-
-        private double[][] ReduceDimension(int dimension, double[][] data)
-        {
-
-            var pca = new PrincipalComponentAnalysis()
-            {
-                Method = PrincipalComponentMethod.Standardize,
-                Whiten = false
-            };
-
-            var transform = pca.Learn(data);
-
-            pca.NumberOfOutputs = dimension;
-
-            return pca.Transform(data);
+            var accuracy = gcm.Accuracy;
+            Logger.Info("Training Error: {}", trainingErrors);
+            Logger.Info("Validation Error: {}", validationErrors);
+            Logger.Info("Training error variance: {}", trainingErrorVar);
+            Logger.Info("Validation error variance: {}", validationErrorVar);
+            Logger.Info("Training error pooled variance: {}", trainingErrorPooledVar);
+            Logger.Info("Validation error pooled variance: {}", validationErrorPooledVar);
+            Logger.Info("General confusion matrix accuracy: {}", accuracy);
         }
     }
 }
