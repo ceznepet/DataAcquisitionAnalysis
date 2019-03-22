@@ -25,7 +25,7 @@ namespace HMModel.Models
         private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
-        private int State { get; set; }
+        private int States { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
@@ -38,9 +38,9 @@ namespace HMModel.Models
             TestData = testData;
         }
 
-        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int state)
+        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
         {
-            State = state;
+            States = states;
             var operations = trainData.ToList();
             foreach (var data in operations)
             {
@@ -74,7 +74,6 @@ namespace HMModel.Models
             Generator.Seed = 0;
 
             var length = 22;
-            var states = dimension;
             var sequences = ToSequence(operation, true);
             var labels = GetLabels(operation, true);
 
@@ -84,7 +83,7 @@ namespace HMModel.Models
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
-
+            Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
@@ -93,7 +92,7 @@ namespace HMModel.Models
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Ergodic(6),
+                    Topology = new Ergodic(States),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
