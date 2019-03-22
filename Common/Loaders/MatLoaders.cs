@@ -42,6 +42,35 @@ namespace Common.Loaders
             return ToDictionary(files.Select(file => LoadToTimeSeries(file.FullName, product)).SelectMany(lists => lists), take, skip, product);
         }
 
+        public static IEnumerable<Operation> LoadProgramsAsTimeSeries(string path, bool product)
+        {
+            var directories = new List<DirectoryInfo>();
+            var files = new List<FileInfo>();
+            var rootDir = new DirectoryInfo(path);
+            var subDirectories = rootDir.GetDirectories().ToList();
+
+            if (subDirectories.Count > 0)
+            {
+                directories.AddRange(subDirectories);
+            }
+            else
+            {
+                directories.Add(rootDir);
+            }
+
+            foreach (var dir in directories)
+            {
+                files.AddRange(dir.GetFiles("*.mat"));
+            }
+
+            if (files.Count == 0)
+            {
+                throw new Exception("There are no *.mat files in that directory");
+            }
+
+                return files.Select(file => LoadToTimeSeriesArray(file.FullName, product));
+        }
+
         private static List<TimeSeries> LoadToTimeSeries(string fileName, bool product)
         {
             var matReader = new MatReader(fileName);
@@ -53,6 +82,19 @@ namespace Common.Loaders
                                : Path.GetFileName(Path.GetDirectoryName(fileName));
 
             return data.Select(row => new TimeSeries(row, name)).ToList();
+        }
+
+        private static Operation LoadToTimeSeriesArray(string fileName, bool product)
+        {
+            var matReader = new MatReader(fileName);
+            var names = matReader.FieldNames;
+            var data = matReader.Read<double[,]>(names[0]).ToJagged(true);
+
+
+            var name = product ? Path.GetFileNameWithoutExtension(fileName)
+                : Path.GetFileName(Path.GetDirectoryName(fileName));
+
+            return new Operation(data, name);
         }
 
 
@@ -78,6 +120,6 @@ namespace Common.Loaders
             }
 
             return dictionary;
-        }
+        }       
     }
 }

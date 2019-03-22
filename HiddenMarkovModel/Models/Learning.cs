@@ -13,6 +13,8 @@ using Accord.Statistics.Kernels;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
+using Common.Models;
+using MongoDB.Bson;
 using NLog;
 
 namespace HMModel.Models
@@ -24,6 +26,8 @@ namespace HMModel.Models
         private MultivariateNormalDistribution InitialDistribution { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
+        private List<Operation> DataToTrain { get; }
+        private List<Operation> DataToTest { get; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
         public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData)
@@ -32,95 +36,134 @@ namespace HMModel.Models
             TestData = testData;
         }
 
-        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension)
+        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take)
         {
-            new Learning(trainData, testData).TeachModel(dimension);
+            var operations = trainData.ToList();
+            foreach (var data in operations)
+            {
+                data.Data = data.Data.Select(element => element.Skip(skip).Take(take).ToArray()).ToArray();
+            }
+
+            DataToTrain = operations;
+
+            operations = testData.ToList();
+            foreach (var data in operations)
+            {
+                data.Data = data.Data.Select(element => element.Skip(skip).Take(take).ToArray()).ToArray();
+            }
+
+            DataToTest = operations;
+
         }
 
-        public void TeachModel(int dimension)
+        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension)
+        {
+            new Learning(trainData, testData).TeachModel(dimension, false);
+        }
+
+        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take)
+        {
+            new Learning(trainData, testData, skip, take).TeachModel(take, true);
+        }
+
+        public void TeachModel(int dimension, bool operation)
         {
             Generator.Seed = 0;
 
-            var length = TrainData.Count();
+            var length = 22;
             var states = dimension;
-            var sequences = new double[length + 1][][];
-            var labels = new int[length + 1];
-            for (var i = 1; i <= length; i++)
-            {
-                sequences[i - 1] = TrainData[i].ToArray();
-                labels[i - 1] = i;
-            }
+            var sequences = ToSequence(operation, true);
+            var labels = GetLabels(operation, true);
 
             labels[length] = 0;
             sequences[length] = new double[][]
             {
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
-            var inputs = new double[length][];
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
 
-            var crossvalidation =
-                new CrossValidation<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>, double[][]>
+            Learner = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
+            {
+                Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    K = 3, // Use 3 folds in cross-validation
-                    Learner = (s) => new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
+                    Topology = new Ergodic(6),
+
+                    Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
+
+                    Tolerance = 1e-6,
+                    MaxIterations = 0,
+
+                    FittingOptions = new NormalOptions()
                     {
-                        Learner = (p) =>
-                            new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
-                            {
-                                Topology = new Ergodic(states),
-                                Emissions = (j) =>
-                                    new MultivariateNormalDistribution(mean: priorM.Generate(),
-                                        covariance: priorC.Generate()),
-                                Tolerance = 1e-6,
-                                MaxIterations = 0,
-                                FittingOptions = new NormalOptions()
-                                {
-                                    Diagonal = true,
-                                    //Robust = true,
-                                    Regularization = 1e-6
-                                }
-                            }
-                    },
-                    Loss = (expected, actual, p) =>
-                    {
-                        var cm = new GeneralConfusionMatrix(classes: p.Model.NumberOfClasses, expected: expected,
-                            predicted: actual);
-                        p.Variance = cm.Variance;
-                        return p.Value = cm.Kappa;
-                    },
-                    Stratify = false,
-                    ParallelOptions = {MaxDegreeOfParallelism = 1},
-                };
+                        Diagonal = true,
+                        // Robust = true,
+                        Regularization = 1e-6
+                    }
+                }
+            };
 
-            var result = crossvalidation.Learn(sequences, labels);
+            //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
-            Logger.Info("Cross-Validation done...");
-            // If desired, compute an aggregate confusion matrix for the validation sets:
-            var gcm = result.ToConfusionMatrix(sequences, labels);
+            Classifier = Learner.Learn(sequences, labels);
+            Logger.Debug("End of Learning phase...");
+            var trainPredicted = Classifier.Decide(sequences);
 
-            // Finally, access the measured performance.
-            var trainingErrors = result.Training.Mean;
-            var validationErrors = result.Validation.Mean;
+            var m1 = new GeneralConfusionMatrix(predicted: trainPredicted, expected: labels);
+            var trainAcc = m1.Accuracy;
 
-            var trainingErrorVar = result.Training.Variance;
-            var validationErrorVar = result.Validation.Variance;
+            Logger.Info("Check of performance: {0}", trainAcc);
 
-            var trainingErrorPooledVar = result.Training.PooledVariance;
-            var validationErrorPooledVar = result.Validation.PooledVariance;
+            var testData = ToSequence(operation, false);
+            var testOutputs = GetLabels(operation, false);
 
-            var accuracy = gcm.Accuracy;
-            Logger.Info("Training Error: {}", trainingErrors);
-            Logger.Info("Validation Error: {}", validationErrors);
-            Logger.Info("Training error variance: {}", trainingErrorVar);
-            Logger.Info("Validation error variance: {}", validationErrorVar);
-            Logger.Info("Training error pooled variance: {}", trainingErrorPooledVar);
-            Logger.Info("Validation error pooled variance: {}", validationErrorPooledVar);
-            Logger.Info("General confusion matrix accuracy: {}", accuracy);
+            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+
+            var testPredict = Classifier.Decide(testData);
+
+            var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
+            var trainAccTest = m2.Accuracy;
+            Logger.Info("Check of performance: {0}", trainAccTest);
+
+        }
+
+        private double[][][] ToSequence(bool operation, bool train)
+        {
+            if (operation)
+            {
+                return train ? DataToTrain.Select(element => element.Data).ToArray() 
+                             : DataToTest.Select(element => element.Data).ToArray();
+            }
+            var length = 22;
+            var sequences = new double[length + 1][][];
+            for (var i = 1; i <= length; i++)
+            {
+                sequences[i - 1] = train ? TrainData[i].ToArray() 
+                                         : TestData[i].ToArray();
+            }
+
+            return sequences;
+        }
+
+        private int[] GetLabels(bool operation, bool train)
+        {
+            if (operation)
+            {
+                return train ? DataToTrain.Select(element => int.Parse(element.Name)).ToArray() 
+                             : DataToTest.Select(element => int.Parse(element.Name)).ToArray();
+            }
+
+            var length = 22;
+            var labels = new int[length + 1];
+            for (var i = 1; i <= length; i++)
+            {
+                labels[i - 1] = i;
+            }
+
+            return labels;
         }
     }
 }
