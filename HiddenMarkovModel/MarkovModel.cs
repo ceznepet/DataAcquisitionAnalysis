@@ -8,7 +8,7 @@ namespace HMModel
     {
         private static readonly Logger Logger = LogManager.GetLogger("Markov main");
 
-        public MarkovModel(string trainFolder, string testFolder)
+        public MarkovModel(string trainFolder, string testFolder, int state)
         {
             const int take = 12;
             const int skip = 0;
@@ -17,7 +17,7 @@ namespace HMModel
             var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, product);
             var test = MatLoaders.LoadProgramsAsTimeSeries(testFolder,  product);
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(train, test, skip, take);
+            Learning.StartTeaching(train, test, skip, take, state);
         }
 
     }
