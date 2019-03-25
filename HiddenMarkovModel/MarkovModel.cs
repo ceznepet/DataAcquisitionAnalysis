@@ -10,7 +10,7 @@ namespace HMModel
 
         public MarkovModel(string trainFolder, string testFolder, int state)
         {
-            const int take = 12;
+            const int take = 18;
             const int skip = 0;
             const bool product = false;
             Logger.Info("Start loading data...");

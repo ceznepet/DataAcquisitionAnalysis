@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Accord.IO;
 using Accord.MachineLearning;
 using Accord.MachineLearning.Performance;
 using Accord.Math;
@@ -108,7 +110,7 @@ namespace HMModel.Models
                 }
             };
 
-            //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
+            Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
             Logger.Debug("End of Learning phase...");
@@ -129,6 +131,14 @@ namespace HMModel.Models
             var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
+
+            if(m2.Accuracy > 0.98)
+            {
+                using (var fileStream = File.Create(@".\Model\MarkovModel.txt"))
+                {
+                    Classifier.Save(fileStream);
+                }
+            }
 
         }
 
