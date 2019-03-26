@@ -30,16 +30,19 @@ namespace HMModel.Models
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
         private List<Operation> DataToTest { get; }
+        private int States { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
-        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData)
+        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int states)
         {
+            States = states;
             TrainData = trainData;
             TestData = testData;
         }
 
-        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take)
+        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
         {
+            States = states;
             var operations = trainData.ToList();
             foreach (var data in operations)
             {
@@ -58,14 +61,14 @@ namespace HMModel.Models
 
         }
 
-        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension)
+        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension, int states)
         {
-            new Learning(trainData, testData).TeachModel(dimension, false);
+            new Learning(trainData, testData, states).TeachModel(dimension, false);
         }
 
-        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take)
+        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
         {
-            new Learning(trainData, testData, skip, take).TeachModel(take, true);
+            new Learning(trainData, testData, skip, take, states).TeachModel(take, true);
         }
 
         public void TeachModel(int dimension, bool operation)
@@ -83,7 +86,7 @@ namespace HMModel.Models
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
-
+            Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
@@ -92,7 +95,7 @@ namespace HMModel.Models
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Ergodic(6),
+                    Topology = new Ergodic(States),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
