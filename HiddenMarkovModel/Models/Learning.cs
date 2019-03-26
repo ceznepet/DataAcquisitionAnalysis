@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Accord.IO;
 using Accord.MachineLearning;
 using Accord.MachineLearning.Performance;
 using Accord.Math;
@@ -127,6 +129,13 @@ namespace HMModel.Models
             var m2 = new GeneralConfusionMatrix(testPredict, testOutputs);
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
+
+            if(trainAccTest > 0.98)
+            {
+                var path = Path.Combine(@"./Configuration", "markov_model.bin");
+                Classifier.Save(path);
+                Logger.Info("Model is saved");
+            }
 
         }
 
