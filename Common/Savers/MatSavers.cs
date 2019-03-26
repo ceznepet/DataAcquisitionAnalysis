@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Accord.Math;
+﻿using Accord.Math;
 using csmatio.io;
 using csmatio.types;
+using System.Collections.Generic;
 
 namespace Common.Savers
 {
