@@ -43,7 +43,7 @@ namespace HMModel
 
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if (trainAccTest > 0.996)
+            if (trainAccTest > 0.99)
             {
                 var trainer = new TrainPredictor(testPredict, 22);
                 trainer.CreateTransitionMatrix();
