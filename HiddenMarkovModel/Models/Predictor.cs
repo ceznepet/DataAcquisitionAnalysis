@@ -17,10 +17,10 @@ namespace HMModel.Models
         public Predictor(HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> continues)
         {
             Continues = continues;
-            CreatDiscrete(Continues.NumberOfClasses);
+            CreateDiscrete(Continues.NumberOfClasses);
         }
 
-        private void CreatDiscrete(int operation)
+        private void CreateDiscrete(int operation)
         {
             var init_proba = Enumerable.Repeat(1.0 / operation, operation).ToArray();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Common.Loaders;
 using Common.Savers;
@@ -23,7 +24,7 @@ namespace DataAcquisitionAnalysis.Processing
         public DataProcessing(string folder, string saveFile)
         {
             Folder = folder;
-            SaveFile = saveFile + @"\moments";
+            SaveFile = Path.Combine(saveFile, "moments");
             Moments = new List<OperationMoments>();
             var data = MatLoaders.LoadPrograms(Folder, (int)ParsingLength.TakeTwelve,
                                           (int)ParsingLength.WithOperation, true);

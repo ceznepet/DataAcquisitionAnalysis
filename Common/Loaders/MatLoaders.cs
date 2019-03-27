@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Accord.IO;
 using Accord.Math;
+using Accord.Statistics.Kernels;
 using Common.Models;
 using NLog;
 
@@ -91,10 +92,10 @@ namespace Common.Loaders
             var data = matReader.Read<double[,]>(names[0]).ToJagged(true);
 
 
-            var name = product ? Path.GetFileNameWithoutExtension(fileName)
+            var name = product ? ((int)data[0].ElementAt(data[0].Length - 1)).ToString()
                 : Path.GetFileName(Path.GetDirectoryName(fileName));
-
-            return new Operation(data, name);
+            var saveData = product ? data.Select(row => row.Take(10).ToArray()).ToArray() : data;
+            return new Operation(saveData, name);
         }
 
 
