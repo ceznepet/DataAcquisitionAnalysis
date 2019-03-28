@@ -18,7 +18,7 @@ namespace HMModel
             const int skip = 0;
             const bool product = false;
             Logger.Info("Start loading data...");
-            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, product);
+            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true).ToList();
             var test = MatLoaders.LoadProgramsAsTimeSeries(testFolder, product);
             Logger.Info("Loading is succesfully done...");
             Learning.StartTeaching(train, test, skip, take, states);
@@ -46,7 +46,7 @@ namespace HMModel
 
             if (trainAccTest > 0.99)
             {
-                var trainer = new DiscreteModel(22, testOutputs.Take(200).ToArray()); //LoadModel.LoadMarkovModel(modelPath)
+                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath)); //LoadModel.LoadMarkovModel(modelPath)
                 var decisions = trainer.Decide(testPredict).ToArray();
 
                 var count = 0;
@@ -57,7 +57,7 @@ namespace HMModel
                         count++;
                         continue;
                     }
-
+                    Logger.Info("Position: {}", count);
                     Logger.Info("Predict: {} \t Actual: {}", decision.State, testOutputs[count]);
                     Logger.Info("Predict probability: {}", decision.Probability[0]);
                     count++;
@@ -70,6 +70,6 @@ namespace HMModel
                 Logger.Info("Check of performance: {0}", trainAccTest2);
             }
 
-        }
+            }
     }
 }

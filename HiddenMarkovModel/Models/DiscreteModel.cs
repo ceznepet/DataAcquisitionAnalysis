@@ -29,7 +29,7 @@ namespace HMModel.Models
         {
             var transition = CreateTransitionMatrix();
             var emission = Matrix.Diagonal(States, States, 1.0);
-            var initial = Vector.Create(States, 0.0);
+            var initial = Vector.Create(States, 1.0 / States);
 
             Model = new HiddenMarkovModel(transition, emission, initial);
 
@@ -40,12 +40,7 @@ namespace HMModel.Models
 
         public IEnumerable<Decision> Decide(int[] sequence)
         {
-            foreach (var decision in sequence)
-            {
-                var variable = new[] { decision };
-
-                yield return new Decision(Model.LogLikelihoods(variable), Model.Decide(variable)[0]);
-            }
+            return sequence.Select(decision => new[] { decision }).Select(variable => new Decision(Model.LogLikelihoods(variable), Model.Decide(variable)[0]));
         }
 
         private double[,] CreateTransitionMatrix()

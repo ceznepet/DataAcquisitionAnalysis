@@ -81,7 +81,7 @@ namespace Common.Loaders
 
             var name = product ? Path.GetFileNameWithoutExtension(fileName)
                                : Path.GetFileName(Path.GetDirectoryName(fileName));
-
+            
             return data.Select(row => new TimeSeries(row, name)).ToList();
         }
 
@@ -94,8 +94,9 @@ namespace Common.Loaders
 
             var name = product ? ((int)data[0].ElementAt(data[0].Length - 1)).ToString()
                 : Path.GetFileName(Path.GetDirectoryName(fileName));
+
             var saveData = product ? data.Select(row => row.Take(10).ToArray()).ToArray() : data;
-            return new Operation(saveData, name);
+            return new Operation(saveData, name, fileName);
         }
 
 
