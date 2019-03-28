@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using Accord.Math;
+﻿using Accord.Math;
 using Accord.Statistics.Analysis;
-using Common.Loaders;
 using Common.Extensions;
+using Common.Loaders;
 using HMModel.Models;
 using NLog;
+using System.Linq;
 
 namespace HMModel
 {
@@ -46,8 +46,28 @@ namespace HMModel
 
             if (trainAccTest > 0.99)
             {
-                var trainer = new TrainPredictor(testPredict, 22);
-                trainer.CreateTransitionMatrix();
+                var trainer = new DiscreteModel(22, testOutputs.Take(200).ToArray()); //LoadModel.LoadMarkovModel(modelPath)
+                var decisions = trainer.Decide(testPredict).ToArray();
+
+                var count = 0;
+                foreach (var decision in decisions)
+                {
+                    if (decision.State == testOutputs[count] || decision.State == 0)
+                    {
+                        count++;
+                        continue;
+                    }
+
+                    Logger.Info("Predict: {} \t Actual: {}", decision.State, testOutputs[count]);
+                    Logger.Info("Predict probability: {}", decision.Probability[0]);
+                    count++;
+                }
+
+                var testPredict2 = decisions.Select(item => item.State == 0 ? 22 : item.State).ToArray();
+                var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
+                var trainAccTest2 = confusionMatrix2.Accuracy;
+
+                Logger.Info("Check of performance: {0}", trainAccTest2);
             }
 
         }
