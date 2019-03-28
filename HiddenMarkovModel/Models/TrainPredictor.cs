@@ -1,11 +1,15 @@
-﻿using System.Runtime.InteropServices.ComTypes;
+﻿using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Accord.Math;
+using NLog;
 
 
 namespace HMModel.Models
 {
     public class TrainPredictor
     {
+        public static readonly Logger Logger = LogManager.GetLogger("Training of Predictor");
+
         public TrainPredictor(int[] prediction, int states)
         {
             OperationPrediction = prediction;
@@ -39,6 +43,17 @@ namespace HMModel.Models
             {
                 row.Normalize(true);
             }
+
+            var emission = transition.ToJagged();
+            var count = 0;
+            foreach (var row in emission)
+            {
+                emission[count] = row.Select(element => (element + 1) / (row.Sum() + 2)).ToArray();
+                count++;
+            }
+
+            var sumOfFirstColumn = emission[0].Sum();
+            Logger.Info("Sum of elements in first column: {}", sumOfFirstColumn);
         }
     }
 }

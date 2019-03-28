@@ -84,7 +84,7 @@ namespace HMModel.Models
             {
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
-            //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
+            sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
             Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
@@ -122,7 +122,7 @@ namespace HMModel.Models
             var testData = ToSequence(operation, false);
             var testOutputs = GetLabels(operation, false);
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var testPredict = Classifier.Decide(testData);
 

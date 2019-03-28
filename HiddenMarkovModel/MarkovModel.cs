@@ -26,6 +26,7 @@ namespace HMModel
 
         public MarkovModel(string modelPath, string dataFolder)
         {
+            Logger.Info("Loading data.");
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
@@ -37,7 +38,7 @@ namespace HMModel
             //testData = Accord.Statistics.Tools.ZScores(testData);
 
             var testPredict = classifier.Decide(testData);
-
+            Logger.Info("Dicision done.");
             var confusionMatrix = new GeneralConfusionMatrix(testPredict, testOutputs);
             var trainAccTest = confusionMatrix.Accuracy;
 
