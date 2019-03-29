@@ -30,7 +30,7 @@ namespace HMModel.Models
         {
             Model = model;
             Classifier = classifier;
-            Model.Algorithm = HiddenMarkovModelAlgorithm.Forward;
+            Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
         }
 
         private void SetUpModel()

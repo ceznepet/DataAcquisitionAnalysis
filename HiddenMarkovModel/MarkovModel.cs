@@ -57,7 +57,7 @@ namespace HMModel
                 var enumerable = decisions.ToList();
                 foreach (var decision in enumerable)
                 {
-                    if (decision.State == testOutputs[count] || decision.State == 0)
+                    if (decision.Probability > 0.8 || decision.State == 0)
                     {
                         count++;
                         continue;
