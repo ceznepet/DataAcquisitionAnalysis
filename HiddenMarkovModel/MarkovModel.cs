@@ -19,9 +19,13 @@ namespace HMModel
             const bool product = false;
             Logger.Info("Start loading data...");
             var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true);
-            var length = train.Count();
+            var operations = train.ToList();
+            var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(train.Take(length/ 2), train.Skip(length / 2), skip, take, states);
+            for(var i  = 0; i < 3; i++)
+            {
+                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states + i, testFolder);
+            }
         }
 
         public MarkovModel(string modelPath, string dataFolder)

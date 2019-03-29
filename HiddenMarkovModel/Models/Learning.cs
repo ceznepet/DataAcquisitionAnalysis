@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,7 @@ using Accord.Statistics.Models.Markov.Topology;
 using Common.Models;
 using MongoDB.Bson;
 using NLog;
+using NLog.LayoutRenderers;
 
 namespace HMModel.Models
 {
@@ -26,23 +28,26 @@ namespace HMModel.Models
         private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
+        private int States { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
         private List<Operation> DataToTest { get; }
         private int States { get; set; }
+        private string ModelFolder { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
-        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int states)
+        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int state)
         {
             States = states;
             TrainData = trainData;
             TestData = testData;
         }
 
-        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
+        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states, string modelFolder)
         {
             States = states;
+            ModelFolder = modelFolder;
             var operations = trainData.ToList();
             foreach (var data in operations)
             {
@@ -61,14 +66,14 @@ namespace HMModel.Models
 
         }
 
-        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension, int states)
+        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension, int state)
         {
-            new Learning(trainData, testData, states).TeachModel(dimension, false);
+            new Learning(trainData, testData, state).TeachModel(dimension, false);
         }
 
-        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
+        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states, string modelFolder)
         {
-            new Learning(trainData, testData, skip, take, states).TeachModel(take, true);
+            new Learning(trainData, testData, skip, take, states, modelFolder).TeachModel(take, true);
         }
 
         public void TeachModel(int dimension, bool operation)
@@ -108,7 +113,7 @@ namespace HMModel.Models
                 }
             };
 
-            //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
+            Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
             Logger.Debug("End of Learning phase...");
@@ -130,9 +135,10 @@ namespace HMModel.Models
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if(trainAccTest > 0.98)
+            if(m2.Accuracy > 0.98)
             {
-                var path = Path.Combine(@"../../../../Models", "markov_model.bin");
+                var modelName = "markov_model"+ DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") +".bin";
+                var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
             }
