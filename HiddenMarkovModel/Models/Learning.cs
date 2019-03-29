@@ -28,7 +28,6 @@ namespace HMModel.Models
         private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private MultivariateNormalDistribution InitialDistribution { get; set; }
-        private int States { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
@@ -37,7 +36,7 @@ namespace HMModel.Models
         private string ModelFolder { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
-        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int state)
+        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int states)
         {
             States = states;
             TrainData = trainData;
@@ -66,9 +65,9 @@ namespace HMModel.Models
 
         }
 
-        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension, int state)
+        public static void StartTeaching(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int dimension, int states)
         {
-            new Learning(trainData, testData, state).TeachModel(dimension, false);
+            new Learning(trainData, testData, states).TeachModel(dimension, false);
         }
 
         public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states, string modelFolder)
