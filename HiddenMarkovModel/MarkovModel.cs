@@ -24,5 +24,31 @@ namespace HMModel
             }
         }
 
+        public MarkovModel(string modelPath, string dataFolder)
+        {
+            Logger.Info("Loading data.");
+            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true).ToList();
+            var classifier = LoadModel.LoadMarkovClassifier(modelPath);
+
+            var testData = test.ToSequence();
+            var testOutputs = test.GetLabels();
+
+            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+
+            //testData = Accord.Statistics.Tools.ZScores(testData);
+
+            var testPredict = classifier.Decide(testData);
+            Logger.Info("Dicision done.");
+            var confusionMatrix = new GeneralConfusionMatrix(testPredict, testOutputs);
+            var trainAccTest = confusionMatrix.Accuracy;
+
+            Logger.Info("Check of performance: {0}", trainAccTest);
+
+            if (trainAccTest > 0.99)
+            {
+                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states + i, testFolder);
+            }
+        }
+
     }
 }
