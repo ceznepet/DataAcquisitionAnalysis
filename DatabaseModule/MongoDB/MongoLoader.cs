@@ -16,6 +16,8 @@ namespace DatabaseModule.MongoDB
 {
     public class MongoLoader
     {
+        private static readonly Logger Logger = LogManager.GetLogger("File saving");
+
         public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder,
             string fileName, bool sorted, bool byProduct)
         {
@@ -42,11 +44,9 @@ namespace DatabaseModule.MongoDB
         private bool ByProduct { get; }
         private string Folder { get; }
         private string FileName { get; }
-        private StringBuilder LocalStringBuilder { get; set; }
         private SortMeasurementProfinet SortedMeasurementProfinet { get; }
         private SortMeasurementEthernet SortedMeasurementEthernet { get; }
         private List<double[]> MeasuredData { get; }
-        private static readonly Logger Logger = LogManager.GetLogger("File saving");
 
         public async Task ReadData()
         {
@@ -57,10 +57,7 @@ namespace DatabaseModule.MongoDB
                 {
                     var batch = cursor.Current;
 
-                    foreach (var document in batch)
-                    {
-                        BsonDocToList(document);
-                    }
+                    foreach (var document in batch) BsonDocToList(document);
                 }
 
                 Logger.Info("Data are loaded from databese.");
@@ -80,12 +77,13 @@ namespace DatabaseModule.MongoDB
                 if (!Sorted)
                 {
                     var time = measurement.SaveTime.TimeInSecond();
-                    var prNumber = (double)measurement.ProgramNumber;
+                    var prNumber = (double) measurement.ProgramNumber;
                     var data = measurement.GetMeasuredValues().ToList();
                     data.Insert(0, time);
                     data.Insert(1, prNumber);
-                    MeasuredData.Add(data.ToArray());                    
+                    MeasuredData.Add(data.ToArray());
                 }
+
                 SortedMeasurementProfinet.AddToList(measurement);
             }
             else
@@ -106,24 +104,18 @@ namespace DatabaseModule.MongoDB
 
         private void Save()
         {
-            if(Sorted)
+            if (Sorted)
             {
                 if (Profinet)
-                {
                     SaveProfinet();
-                }
                 else
-                {
                     SaveEthernet();
-                }
             }
             else
             {
                 SortedMeasurementProfinet.SortMeasurement();
                 foreach (var mesurement in SortedMeasurementProfinet.Measurements)
-                {
                     CsvSavers.ToCsvFile(mesurement, FileName);
-                }
                 MeasuredData.Sort((x, y) => x[0].CompareTo(y[0]));
                 MatSavers.ToMatFile(MeasuredData, "0", FileName);
             }
@@ -132,18 +124,13 @@ namespace DatabaseModule.MongoDB
         private void SaveProfinet()
         {
             if (ByProduct)
-            {
                 SortedMeasurementProfinet.SortByProduct();
-            }else
-            {
+            else
                 SortedMeasurementProfinet.SortList();
-            }
             var sortedProfinet = SortedMeasurementProfinet.Dictionary;
 
             foreach (var key in sortedProfinet.Keys)
-            {
                 PrintOneProgramProfinet(key, sortedProfinet.First(data => data.Key == key).Value);
-            }
         }
 
         private void SaveEthernet()
@@ -153,9 +140,7 @@ namespace DatabaseModule.MongoDB
             var sortedEthernet = SortedMeasurementEthernet.Dictionary;
 
             foreach (var key in sortedEthernet.Keys)
-            {
                 PrintOneProgramEthernet(key, sortedEthernet.First(data => data.Key == key).Value);
-            }
         }
 
         private void PrintOneProgramProfinet(int programNumber, List<MeasuredVariables> measuredVariables)
@@ -164,7 +149,7 @@ namespace DatabaseModule.MongoDB
             foreach (var measurement in measuredVariables)
             {
                 var time = measurement.SaveTime.TimeInSecond();
-                var prNumber = (double)measurement.ProgramNumber;
+                var prNumber = (double) measurement.ProgramNumber;
                 var data = measurement.GetMeasuredValues().ToList();
                 data.Insert(0, time);
                 data.Insert(1, prNumber);

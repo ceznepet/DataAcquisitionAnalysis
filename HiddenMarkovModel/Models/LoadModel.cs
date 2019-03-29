@@ -2,6 +2,7 @@
 using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Models.Markov;
 using System.IO;
+using Accord.Statistics.Distributions.Univariate;
 
 namespace HMModel.Models
 {
@@ -26,14 +27,14 @@ namespace HMModel.Models
             return Serializer.Load<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>>(Path.Combine(FilePath, "markov_model.bin"));
         }
 
-        public static HiddenMarkovModel LoadMarkovModel(string filePath)
+        public static HiddenMarkovModel<GeneralDiscreteDistribution, int> LoadMarkovModel(string filePath)
         {
             return new LoadModel(filePath).LoadMarkov();
         }
 
-        private HiddenMarkovModel LoadMarkov()
+        private HiddenMarkovModel<GeneralDiscreteDistribution, int> LoadMarkov()
         {
-            return Serializer.Load<HiddenMarkovModel>(Path.Combine(FilePath, "dis_markov_model.bin"));
+            return Serializer.Load<HiddenMarkovModel<GeneralDiscreteDistribution, int>>(Path.Combine(FilePath, "dis_markov_model.bin"));
         }
 
     }

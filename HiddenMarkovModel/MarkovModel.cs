@@ -22,7 +22,7 @@ namespace HMModel
             var operations = train.ToList();
             var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
-            for(var i  = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states + i, testFolder);
             }
@@ -34,27 +34,28 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence();
-            var testOutputs = test.GetLabels();
+            var testData = test.ToSequence().Take(100).ToArray();
+            var testOutputs = test.GetLabels().Take(100).ToArray();
+            Logger.Info("Load done.");
 
             testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             //testData = Accord.Statistics.Tools.ZScores(testData);
-
             var testPredict = classifier.Decide(testData);
+
             Logger.Info("Dicision done.");
             var confusionMatrix = new GeneralConfusionMatrix(testPredict, testOutputs);
             var trainAccTest = confusionMatrix.Accuracy;
 
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if (trainAccTest > 0.99)
+            if (trainAccTest >= 0.5)
             {
-                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath)); //LoadModel.LoadMarkovModel(modelPath)
-                var decisions = trainer.Decide(testPredict).ToArray();
-
+                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath) || 22, testOutputs.Take(200).ToArray()
+                var decisions = testData.Select(element => trainer.Decide(element));
                 var count = 0;
-                foreach (var decision in decisions)
+                var enumerable = decisions.ToList();
+                foreach (var decision in enumerable)
                 {
                     if (decision.State == testOutputs[count] || decision.State == 0)
                     {
@@ -63,17 +64,18 @@ namespace HMModel
                     }
                     Logger.Info("Position: {}", count);
                     Logger.Info("Predict: {} \t Actual: {}", decision.State, testOutputs[count]);
-                    Logger.Info("Predict probability: {}", decision.Probability[0]);
+                    Logger.Info("Predict probability: {}", decision.Probability);
+                    Logger.Info("Classifier probability: {}", decision.ClassifierProbability);
                     count++;
                 }
 
-                var testPredict2 = decisions.Select(item => item.State == 0 ? 22 : item.State).ToArray();
+                var testPredict2 = enumerable.Select(item => item.State == 0 ? 22 : item.State).ToArray();
                 var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
                 var trainAccTest2 = confusionMatrix2.Accuracy;
 
                 Logger.Info("Check of performance: {0}", trainAccTest2);
             }
 
-            }
+        }
     }
 }
