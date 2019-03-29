@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,6 +33,8 @@ namespace HMModel.Models
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
         private List<Operation> DataToTest { get; }
+        private int States { get; set; }
+        private string ModelFolder { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
         public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int state)
@@ -40,9 +43,10 @@ namespace HMModel.Models
             TestData = testData;
         }
 
-        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states)
+        public Learning(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states, string modelFolder)
         {
             States = states;
+            ModelFolder = modelFolder;
             var operations = trainData.ToList();
             foreach (var data in operations)
             {
@@ -66,9 +70,9 @@ namespace HMModel.Models
             new Learning(trainData, testData, state).TeachModel(dimension, false);
         }
 
-        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int state)
+        public static void StartTeaching(IEnumerable<Operation> trainData, IEnumerable<Operation> testData, int skip, int take, int states, string modelFolder)
         {
-            new Learning(trainData, testData, skip, take, state).TeachModel(take, true);
+            new Learning(trainData, testData, skip, take, states, modelFolder).TeachModel(take, true);
         }
 
         public void TeachModel(int dimension, bool operation)
@@ -134,10 +138,10 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.98)
             {
-                using (var fileStream = File.Create(@".\Model\MarkovModel.txt"))
-                {
-                    Classifier.Save(fileStream);
-                }
+                var modelName = "markov_model"+ DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") +".bin";
+                var path = Path.Combine(ModelFolder, modelName);
+                Classifier.Save(path);
+                Logger.Info("Model is saved");
             }
 
         }
