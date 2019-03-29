@@ -27,8 +27,6 @@ namespace HMModel.Models
     {
         private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
-        private MultivariateNormalDistribution InitialDistribution { get; set; }
-        private int States { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
@@ -37,7 +35,7 @@ namespace HMModel.Models
         private string ModelFolder { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Learning");
 
-        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int state)
+        public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int states)
         {
             States = states;
             TrainData = trainData;
@@ -137,7 +135,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.98)
             {
-                var modelName = "markov_model"+ DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") +".bin";
+                var modelName = "markov_model_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
