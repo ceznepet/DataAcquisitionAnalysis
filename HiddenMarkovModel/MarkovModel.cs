@@ -12,7 +12,7 @@ namespace HMModel
     {
         private static readonly Logger Logger = LogManager.GetLogger("Markov main");
 
-        public MarkovModel(string trainFolder, string testFolder, int state)
+        public MarkovModel(string trainFolder, string testFolder, int states)
         {
             const int take = 10;
             const int skip = 0;
