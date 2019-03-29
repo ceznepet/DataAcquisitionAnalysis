@@ -18,19 +18,17 @@ namespace Common.Logging
                 Layout = @"${longdate} | ${level:uppercase=true} | ${message}"
             };
             config.AddTarget(consoleTarget);
+            var time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             var fileTarget = new FileTarget("target2")
             {
-                FileName = "${basedir}/Logs/logfile.txt",
+                FileName = "${basedir}/Logs/logfile_"+ time +".txt",
                 Layout = "${longdate} | ${level:uppercase=true} | ${message} |  ${exception}",
-                DeleteOldFileOnStartup = true                
+                DeleteOldFileOnStartup = false                
             };
             config.AddTarget(fileTarget);
 
-            // Step 3. Define rules
-            config.AddRuleForOneLevel(LogLevel.Error, fileTarget); // only errors to file
-            config.AddRuleForOneLevel(LogLevel.Warn, fileTarget); // only errors to file
-            config.AddRuleForOneLevel(LogLevel.Fatal, fileTarget); // only errors to file
-            config.AddRuleForAllLevels(consoleTarget); // all to console
+            config.AddRuleForAllLevels(consoleTarget);
+            config.AddRuleForAllLevels(fileTarget);
 
             // Step 4. Activate the configuration
             LogManager.Configuration = config;

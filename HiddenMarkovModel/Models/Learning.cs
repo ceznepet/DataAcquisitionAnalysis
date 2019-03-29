@@ -39,6 +39,7 @@ namespace HMModel.Models
 
         public Learning(Dictionary<int, List<double[]>> trainData, Dictionary<int, List<double[]>> testData, int state)
         {
+            States = states;
             TrainData = trainData;
             TestData = testData;
         }
@@ -90,7 +91,7 @@ namespace HMModel.Models
             };
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
             Logger.Info("Number of states: {}", States);
-            var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension + 5);
+            var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
 
@@ -103,12 +104,10 @@ namespace HMModel.Models
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
                     Tolerance = 1e-6,
-                    MaxIterations = 0,
+                    MaxIterations = 1000,
 
                     FittingOptions = new NormalOptions()
                     {
-                        Diagonal = true,
-                        // Robust = true,
                         Regularization = 1e-6
                     }
                 }
