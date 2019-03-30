@@ -51,13 +51,14 @@ namespace HMModel
 
             if (trainAccTest >= 0.5)
             {
-                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath) || 22, testOutputs.Take(200).ToArray()
+                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
                 var decisions = testData.Select(element => trainer.Decide(element));
                 var count = 0;
                 var enumerable = decisions.ToList();
                 foreach (var decision in enumerable)
                 {
-                    if (decision.Probability > 0.8 || decision.State == 0)
+                    var check = decision.State;
+                    if (check == testOutputs[count])
                     {
                         count++;
                         continue;
@@ -69,7 +70,7 @@ namespace HMModel
                     count++;
                 }
 
-                var testPredict2 = enumerable.Select(item => item.State == 0 ? 22 : item.State).ToArray();
+                var testPredict2 = enumerable.Select(item => item.State).ToArray();
                 var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
                 var trainAccTest2 = confusionMatrix2.Accuracy;
 
