@@ -8,6 +8,7 @@ using Accord.MachineLearning;
 using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Distributions.Univariate;
 using Accord.Statistics.Models.Markov.Learning;
+using Accord.Statistics.Running;
 using NLog;
 
 namespace HMModel.Models
@@ -16,7 +17,8 @@ namespace HMModel.Models
     {
         private int States { get; set; }
         private int[] LearnedPrediction { get; set; }
-        private HiddenMarkovModel<GeneralDiscreteDistribution, int> Model { get; set; }
+        private HiddenMarkovModel Model { get; set; }
+        private RunningMarkovStatistics MarkovStatistics { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private Queue<int> StatesQueue { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Discrete model");
@@ -29,9 +31,10 @@ namespace HMModel.Models
             SetUpModel();
         }
 
-        public DiscreteModel(HiddenMarkovModel<GeneralDiscreteDistribution, int> model, HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> classifier)
+        public DiscreteModel(HiddenMarkovModel model, HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> classifier)
         {
             Model = model;
+            MarkovStatistics = new RunningMarkovStatistics(Model);
             Classifier = classifier;
             StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
@@ -41,11 +44,10 @@ namespace HMModel.Models
         {
             var transition = CreateTransitionMatrix();
             
-            var emission = Matrix.Diagonal(States, States , 1.0);
+            var emission = Matrix.Diagonal(States + 1, States + 1, 1.0);
             var initial = CreateInitial();
-            var emissions = GeneralDiscreteDistribution.FromMatrix(emission);
 
-            Model =new HiddenMarkovModel<GeneralDiscreteDistribution, int>(transition, emissions, initial);
+            Model = new HiddenMarkovModel(transition, emission, initial);
 
             var path = Path.Combine(@"../../../../Models", "dis_markov_model.bin");
             Logger.Info("Model saved.");
@@ -55,7 +57,7 @@ namespace HMModel.Models
 
         private double[] CreateInitial()
         {
-            var initial = Vector.Create(States, 1.0 / States);
+            var initial = Vector.Create(States + 1, 1.0 / (States + 1));
             return initial;
         }
 
@@ -63,12 +65,14 @@ namespace HMModel.Models
         {
             sequence = Accord.Statistics.Tools.ZScores(sequence);
             var decision = Classifier.Decide(sequence);
+            MarkovStatistics.Push(decision);
             //var p = Classifier.ToMultilabel().Probabilities(sequence);
-            var classifierProbability = Classifier.LogLikelihood(sequence);
+            var classifierProbability = Classifier.Probability(sequence);
             StatesQueue.Enqueue(decision == 22 ? 0 : decision);
-            var probability = Model.Predict(StatesQueue.ToArray().Take(StatesQueue.Count).ToArray());
+            var detectSequence = MarkovStatistics.Current;
+            var probability = MarkovStatistics.CurrentState;            
             CleanStatesQueue();
-            return new Decision(classifierProbability, probability, decision);
+            return new Decision(classifierProbability, probability, decision, detectSequence);
         }
 
         private void CleanStatesQueue()
@@ -82,14 +86,14 @@ namespace HMModel.Models
         private double[,] CreateTransitionMatrix()
         {
             var transition = CalculateFrequency().ToJagged();
-            //transition[0] = Vector.Create(States + 1, 1.0);
+            transition[0] = Vector.Create(States + 1, 1.0);
             return NormalizeTransition(transition).ToArray().ToMatrix();
 
         }
 
         private double[,] CalculateFrequency()
         {
-            var transition = Matrix.Create(States, States, 0.0);
+            var transition = Matrix.Create(States + 1, States + 1, 0.0);
 
             var prevState = 0;
 
@@ -97,11 +101,11 @@ namespace HMModel.Models
             {
                 if (i == 0)
                 {
-                    prevState = LearnedPrediction[i] - 1;
+                    prevState = LearnedPrediction[i];
                     continue;
                 }
 
-                var state = LearnedPrediction[i] - 1;
+                var state = LearnedPrediction[i];
                 transition[prevState, state] += 1;
                 prevState = state;
             }

@@ -24,17 +24,17 @@ namespace HMModel.Models
 
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> LoadClassifier()
         {
-            return Serializer.Load<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>>(Path.Combine(FilePath, "markov_model_20.bin"));
+            return Serializer.Load<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>>(Path.Combine(FilePath, "markov_model_14.bin"));
         }
 
-        public static HiddenMarkovModel<GeneralDiscreteDistribution, int> LoadMarkovModel(string filePath)
+        public static HiddenMarkovModel LoadMarkovModel(string filePath)
         {
             return new LoadModel(filePath).LoadMarkov();
         }
 
-        private HiddenMarkovModel<GeneralDiscreteDistribution, int> LoadMarkov()
+        private HiddenMarkovModel LoadMarkov()
         {
-            return Serializer.Load<HiddenMarkovModel<GeneralDiscreteDistribution, int>>(Path.Combine(FilePath, "dis_markov_model.bin"));
+            return Serializer.Load<HiddenMarkovModel>(Path.Combine(FilePath, "dis_markov_model.bin"));
         }
 
     }

@@ -51,30 +51,30 @@ namespace HMModel
 
             //if (trainAccTest >= 0.5)
             //{
-                var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
-                var decisions = testData.Select(element => trainer.Decide(element));
-                var count = 0;
-                var enumerable = decisions.ToList();
-                foreach (var decision in enumerable)
+            var trainer = new DiscreteModel(22, testOutputs.Take(200).ToArray()); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
+            var decisions = testData.Select(element => trainer.Decide(element));
+            var count = 0;
+            var enumerable = decisions.ToList();
+            foreach (var decision in enumerable)
+            {
+                var check = decision.State;
+                if (check == testOutputs[count])
                 {
-                    var check = decision.State;
-                    if (check == testOutputs[count])
-                    {
-                        count++;
-                        continue;
-                    }
-                    Logger.Info("Position: {}", count);
-                    Logger.Info("Predict: {} \t Actual: {}", decision.State, testOutputs[count]);
-                    Logger.Info("Predict probability: {}", decision.Probability);
-                    Logger.Info("Classifier probability: {}", decision.ClassifierProbability);
                     count++;
+                    continue;
                 }
+                Logger.Info("Position: {}", count);
+                Logger.Info("Predict: {} \t Actual: {}", decision.State, testOutputs[count]);
+                Logger.Info("Predict probability of sequence {} is {}", decision.Sequence, decision.Probability);
+                Logger.Info("Classifier probability: {}", decision.ClassifierProbability);
+                count++;
+            }
 
-                var testPredict2 = enumerable.Select(item => item.State).ToArray();
-                var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
-                var trainAccTest2 = confusionMatrix2.Accuracy;
+            var testPredict2 = enumerable.Select(item => item.State).ToArray();
+            var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
+            var trainAccTest2 = confusionMatrix2.Accuracy;
 
-                Logger.Info("Check of performance: {0}", trainAccTest2);
+            Logger.Info("Check of performance: {0}", trainAccTest2);
             //}
 
         }
