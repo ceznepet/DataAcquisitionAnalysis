@@ -7,6 +7,7 @@ using System.Linq;
 using Accord.MachineLearning;
 using Accord.Statistics.Distributions.Multivariate;
 using Accord.Statistics.Distributions.Univariate;
+using Accord.Statistics.Models.Markov.Learning;
 using NLog;
 
 namespace HMModel.Models
@@ -32,7 +33,6 @@ namespace HMModel.Models
         {
             Model = model;
             Classifier = classifier;
-            Classifier.Sensitivity = 0.7;
             StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
         }
@@ -41,15 +41,22 @@ namespace HMModel.Models
         {
             var transition = CreateTransitionMatrix();
             
-            var emission = Matrix.Diagonal(States + 1, States + 1, 1.0);
-            var initial = Vector.Create(States + 1, 1.0 / (States + 1));
+            var emission = Matrix.Diagonal(States, States , 1.0);
+            var initial = CreateInitial();
+            var emissions = GeneralDiscreteDistribution.FromMatrix(emission);
 
-            Model = HiddenMarkovModel.CreateDiscrete(transition, emission, initial);
+            Model =new HiddenMarkovModel<GeneralDiscreteDistribution, int>(transition, emissions, initial);
 
             var path = Path.Combine(@"../../../../Models", "dis_markov_model.bin");
             Logger.Info("Model saved.");
             Serializer.Save(Model, path);
 
+        }
+
+        private double[] CreateInitial()
+        {
+            var initial = Vector.Create(States, 1.0 / States);
+            return initial;
         }
 
         public Decision Decide(double[][] sequence)
@@ -58,8 +65,8 @@ namespace HMModel.Models
             var decision = Classifier.Decide(sequence);
             //var p = Classifier.ToMultilabel().Probabilities(sequence);
             var classifierProbability = Classifier.LogLikelihood(sequence);
-            StatesQueue.Enqueue(decision);
-            var probability = Model.Probability(StatesQueue.ToArray());
+            StatesQueue.Enqueue(decision == 22 ? 0 : decision);
+            var probability = Model.Predict(StatesQueue.ToArray().Take(StatesQueue.Count).ToArray());
             CleanStatesQueue();
             return new Decision(classifierProbability, probability, decision);
         }
@@ -75,14 +82,14 @@ namespace HMModel.Models
         private double[,] CreateTransitionMatrix()
         {
             var transition = CalculateFrequency().ToJagged();
-            transition[0] = Vector.Create(States + 1, 1.0);
+            //transition[0] = Vector.Create(States + 1, 1.0);
             return NormalizeTransition(transition).ToArray().ToMatrix();
 
         }
 
         private double[,] CalculateFrequency()
         {
-            var transition = Matrix.Create(States + 1, States + 1, 0.0);
+            var transition = Matrix.Create(States, States, 0.0);
 
             var prevState = 0;
 
@@ -90,11 +97,11 @@ namespace HMModel.Models
             {
                 if (i == 0)
                 {
-                    prevState = LearnedPrediction[i];
+                    prevState = LearnedPrediction[i] - 1;
                     continue;
                 }
 
-                var state = LearnedPrediction[i];
+                var state = LearnedPrediction[i] - 1;
                 transition[prevState, state] += 1;
                 prevState = state;
             }
