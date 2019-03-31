@@ -133,9 +133,9 @@ namespace HMModel.Models
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if(m2.Accuracy > 0.98)
+            if(m2.Accuracy > 0.9)
             {
-                var modelName = "markov_model_"+ States +".bin";
+                var modelName = "markov_model_all_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
