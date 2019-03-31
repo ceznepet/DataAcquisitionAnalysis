@@ -25,7 +25,7 @@ namespace HMModel.Models
 
         public DiscreteModel(int states, int[] learnedPrediction)
         {
-            States = states;
+            States = states + 1;
             LearnedPrediction = learnedPrediction;
             StatesQueue = new Queue<int>(5);
             SetUpModel();
@@ -44,7 +44,7 @@ namespace HMModel.Models
         {
             var transition = CreateTransitionMatrix();
             
-            var emission = Matrix.Diagonal(States + 1, States + 1, 1.0);
+            var emission = Matrix.Diagonal(States, States, 1.0);
             var initial = CreateInitial();
 
             Model = new HiddenMarkovModel(transition, emission, initial);
@@ -57,7 +57,7 @@ namespace HMModel.Models
 
         private double[] CreateInitial()
         {
-            var initial = Vector.Create(States + 1, 1.0 / (States + 1));
+            var initial = Vector.Create(States, 1.0 / (States));
             return initial;
         }
 
@@ -65,7 +65,7 @@ namespace HMModel.Models
         {
             sequence = Accord.Statistics.Tools.ZScores(sequence);
             var decision = Classifier.Decide(sequence);
-            MarkovStatistics.Push(decision);
+            MarkovStatistics.Push(decision == 22 ? 0 : decision);
             //var p = Classifier.ToMultilabel().Probabilities(sequence);
             var classifierProbability = Classifier.Probability(sequence);
             StatesQueue.Enqueue(decision == 22 ? 0 : decision);
@@ -86,14 +86,14 @@ namespace HMModel.Models
         private double[,] CreateTransitionMatrix()
         {
             var transition = CalculateFrequency().ToJagged();
-            transition[0] = Vector.Create(States + 1, 1.0);
+            transition[0] = Vector.Create(States, 1.0);
             return NormalizeTransition(transition).ToArray().ToMatrix();
 
         }
 
         private double[,] CalculateFrequency()
         {
-            var transition = Matrix.Create(States + 1, States + 1, 0.0);
+            var transition = Matrix.Create(States, States, 0.0);
 
             var prevState = 0;
 

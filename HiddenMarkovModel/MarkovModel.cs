@@ -51,7 +51,7 @@ namespace HMModel
 
             //if (trainAccTest >= 0.5)
             //{
-            var trainer = new DiscreteModel(22, testOutputs.Take(200).ToArray()); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
+            var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
             var decisions = testData.Select(element => trainer.Decide(element));
             var count = 0;
             var enumerable = decisions.ToList();
