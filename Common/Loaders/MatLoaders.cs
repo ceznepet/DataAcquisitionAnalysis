@@ -43,7 +43,7 @@ namespace Common.Loaders
             return ToDictionary(files.Select(file => LoadToTimeSeries(file.FullName, product)).SelectMany(lists => lists), take, skip, product);
         }
 
-        public static IEnumerable<Operation> LoadProgramsAsTimeSeries(string path, bool product)
+        public static IEnumerable<Operation> LoadProgramsAsTimeSeries(string path, bool product, int take)
         {
             var directories = new List<DirectoryInfo>();
             var files = new List<FileInfo>();
@@ -69,7 +69,7 @@ namespace Common.Loaders
                 throw new Exception("There are no *.mat files in that directory");
             }
 
-                return files.Select(file => LoadToTimeSeriesArray(file.FullName, product));
+                return files.Select(file => LoadToTimeSeriesArray(file.FullName, product, take));
         }
 
         private static List<TimeSeries> LoadToTimeSeries(string fileName, bool product)
@@ -85,7 +85,7 @@ namespace Common.Loaders
             return data.Select(row => new TimeSeries(row, name)).ToList();
         }
 
-        private static Operation LoadToTimeSeriesArray(string fileName, bool product)
+        private static Operation LoadToTimeSeriesArray(string fileName, bool product, int take)
         {
             var matReader = new MatReader(fileName);
             var names = matReader.FieldNames;
@@ -95,7 +95,7 @@ namespace Common.Loaders
             var name = product ? ((int)data[0].ElementAt(data[0].Length - 1)).ToString()
                 : Path.GetFileName(Path.GetDirectoryName(fileName));
 
-            var saveData = product ? data.Select(row => row.Take(10).ToArray()).ToArray() : data;
+            var saveData = product ? data.Select(row => row.Take(take).ToArray()).ToArray() : data;
             return new Operation(saveData, name, fileName);
         }
 

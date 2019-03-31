@@ -17,7 +17,7 @@ namespace HMModel
             const int take = 18;
             const int skip = 0;
             Logger.Info("Start loading data...");
-            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true);
+            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true, take);
             var operations = train.ToList();
             var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
@@ -30,7 +30,7 @@ namespace HMModel
         public MarkovModel(string modelPath, string dataFolder)
         {
             Logger.Info("Loading data.");
-            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true).ToList();
+            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
             var testData = test.ToSequence();
