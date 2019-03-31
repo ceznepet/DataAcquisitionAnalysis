@@ -21,5 +21,12 @@ namespace HMModel.Models
             State = state;
             Sequence = sequence;
         }
+
+        public Decision(double classifier, double probability, int state)
+        {
+            ClassifierProbability = classifier;
+            Probability = probability;
+            State = state;
+        }
     }
 }

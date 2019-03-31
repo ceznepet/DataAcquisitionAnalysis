@@ -1,4 +1,5 @@
-﻿using Accord.IO;
+﻿using System;
+using Accord.IO;
 using Accord.Math;
 using Accord.Statistics.Models.Markov;
 using System.Collections.Generic;
@@ -65,14 +66,24 @@ namespace HMModel.Models
         {
             sequence = Accord.Statistics.Tools.ZScores(sequence);
             var decision = Classifier.Decide(sequence);
-            MarkovStatistics.Push(decision == 22 ? 0 : decision);
-            //var p = Classifier.ToMultilabel().Probabilities(sequence);
+           
+
             var classifierProbability = Classifier.Probability(sequence);
-            StatesQueue.Enqueue(decision == 22 ? 0 : decision);
-            var detectSequence = MarkovStatistics.Current;
-            var probability = MarkovStatistics.CurrentState;            
+
+            var probability = MarkovStatistics.Peek(decision == 22 ? 0 : decision);
+
+            if (probability < -5)
+            {
+                Logger.Info("Predicted: {}", decision);
+                MarkovStatistics.Clear();
+            }
+            else
+            {
+                MarkovStatistics.Push(decision == 22 ? 0 : decision);
+                StatesQueue.Enqueue(decision);
+            }
             CleanStatesQueue();
-            return new Decision(classifierProbability, probability, decision, detectSequence);
+            return new Decision(classifierProbability, probability, decision);
         }
 
         private void CleanStatesQueue()
