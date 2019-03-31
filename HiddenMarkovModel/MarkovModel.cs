@@ -23,7 +23,7 @@ namespace HMModel
             Logger.Info("Loading is succesfully done...");
             for(var i  = 18; i < 36; i+=2)
             {
-                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states + i, testFolder);
+                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take,  i, testFolder);
             }
         }
 
