@@ -27,7 +27,6 @@ namespace HMModel.Models
     {
         private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
-        private MultivariateNormalDistribution InitialDistribution { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
@@ -115,6 +114,10 @@ namespace HMModel.Models
             Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
+            if (Learner.Rejection)
+            {
+                Classifier.Threshold = Learner.Threshold();
+            }
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
 
