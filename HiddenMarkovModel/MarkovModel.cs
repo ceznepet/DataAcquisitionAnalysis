@@ -14,17 +14,14 @@ namespace HMModel
 
         public MarkovModel(string trainFolder, string testFolder, int states)
         {
-            const int take = 18;
+            const int take = 10;
             const int skip = 0;
             Logger.Info("Start loading data...");
             var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true, take);
             var operations = train.ToList();
             var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
-            for(var i  = 18; i < 36; i+=2)
-            {
-                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take,  i, testFolder);
-            }
+            Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take,  states, testFolder);
         }
 
         public MarkovModel(string modelPath, string dataFolder)
