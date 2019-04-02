@@ -102,11 +102,13 @@ namespace HMModel.Models
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
                     Tolerance = 1e-6,
-                    MaxIterations = 1000,
+                    MaxIterations = 0,
 
                     FittingOptions = new NormalOptions()
                     {
-                        Regularization = 1e-6
+                        Regularization = 1e-6,
+                        Robust = true,
+                        
                     }
                 }
             };
