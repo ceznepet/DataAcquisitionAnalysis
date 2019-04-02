@@ -114,10 +114,13 @@ namespace HMModel.Models
             Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
+
             if (Learner.Rejection)
             {
+                Logger.Info("Threshold model has to be determinated.");
                 Classifier.Threshold = Learner.Threshold();
             }
+
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
 
@@ -137,9 +140,9 @@ namespace HMModel.Models
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if(m2.Accuracy > 0.98)
+            if (m2.Accuracy > 0.9)
             {
-                var modelName = "markov_model"+ DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") +".bin";
+                var modelName = "markov_model" + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss") + ".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
@@ -151,14 +154,14 @@ namespace HMModel.Models
         {
             if (operation)
             {
-                return train ? DataToTrain.Select(element => element.Data).ToArray() 
+                return train ? DataToTrain.Select(element => element.Data).ToArray()
                              : DataToTest.Select(element => element.Data).ToArray();
             }
             var length = 22;
             var sequences = new double[length + 1][][];
             for (var i = 1; i <= length; i++)
             {
-                sequences[i - 1] = train ? TrainData[i].ToArray() 
+                sequences[i - 1] = train ? TrainData[i].ToArray()
                                          : TestData[i].ToArray();
             }
 
@@ -169,7 +172,7 @@ namespace HMModel.Models
         {
             if (operation)
             {
-                return train ? DataToTrain.Select(element => int.Parse(element.Name)).ToArray() 
+                return train ? DataToTrain.Select(element => int.Parse(element.Name)).ToArray()
                              : DataToTest.Select(element => int.Parse(element.Name)).ToArray();
             }
 

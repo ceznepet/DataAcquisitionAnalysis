@@ -22,16 +22,13 @@ namespace HMModel
             var operations = train.ToList();
             var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
-            for (var i = 0; i < 3; i++)
-            {
-                Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states + i, testFolder);
-            }
+            Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states, testFolder);
         }
 
         public MarkovModel(string modelPath, string dataFolder)
         {
             Logger.Info("Loading data.");
-            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
+            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 18).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
             var testData = test.ToSequence().Take(100).ToArray();
@@ -40,17 +37,6 @@ namespace HMModel
 
             testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
-            //testData = Accord.Statistics.Tools.ZScores(testData);
-            //var testPredict = classifier.Decide(testData);
-
-            //Logger.Info("Dicision done.");
-            //var confusionMatrix = new GeneralConfusionMatrix(testPredict, testOutputs);
-            //var trainAccTest = confusionMatrix.Accuracy;
-
-            //Logger.Info("Check of performance: {0}", trainAccTest);
-
-            //if (trainAccTest >= 0.5)
-            //{
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
             var decisions = testData.Select(element => trainer.Decide(element));
             var count = 0;
@@ -75,8 +61,6 @@ namespace HMModel
             var trainAccTest2 = confusionMatrix2.Accuracy;
 
             Logger.Info("Check of performance: {0}", trainAccTest2);
-            //}
-
         }
     }
 }

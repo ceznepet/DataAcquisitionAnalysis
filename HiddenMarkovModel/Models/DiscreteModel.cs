@@ -75,7 +75,7 @@ namespace HMModel.Models
             if (probability < -5)
             {
                 Logger.Info("Predicted: {}", decision);
-                MarkovStatistics.Clear();
+                Logger.Info("Should be: {}", MarkovStatistics.CurrentState);
             }
             else
             {
