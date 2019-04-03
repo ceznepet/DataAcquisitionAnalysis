@@ -107,8 +107,7 @@ namespace HMModel.Models
                     FittingOptions = new NormalOptions()
                     {
                         Regularization = 1e-6,
-                        Robust = true,
-                        
+                        Diagonal = true,                        
                     }
                 }
             };
