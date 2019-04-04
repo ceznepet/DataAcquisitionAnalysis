@@ -1,25 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Accord.IO;
-using Accord.MachineLearning;
-using Accord.MachineLearning.Performance;
 using Accord.Math;
-using Accord.Math.Optimization.Losses;
 using Accord.Math.Random;
 using Accord.Statistics.Analysis;
 using Accord.Statistics.Distributions.Fitting;
 using Accord.Statistics.Distributions.Multivariate;
-using Accord.Statistics.Distributions.Univariate;
-using Accord.Statistics.Kernels;
 using Accord.Statistics.Models.Markov;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Models.Markov.Topology;
 using Common.Models;
-using MongoDB.Bson;
 using NLog;
-using NLog.LayoutRenderers;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace HMModel.Models
 {
@@ -87,6 +79,8 @@ namespace HMModel.Models
             {
                 Enumerable.Repeat(0.0, dimension).ToArray()
             };
+
+            // Specify a initial independent normal distribution for the samples.
             sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
             Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
@@ -107,20 +101,18 @@ namespace HMModel.Models
                     FittingOptions = new NormalOptions()
                     {
                         Regularization = 1e-6,
-                        Robust = true,
-                        
                     }
                 },
                 Rejection = true
             };
 
-            Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
+            //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
 
             if (Learner.Rejection)
             {
-                Logger.Info("Threshold model has to be determinated.");
+                Logger.Info("Threshold model has to be estimated.");
                 Classifier.Threshold = Learner.Threshold();
             }
 
