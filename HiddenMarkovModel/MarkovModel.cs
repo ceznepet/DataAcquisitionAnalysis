@@ -28,7 +28,7 @@ namespace HMModel
         public MarkovModel(string modelPath, string dataFolder)
         {
             Logger.Info("Loading data.");
-            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 18).ToList();
+            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
             var testData = test.ToSequence().Take(100).ToArray();
