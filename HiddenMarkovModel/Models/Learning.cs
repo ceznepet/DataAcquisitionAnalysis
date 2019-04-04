@@ -25,8 +25,8 @@ namespace HMModel.Models
 {
     public class Learning
     {
-        private HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]> Learner { get; set; }
-        private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
+        private HiddenMarkovClassifierLearning<Independent<NormalDistribution>, double[]> Learner { get; set; }
+        private HiddenMarkovClassifier<Independent<NormalDistribution>, double[]> Classifier { get; set; }
         private Dictionary<int, List<double[]>> TrainData { get; set; }
         private Dictionary<int, List<double[]>> TestData { get; set; }
         private List<Operation> DataToTrain { get; }
@@ -93,21 +93,14 @@ namespace HMModel.Models
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
             Logger.Info("Preparation of model...");
 
-            Learner = new HiddenMarkovClassifierLearning<MultivariateNormalDistribution, double[]>()
+            Learner = new HiddenMarkovClassifierLearning<Independent<NormalDistribution>, double[]>()
             {
-                Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
+                Learner = (i) => new BaumWelchLearning<Independent<NormalDistribution>, double[]>()
                 {
                     Topology = new Ergodic(States),
 
-                    Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
-
                     Tolerance = 1e-6,
                     MaxIterations = 1000,
-
-                    FittingOptions = new NormalOptions()
-                    {
-                        Regularization = 1e-6,              
-                    }
                 }
             };
 
@@ -142,7 +135,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.9)
             {
-                var modelName = "markov_model_all_"+ States +".bin";
+                var modelName = "markov_model_2_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
