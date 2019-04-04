@@ -34,7 +34,6 @@ namespace DatabaseModule.MongoDB
         {
             var packet = xml.XmlDeserialize<EthernetXmlSerialization>();
             var document = BsonDocument.Parse(packet.ToJson());
-            //var document = BsonDocument.Parse(JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.Indented));
             if (document == null)
             {
                 _logger.Info("Document is empty!");
@@ -46,23 +45,12 @@ namespace DatabaseModule.MongoDB
 
         public void SaveIOData(dynamic measurement)
         {
-            //TODO: Test if this is correct serialization
             if (measurement == null)
             {
                 _logger.Info("Document is empty!");
                 return;
             }
             var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
-            //try
-            //{
-            //    Collection.InsertOne(document);
-            //    _logger.Info("Saving of the I/O is done.");
-            //}
-            //catch (OutOfMemoryException exception)
-            //{
-            //    _logger.Info("Je to tady...: {0}", exception);
-            //    throw new OutOfMemoryException();
-            //}
             
             Collection.InsertOne(document);
             _logger.Info("Saving of the I/O is done.");            
