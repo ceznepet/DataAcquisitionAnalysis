@@ -110,7 +110,8 @@ namespace HMModel.Models
                         Robust = true,
                         
                     }
-                }
+                },
+                Rejection = true
             };
 
             Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
@@ -144,7 +145,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.9)
             {
-                var modelName = "markov_model_all_"+ States +".bin";
+                var modelName = "markov_model_2_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
