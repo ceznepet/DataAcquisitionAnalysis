@@ -66,8 +66,8 @@ namespace HMModel.Models
         {
             sequence = Accord.Statistics.Tools.ZScores(sequence);
             var decision = Classifier.Decide(sequence);
-           
 
+            //var pokus = Classifier.Decide(sequence, new double[23]);
             var classifierProbability = Classifier.Probability(sequence);
 
             var probability = MarkovStatistics.Peek(decision == 22 ? 0 : decision);
