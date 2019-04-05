@@ -67,23 +67,20 @@ namespace HMModel.Models
             sequence = Accord.Statistics.Tools.ZScores(sequence);
             var decision = Classifier.Decide(sequence);
 
-            //var pokus = Classifier.Decide(sequence, new double[23]);
+            var logLikelihoods = new List<double>();
+            foreach (var model in Classifier.Models)
+            {
+                logLikelihoods.Add(model.LogLikelihood(sequence));
+            }
             var classifierProbability = Classifier.Probability(sequence);
 
             var probability = MarkovStatistics.Peek(decision == 22 ? 0 : decision);
-
-            if (probability < -5)
-            {
-                Logger.Info("Predicted: {}", decision);
-                Logger.Info("Should be: {}", MarkovStatistics.CurrentState);
-            }
-            else
-            {
-                MarkovStatistics.Push(decision == 22 ? 0 : decision);
-                StatesQueue.Enqueue(decision);
-            }
+            MarkovStatistics.Push(decision == 22 ? 0 : decision);
+            Logger.Info("Current state probability: {}", MarkovStatistics.LogForward);            
+            StatesQueue.Enqueue(decision);
+            
             CleanStatesQueue();
-            return new Decision(classifierProbability, probability, decision);
+            return new Decision(classifierProbability, logLikelihoods[decision], decision);
         }
 
         private void CleanStatesQueue()
@@ -104,7 +101,7 @@ namespace HMModel.Models
 
         private double[,] CalculateFrequency()
         {
-            var transition = Matrix.Create(States, States, 0.0);
+            var transition = Matrix.Create(States, States, 0.5);
 
             var prevState = 0;
 

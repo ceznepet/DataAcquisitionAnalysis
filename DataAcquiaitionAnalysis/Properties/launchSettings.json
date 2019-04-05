@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "markov -l \"1\" -f \"C:\\school\\diplomka\\DataAcquisitionAnalysis\\Models\" -t \"C:\\Users\\cezyc\\Downloads\\operation2-20190330T110623Z-001\\operation2\""
+      "commandLineArgs": "markov -l \"1\" -f \"C:\\Projects\\Diplomka\\DataAcquiaitionAnalysis\\Models\" -t \"C:\\Data\\operation3\""
     }
   }
 }
