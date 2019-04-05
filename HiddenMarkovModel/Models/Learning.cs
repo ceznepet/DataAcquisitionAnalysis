@@ -110,11 +110,11 @@ namespace HMModel.Models
 
             Classifier = Learner.Learn(sequences, labels);
 
-            if (Learner.Rejection)
-            {
-                Logger.Info("Threshold model has to be estimated.");
-                Classifier.Threshold = Learner.Threshold();
-            }
+            //if (Learner.Rejection)
+            //{
+            //    Logger.Info("Threshold model has to be estimated.");
+            //    Classifier.Threshold = Learner.Threshold();
+            //}
 
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
