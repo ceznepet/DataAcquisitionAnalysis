@@ -91,7 +91,7 @@ namespace HMModel.Models
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Ergodic(States),
+                    Topology = new Forward(States),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
@@ -102,8 +102,7 @@ namespace HMModel.Models
                     {
                         Regularization = 1e-6,
                     }
-                },
-                Rejection = true
+                }
             };
 
             //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
@@ -137,7 +136,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.1)
             {
-                var modelName = "markov_model_22_"+ States +".bin";
+                var modelName = "markov_model_f_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
