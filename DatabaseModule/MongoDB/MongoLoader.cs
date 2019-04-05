@@ -34,7 +34,7 @@ namespace DatabaseModule.MongoDB
             Collection = Database.GetCollection<BsonDocument>(document);
 
             var source = int.Parse(profinet) == 1 ? "_profinet_" : "_ethernet_";
-            FileName = Folder + "/" + fileName + source + DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+            FileName = Folder + "/" + fileName + source;
         }
 
         private IMongoDatabase Database { get; }
