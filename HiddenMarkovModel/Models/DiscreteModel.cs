@@ -73,7 +73,7 @@ namespace HMModel.Models
                 logLikelihoods.Add(model.LogLikelihood(sequence));
             }
             var classifierProbability = Classifier.Probability(sequence);
-
+            var path = Model.Decide(new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0, 14});
             var probability = MarkovStatistics.Peek(decision == 22 ? 0 : decision);
             MarkovStatistics.Push(decision == 22 ? 0 : decision);
             Logger.Info("Current state probability: {}", MarkovStatistics.LogForward);            
