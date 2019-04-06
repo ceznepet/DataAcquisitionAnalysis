@@ -68,6 +68,7 @@ namespace HMModel.Models
             var decision = Classifier.Decide(sequence);
 
             var logLikelihoods = new List<double>();
+            var pp = Classifier.Probabilities(sequence);
             foreach (var model in Classifier.Models)
             {
                 logLikelihoods.Add(model.LogLikelihood(sequence));
