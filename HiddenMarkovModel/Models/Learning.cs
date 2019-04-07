@@ -81,7 +81,7 @@ namespace HMModel.Models
             };
 
             // Specify a initial independent normal distribution for the samples.
-            sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
+            //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
             Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
@@ -91,7 +91,7 @@ namespace HMModel.Models
             {
                 Learner = (i) => new BaumWelchLearning<MultivariateNormalDistribution, double[], NormalOptions>()
                 {
-                    Topology = new Forward(States),
+                    Topology = new Ergodic(States),
 
                     Emissions = (j) => new MultivariateNormalDistribution(mean: priorM.Generate(), covariance: priorC.Generate()),
 
@@ -126,7 +126,7 @@ namespace HMModel.Models
             var testData = ToSequence(operation, false);
             var testOutputs = GetLabels(operation, false);
 
-            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var testPredict = Classifier.Decide(testData);
 
