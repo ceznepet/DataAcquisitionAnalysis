@@ -31,11 +31,11 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence().Take(100).ToArray();
-            var testOutputs = test.GetLabels().Take(100).ToArray();
+            var testData = test.ToSequence();
+            var testOutputs = test.GetLabels();
             Logger.Info("Load done.");
 
-            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
             var decisions = testData.Select(element => trainer.Decide(element));
