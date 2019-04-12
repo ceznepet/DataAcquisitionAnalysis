@@ -70,18 +70,12 @@ namespace HMModel.Models
         {
             Generator.Seed = 0;
 
-            var length = 22;
             var sequences = ToSequence(operation, true);
             var labels = GetLabels(operation, true);
 
-            labels[length] = 0;
-            sequences[length] = new double[][]
-            {
-                Enumerable.Repeat(0.0, dimension).ToArray()
-            };
 
-            // Specify a initial independent normal distribution for the samples.
             //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
+
             Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
             var priorM = new MultivariateNormalDistribution(dimension: dimension);
@@ -136,7 +130,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.1)
             {
-                var modelName = "markov_model_f_"+ States +".bin";
+                var modelName = "markov_model_n_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
@@ -152,7 +146,7 @@ namespace HMModel.Models
                              : DataToTest.Select(element => element.Data).ToArray();
             }
             var length = 22;
-            var sequences = new double[length + 1][][];
+            var sequences = new double[length][][];
             for (var i = 1; i <= length; i++)
             {
                 sequences[i - 1] = train ? TrainData[i].ToArray() 
@@ -166,12 +160,12 @@ namespace HMModel.Models
         {
             if (operation)
             {
-                return train ? DataToTrain.Select(element => int.Parse(element.Name)).ToArray() 
-                             : DataToTest.Select(element => int.Parse(element.Name)).ToArray();
+                return train ? DataToTrain.Select(element => int.Parse(element.Name) - 1).ToArray() 
+                             : DataToTest.Select(element => int.Parse(element.Name) - 1).ToArray();
             }
 
             var length = 22;
-            var labels = new int[length + 1];
+            var labels = new int[length];
             for (var i = 1; i <= length; i++)
             {
                 labels[i - 1] = i;
