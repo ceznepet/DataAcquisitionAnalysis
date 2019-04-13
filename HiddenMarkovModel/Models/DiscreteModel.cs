@@ -81,7 +81,7 @@ namespace HMModel.Models
             StatesQueue.Enqueue(decision);
             
             CleanStatesQueue();
-            return new Decision(classifierProbability, logLikelihoods[decision], decision);
+            return new Decision(classifierProbability, logLikelihoods[decision], decision + 1);
         }
 
         private void CleanStatesQueue()

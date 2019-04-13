@@ -31,8 +31,8 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence();
-            var testOutputs = test.GetLabels();
+            var testData = test.ToSequence().Take(100).ToArray();
+            var testOutputs = test.GetLabels().Take(100).ToArray();
             Logger.Info("Load done.");
 
             //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
