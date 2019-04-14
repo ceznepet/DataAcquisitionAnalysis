@@ -132,7 +132,6 @@ namespace HMModel.Models
             var testData = ToSequence(operation, false);
             var testOutputs = GetLabels(operation, false);
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var testPredict = Classifier.Decide(testData);
 
