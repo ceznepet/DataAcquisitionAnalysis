@@ -73,13 +73,13 @@ namespace HMModel.Models
                 logLikelihoods.Add(model.LogLikelihood(sequence));
             }
             var classifierProbability = Classifier.Probability(sequence);
-            //var proba = logLikelihoods.Select(item => (item * Classifier.Priors[decision]) / logLikelihoods.Sum());
+            var proba = logLikelihoods.Select(item => (item) / logLikelihoods.Sum());
             //var pp = Classifier.ToMulticlass().Probabilities(sequence, new double[22]);
 
             StatesQueue.Enqueue(decision);
             
             CleanStatesQueue();
-            return new Decision(classifierProbability, logLikelihoods[decision], decision + 1);
+            return new Decision(classifierProbability, Math.Exp(proba.ElementAt(decision) * Classifier.Priors[decision]), decision + 1);
         }
 
         private void CleanStatesQueue()

@@ -16,7 +16,7 @@ namespace Common.Savers
             var newLine = string.Join(", ",
                 measuredData.FilePreparation().ToArray()
                     .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            File.AppendAllText(fileName + ".csv", begin + ", " + newLine);
+            File.AppendAllText(fileName + ".csv", begin + ", " + newLine + "\n");
         }
 
         public static void ToCsvFile(MeasuredVariables measuredData, string fileName)
@@ -27,7 +27,7 @@ namespace Common.Savers
             var newLine = string.Join(", ",
                 measuredData.GetMeasuredValues().ToArray()
                     .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
-            File.AppendAllText(fileName + ".csv", begin + ", " + newLine);
+            File.AppendAllText(fileName + ".csv", begin + ", " + newLine + "\n");
         }
 
         public static void ToCsvFile(double[] measuredData, int operationNumber, string fileName)

@@ -108,18 +108,14 @@ namespace HMModel.Models
                     {
                         Regularization = 1e-6
                     }
-                }
+                },
+                Rejection = true,               
             };
 
             Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
 
-            if (Learner.Rejection)
-            {
-                Logger.Info("Threshold model has to be determinated.");
-                Classifier.Threshold = Learner.Threshold();
-            }
 
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
