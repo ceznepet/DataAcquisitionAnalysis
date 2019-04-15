@@ -33,7 +33,7 @@ namespace DatabaseModule.MongoDB
             Database = client.GetDatabase(database);
             Collection = Database.GetCollection<BsonDocument>(document);
 
-            var source = int.Parse(profinet) == 1 ? "_profinet_" : "_ethernet_";
+            var source = int.Parse(profinet) == 1 ? "_profinet" : "_ethernet";
             FileName = Folder + "/" + fileName + source;
         }
 
