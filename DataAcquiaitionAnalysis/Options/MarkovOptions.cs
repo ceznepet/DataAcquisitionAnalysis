@@ -16,5 +16,8 @@ namespace DataAcquisitionAnalysis.Options
 
         [Option('s', "states", HelpText = "Number of states")]
         public int States { get; set; }
+
+        [Option('v', "vector", HelpText = "Lenght of sequence vector", Default = 10)]
+        public int DataSet { get; set; }
     }
 }

@@ -12,9 +12,8 @@ namespace HMModel
     {
         private static readonly Logger Logger = LogManager.GetLogger("Markov main");
 
-        public MarkovModel(string trainFolder, string testFolder, int states)
+        public MarkovModel(string trainFolder, string testFolder, int states, int take)
         {
-            const int take = 10;
             const int skip = 0;
             Logger.Info("Start loading data...");
             var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true, take);
@@ -24,10 +23,10 @@ namespace HMModel
             Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take,  states, testFolder);
         }
 
-        public MarkovModel(string modelPath, string dataFolder)
+        public MarkovModel(string modelPath, string dataFolder, int take)
         {
             Logger.Info("Loading data.");
-            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, 10).ToList();
+            var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
             var testData = test.ToSequence();
@@ -35,7 +34,6 @@ namespace HMModel
 
             testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
-            //testData = Accord.Statistics.Tools.ZScores(testData);
 
             var testPredict = classifier.Decide(testData);
             Logger.Info("Dicision done.");

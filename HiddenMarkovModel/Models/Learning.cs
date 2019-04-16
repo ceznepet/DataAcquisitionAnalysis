@@ -74,7 +74,6 @@ namespace HMModel.Models
             var labels = GetLabels(operation, true);
 
 
-            //sequences = sequences.Apply(Accord.Statistics.Tools.ZScores);
 
             Logger.Info("Number of states: {}", States);
             var priorC = new WishartDistribution(dimension: dimension, degreesOfFreedom: dimension * 2);
@@ -99,15 +98,9 @@ namespace HMModel.Models
                 }
             };
 
-            //Learner.ParallelOptions.MaxDegreeOfParallelism = 5;
 
             Classifier = Learner.Learn(sequences, labels);
 
-            //if (Learner.Rejection)
-            //{
-            //    Logger.Info("Threshold model has to be estimated.");
-            //    Classifier.Threshold = Learner.Threshold();
-            //}
 
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
@@ -120,7 +113,6 @@ namespace HMModel.Models
             var testData = ToSequence(operation, false);
             var testOutputs = GetLabels(operation, false);
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var testPredict = Classifier.Decide(testData);
 
@@ -130,7 +122,7 @@ namespace HMModel.Models
 
             if(m2.Accuracy > 0.1)
             {
-                var modelName = "markov_model_n_"+ States +".bin";
+                var modelName = "markov_model_l_"+ States +".bin";
                 var path = Path.Combine(ModelFolder, modelName);
                 Classifier.Save(path);
                 Logger.Info("Model is saved");
