@@ -95,12 +95,17 @@ namespace HMModel.Models
                     {
                         Regularization = 1e-6,
                     }
-                }
+                },
+                Rejection = true,                
             };
 
 
             Classifier = Learner.Learn(sequences, labels);
 
+            var modelName = "markov_model_rl_" + States + ".bin";
+            var path = Path.Combine(ModelFolder, modelName);
+            Classifier.Save(path);
+            Logger.Info("Model is saved");
 
             Logger.Debug("End of Learning phase...");
             var trainPredicted = Classifier.Decide(sequences);
@@ -120,13 +125,13 @@ namespace HMModel.Models
             var trainAccTest = m2.Accuracy;
             Logger.Info("Check of performance: {0}", trainAccTest);
 
-            if(m2.Accuracy > 0.1)
-            {
-                var modelName = "markov_model_l_"+ States +".bin";
-                var path = Path.Combine(ModelFolder, modelName);
-                Classifier.Save(path);
-                Logger.Info("Model is saved");
-            }
+            //if(m2.Accuracy > 0.1)
+            //{
+            //    var modelName = "markov_model_l_"+ States +".bin";
+            //    var path = Path.Combine(ModelFolder, modelName);
+            //    Classifier.Save(path);
+            //    Logger.Info("Model is saved");
+            //}
 
         }
 
