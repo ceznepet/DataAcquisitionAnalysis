@@ -65,11 +65,11 @@ namespace DataAcquisitionAnalysis
             if (options.Load == "1")
             {
                 Logger.Info("Loading the model form path: {}.", options.TrainFolderPath);
-                var predictor = new MarkovModel(options.TrainFolderPath, options.TestFolderPath);
+                var predictor = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.DataSet);
                 return 0;
             }
             Logger.Info("Start of learning the markov model.");
-            var model = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.States);
+            var model = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.States, options.DataSet);
             return 0;
         }
 
