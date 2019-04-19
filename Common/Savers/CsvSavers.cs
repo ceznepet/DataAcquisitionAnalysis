@@ -44,5 +44,18 @@ namespace Common.Savers
         {
             File.AppendAllText(fileName + ".csv",  measuredData + "\n");
         }
+
+        public static void SaveClassificationOuput(int[] testOutput, int[] testRefence, string fileName)
+        {
+            var length = testOutput.Length;
+            File.WriteAllText(fileName, "Test Output,Test Reference\n");
+            for(var i = 0; i < length; i++)
+            {
+                var test = testOutput[i].ToString();
+                var reference = testRefence[i].ToString();
+
+                File.AppendAllText(fileName, test + "," + reference + "\n");
+            }
+        }
     }
 }

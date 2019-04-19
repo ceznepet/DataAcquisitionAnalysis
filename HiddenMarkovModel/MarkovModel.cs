@@ -2,6 +2,7 @@
 using Accord.Statistics.Analysis;
 using Common.Extensions;
 using Common.Loaders;
+using Common.Savers;
 using HMModel.Models;
 using NLog;
 using System.Linq;
@@ -30,8 +31,8 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence();
-            var testOutputs = test.GetLabels();
+            var testData = test.ToSequence().Take(22).ToArray();
+            var testOutputs = test.GetLabels().Take(22).ToArray();
             Logger.Info("Load done.");
 
             //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
@@ -60,6 +61,9 @@ namespace HMModel
             var trainAccTest2 = confusionMatrix2.Accuracy;
 
             Logger.Info("Check of performance: {0}", trainAccTest2);
+
+            //CsvSavers.SaveClassificationOuput(testPredict2, testOutputs, @"C:\Projects\Diplomka\DataProcessing\data\compare_bad.csv");
+
         }
     }
 }
