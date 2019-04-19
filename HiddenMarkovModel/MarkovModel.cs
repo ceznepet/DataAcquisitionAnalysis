@@ -20,7 +20,7 @@ namespace HMModel
             var operations = train.ToList();
             var length = operations.Count();
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take,  states, testFolder);
+            Learning.StartTeaching(operations, operations.Skip(length / 2), skip, take,  states, testFolder);
         }
 
         public MarkovModel(string modelPath, string dataFolder, int take)
