@@ -13,6 +13,8 @@ namespace HMModel.Models
         public double[] Sequence { get; set; }
         public int State { get; set; }
 
+        public double LogLikelihoodDifferences { get; set; }
+
 
         public Decision(double classifier, double probability, int state, double[] sequence)
         {
@@ -22,11 +24,12 @@ namespace HMModel.Models
             Sequence = sequence;
         }
 
-        public Decision(double classifier, double probability, int state)
+        public Decision(double classifier, double logDifferences, int state)
         {
             ClassifierProbability = classifier;
-            Probability = probability;
+            LogLikelihoodDifferences = logDifferences;
             State = state;
         }
+
     }
 }

@@ -37,7 +37,7 @@ namespace HMModel.Models
             Model = model;
             MarkovStatistics = new RunningMarkovStatistics(Model);
             Classifier = classifier;
-            Classifier.Sensitivity = 1E-120;
+            Classifier.Sensitivity = 1e-150;
             StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
         }
@@ -75,12 +75,8 @@ namespace HMModel.Models
             }
             var classifierProbability = Classifier.Probability(sequence);
             var proba = logLikelihoods.Select(item => (item) / logLikelihoods.Sum());
-            //var pp = Classifier.ToMulticlass().Probabilities(sequence, new double[22]);
 
-            StatesQueue.Enqueue(decision);
-            
-            CleanStatesQueue();
-            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) - logLikelihoods.Max(), decision + 1);
+            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , decision + 1);
         }
 
         private void CleanStatesQueue()

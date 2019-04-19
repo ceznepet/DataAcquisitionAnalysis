@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -45,16 +46,14 @@ namespace Common.Savers
             File.AppendAllText(fileName + ".csv",  measuredData + "\n");
         }
 
-        public static void SaveClassificationOuput(int[] testOutput, int[] testRefence, string fileName)
+        public static void SaveClassificationOuput(Dictionary<int, double>  testOutput, string columns, string fileName)
         {
-            var length = testOutput.Length;
-            File.WriteAllText(fileName, "Test Output,Test Reference\n");
-            for(var i = 0; i < length; i++)
+            File.WriteAllText(fileName, columns + "\n");
+            foreach(var key in testOutput.Keys)
             {
-                var test = testOutput[i].ToString();
-                var reference = testRefence[i].ToString();
+                var test = testOutput[key].ToString("0.0000000", CultureInfo.InvariantCulture);
 
-                File.AppendAllText(fileName, test + "," + reference + "\n");
+                File.AppendAllText(fileName, key + "," +test + "\n");
             }
         }
     }
