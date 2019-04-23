@@ -56,5 +56,18 @@ namespace Common.Savers
                 File.AppendAllText(fileName, key + "," +test + "\n");
             }
         }
+
+        public static void SaveLogLikelihoodEvaluation(string fileName, double[][] logLikelihood)
+        {
+            File.AppendAllText(fileName, "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22\n");
+            foreach (var likelihood in logLikelihood)
+            {
+                var line = string.Join(", ", likelihood
+                                 .Select(element => element.ToString("0.0000000", CultureInfo.InvariantCulture))
+                                 .ToArray());
+                File.AppendAllText(fileName, line + "\n");
+            }
+
+        }
     }
 }

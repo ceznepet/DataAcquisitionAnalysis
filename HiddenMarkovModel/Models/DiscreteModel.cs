@@ -11,6 +11,7 @@ using Accord.Statistics.Distributions.Univariate;
 using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Running;
 using NLog;
+using Common.Savers;
 
 namespace HMModel.Models
 {
@@ -74,17 +75,33 @@ namespace HMModel.Models
                 logLikelihoods.Add(model.LogLikelihood(sequence));
             }
             var classifierProbability = Classifier.Probability(sequence);
-            var proba = logLikelihoods.Select(item => (item) / logLikelihoods.Sum());
 
-            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , decision + 1);
+            var operation = logLikelihoods.ToList().IndexOf(logLikelihoods.Max());
+
+            if (decision  == -1)
+            {
+                Logger.Warn("The operation is: {}, but it is out the refrence. \n It is possible, that the robot is demage, please call the maintenance", operation);
+            }
+
+            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , operation + 1);
         }
 
-        private void CleanStatesQueue()
+        public void Decide(double[][] sequence, string filePath)
         {
-            if (StatesQueue.Count == 5)
+            var decisionList = new List<double[]>();
+            var samples = new List<double[]>();
+            var logLikelihoods = new List<double>();
+            foreach (var line in sequence)
             {
-                StatesQueue.Dequeue();
+                samples.Add(line);
+                foreach (var model in Classifier.Models)
+                {
+                    logLikelihoods.Add(model.LogLikelihood(samples.ToArray()));
+                }                
+                decisionList.Add(logLikelihoods.ToArray());
+                logLikelihoods.Clear();
             }
+            CsvSavers.SaveLogLikelihoodEvaluation(filePath, decisionList.ToArray());
         }
 
         private double[,] CreateTransitionMatrix()

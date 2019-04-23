@@ -33,13 +33,16 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence().Take(250).ToArray();
-            var testOutputs = test.GetLabels().Take(250).ToArray();
+            var testData = test.ToSequence();
+            var testOutputs = test.GetLabels();
             Logger.Info("Load done.");
 
             //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
+
+            //trainer.Decide(testData[400], @"C:\Users\cezyc\OneDrive\Plocha\log_likelihood.csv");
+
             var decisions = testData.Select(element => trainer.Decide(element));
             var count = 0;
             var enumerable = decisions.ToList();
