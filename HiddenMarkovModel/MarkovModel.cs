@@ -4,12 +4,12 @@ using Accord.Statistics.Analysis;
 using Common.Extensions;
 using Common.Loaders;
 using Common.Savers;
-using HMModel.Models;
 using NLog;
 using System.Collections.Generic;
 using System.Linq;
+using MarkovModule.Models;
 
-namespace HMModel
+namespace MarkovModule
 {
     public class MarkovModel
     {
@@ -33,8 +33,8 @@ namespace HMModel
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take).ToList();
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
 
-            var testData = test.ToSequence();
-            var testOutputs = test.GetLabels();
+            var testData = test.ToSequence().Take(100).ToArray();
+            var testOutputs = test.GetLabels().Take(100).ToArray();
             Logger.Info("Load done.");
 
             //testData = testData.Apply(Accord.Statistics.Tools.ZScores);

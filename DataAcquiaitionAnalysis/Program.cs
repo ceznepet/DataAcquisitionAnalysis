@@ -6,10 +6,10 @@ using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
 using KunbusRevolutionPiModule.Robot;
 using Newtonsoft.Json;
-using TcpCommunication.TcpClientDAA;
+using TcpCommunicationModule.TcpClientDAA;
 using Common.Logging;
 using DataAcquisitionAnalysis.Processing;
-using HMModel;
+using MarkovModule;
 using NLog;
 
 namespace DataAcquisitionAnalysis

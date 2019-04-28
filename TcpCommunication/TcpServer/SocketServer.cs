@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 
-namespace TcpCommunication.TcpServer
+namespace TcpCommunicationModule.TcpServer
 {
     public class StateObject
     {

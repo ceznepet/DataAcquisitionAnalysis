@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAcquisitionAnalysis", "
 		{53F533B6-AC10-49E2-8763-E4484A12B664} = {53F533B6-AC10-49E2-8763-E4484A12B664}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpCommunication", "TcpCommunication\TcpCommunication.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpCommunicationModule", "TcpCommunication\TcpCommunicationModule.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseModule", "DatabaseModule\DatabaseModule.csproj", "{944B6E9C-5D28-418E-9125-F168DDBD0B33}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KunbusRevolutionPiModule", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{53F533B6-AC10-49E2-8763-E4484A12B664}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HMModel", "HiddenMarkovModel\HMModel.csproj", "{DB7277FD-9D6A-4623-A5B4-7228442CB0FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarkovModule", "HiddenMarkovModel\MarkovModule.csproj", "{DB7277FD-9D6A-4623-A5B4-7228442CB0FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

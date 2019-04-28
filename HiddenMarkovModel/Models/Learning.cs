@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using NLog;
 using NLog.LayoutRenderers;
 
-namespace HMModel.Models
+namespace MarkovModule.Models
 {
     public class Learning
     {

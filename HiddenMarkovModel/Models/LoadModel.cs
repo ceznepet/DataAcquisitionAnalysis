@@ -4,7 +4,7 @@ using Accord.Statistics.Models.Markov;
 using System.IO;
 using Accord.Statistics.Distributions.Univariate;
 
-namespace HMModel.Models
+namespace MarkovModule.Models
 {
     public class LoadModel
     {
@@ -24,7 +24,7 @@ namespace HMModel.Models
 
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> LoadClassifier()
         {
-            return Serializer.Load<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>>(Path.Combine(FilePath, "markov_model_rl_14.bin"));
+            return Serializer.Load<HiddenMarkovClassifier<MultivariateNormalDistribution, double[]>>(Path.Combine(FilePath, "markov_model_r_long_14.bin"));
         }
 
         public static HiddenMarkovModel LoadMarkovModel(string filePath)

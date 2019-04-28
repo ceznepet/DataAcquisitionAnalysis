@@ -13,7 +13,7 @@ using Accord.Statistics.Running;
 using NLog;
 using Common.Savers;
 
-namespace HMModel.Models
+namespace MarkovModule.Models
 {
     public class DiscreteModel
     {
@@ -38,7 +38,7 @@ namespace HMModel.Models
             Model = model;
             MarkovStatistics = new RunningMarkovStatistics(Model);
             Classifier = classifier;
-            Classifier.Sensitivity = 1e-150;
+            Classifier.Sensitivity = 0.01;
             StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
         }

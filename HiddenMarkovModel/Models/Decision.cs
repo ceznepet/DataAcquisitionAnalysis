@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Transactions;
 
-namespace HMModel.Models
+namespace MarkovModule.Models
 {
     public class Decision
     {

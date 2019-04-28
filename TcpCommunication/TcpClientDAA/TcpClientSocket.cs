@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using DatabaseModule.MongoDB;
 using NLog;
 
-namespace TcpCommunication.TcpClientDAA
+namespace TcpCommunicationModule.TcpClientDAA
 {
     public class TcpClientSocket
     {
