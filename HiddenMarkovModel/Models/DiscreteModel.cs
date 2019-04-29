@@ -23,24 +23,30 @@ namespace MarkovModule.Models
         private RunningMarkovStatistics MarkovStatistics { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
         private Queue<int> StatesQueue { get; set; }
+
+        private double[] ProbabilityA { get; set; }
+
         private static readonly Logger Logger = LogManager.GetLogger("Discrete model");
 
         public DiscreteModel(int states, int[] learnedPrediction)
         {
-            States = states + 1;
+            States = states;
             LearnedPrediction = learnedPrediction;
             StatesQueue = new Queue<int>(5);
             SetUpModel();
+            ProbabilityA = CreateInitial();
         }
 
         public DiscreteModel(HiddenMarkovModel model, HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> classifier)
         {
             Model = model;
+            States = classifier.NumberOfClasses;
             MarkovStatistics = new RunningMarkovStatistics(Model);
             Classifier = classifier;
-            Classifier.Sensitivity = 0.01;
+            Classifier.Sensitivity = 1e-150;
             StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
+            ProbabilityA = CreateInitial();
         }
 
         private void SetUpModel()
@@ -82,7 +88,7 @@ namespace MarkovModule.Models
             {
                 Logger.Warn("The operation is: {}, but it is out the refrence. \n It is possible, that the robot is demage, please call the maintenance", operation);
             }
-
+            ComputeCurrentState(logLikelihoods.ToArray());
             return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , operation + 1);
         }
 
@@ -101,15 +107,25 @@ namespace MarkovModule.Models
                 decisionList.Add(logLikelihoods.ToArray());
                 logLikelihoods.Clear();
             }
+            ComputeCurrentState(logLikelihoods.ToArray());
             CsvSavers.SaveLogLikelihoodEvaluation(filePath, decisionList.ToArray());
         }
 
         private double[,] CreateTransitionMatrix()
         {
             var transition = CalculateFrequency().ToJagged();
-            transition[0] = Vector.Create(States, 1.0);
             return NormalizeTransition(transition).ToArray().ToMatrix();
 
+        }
+
+        private void ComputeCurrentState(double[] probabilityC)
+        {
+            var probabilityD = Model.LogTransitions.Dot(ProbabilityA);
+            var newProbabilityA = probabilityD.Dot(Matrix.Diagonal(probabilityC));
+
+            ProbabilityA = newProbabilityA;
+
+            var retVal = ProbabilityA.Max();
         }
 
         private double[,] CalculateFrequency()
@@ -122,11 +138,11 @@ namespace MarkovModule.Models
             {
                 if (i == 0)
                 {
-                    prevState = LearnedPrediction[i];
+                    prevState = LearnedPrediction[i] - 1;
                     continue;
                 }
 
-                var state = LearnedPrediction[i];
+                var state = LearnedPrediction[i] - 1;
                 transition[prevState, state] += 1;
                 prevState = state;
             }
