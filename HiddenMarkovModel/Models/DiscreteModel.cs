@@ -125,7 +125,7 @@ namespace MarkovModule.Models
 
             ProbabilityA = newProbabilityA;
 
-            var retVal = ProbabilityA.Max();
+            var retVal = ProbabilityA.IndexOf(ProbabilityA.Min());
         }
 
         private double[,] CalculateFrequency()
