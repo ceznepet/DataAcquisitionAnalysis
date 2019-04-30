@@ -37,7 +37,7 @@ namespace MarkovModule
             var testOutputs = test.GetLabels().Take(100).ToArray();
             Logger.Info("Load done.");
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
+            testData = testData.Apply(Accord.Statistics.Tools.ZScores);
 
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
 
