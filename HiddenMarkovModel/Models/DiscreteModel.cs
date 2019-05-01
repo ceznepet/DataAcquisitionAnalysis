@@ -88,8 +88,8 @@ namespace MarkovModule.Models
             {
                 Logger.Warn("The operation is: {}, but it is out the refrence. \n It is possible, that the robot is demage, please call the maintenance", operation);
             }
-            ComputeCurrentState(logLikelihoods.ToArray());
-            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , operation + 1);
+            /*ComputeCurrentState(logLikelihoods.ToArray())*/;
+            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , ComputeCurrentState(logLikelihoods.ToArray()) + 1);
         }
 
         public void Decide(double[][] sequence, string filePath)
@@ -107,7 +107,7 @@ namespace MarkovModule.Models
                 decisionList.Add(logLikelihoods.ToArray());
                 logLikelihoods.Clear();
             }
-            ComputeCurrentState(logLikelihoods.ToArray());
+            //ComputeCurrentState(logLikelihoods.ToArray());
             CsvSavers.SaveLogLikelihoodEvaluation(filePath, decisionList.ToArray());
         }
 
@@ -118,33 +118,30 @@ namespace MarkovModule.Models
 
         }
 
-        private void ComputeCurrentState(double[] probabilityC)
+        private int ComputeCurrentState(double[] probabilityC)
         {
-            var probabilityD = Model.LogTransitions.Dot(ProbabilityA);
-            var newProbabilityA = probabilityD.Dot(Matrix.Diagonal(probabilityC));
+            probabilityC = probabilityC.Select(item => item / probabilityC.Sum()).ToArray();
+            var probabilityD = Model.Transitions.Multiply(ProbabilityA);
+            probabilityD = probabilityD.Select(item => item / probabilityD.Sum()).ToArray();
+            var newProbabilityA = Matrix.Diagonal(probabilityD).Multiply(probabilityC);
 
             ProbabilityA = newProbabilityA;
-
-            var retVal = ProbabilityA.IndexOf(ProbabilityA.Min());
+            //ProbabilityA = ProbabilityA.Select(item => item / ProbabilityA.Sum()).ToArray();
+            return ProbabilityA.IndexOf(ProbabilityA.Min());
         }
 
         private double[,] CalculateFrequency()
         {
-            var transition = Matrix.Create(States, States, 0.5);
+            var transition = Matrix.Create(States, States, 0.001);
 
-            var prevState = 0;
-
-            for (var i = 0; i < LearnedPrediction.Length; i++)
+            var prevState = 21;
+            int k = 0;
+            for (var i = 0; i < 22; i++)
             {
-                if (i == 0)
-                {
-                    prevState = LearnedPrediction[i] - 1;
-                    continue;
-                }
-
-                var state = LearnedPrediction[i] - 1;
-                transition[prevState, state] += 1;
+                var state = k;
+                transition[prevState, state] += 20;
                 prevState = state;
+                k++;
             }
 
             return transition;
