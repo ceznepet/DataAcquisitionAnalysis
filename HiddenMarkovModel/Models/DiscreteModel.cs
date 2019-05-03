@@ -5,10 +5,7 @@ using Accord.Statistics.Models.Markov;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Accord.MachineLearning;
 using Accord.Statistics.Distributions.Multivariate;
-using Accord.Statistics.Distributions.Univariate;
-using Accord.Statistics.Models.Markov.Learning;
 using Accord.Statistics.Running;
 using NLog;
 using Common.Savers;
@@ -18,21 +15,17 @@ namespace MarkovModule.Models
     public class DiscreteModel
     {
         private int States { get; set; }
-        private int[] LearnedPrediction { get; set; }
-        private HiddenMarkovModel Model { get; set; }
         private RunningMarkovStatistics MarkovStatistics { get; set; }
+        private HiddenMarkovModel Model { get; set; }
         private HiddenMarkovClassifier<MultivariateNormalDistribution, double[]> Classifier { get; set; }
-        private Queue<int> StatesQueue { get; set; }
 
         private double[] ProbabilityA { get; set; }
 
         private static readonly Logger Logger = LogManager.GetLogger("Discrete model");
 
-        public DiscreteModel(int states, int[] learnedPrediction)
+        public DiscreteModel(int states)
         {
             States = states;
-            LearnedPrediction = learnedPrediction;
-            StatesQueue = new Queue<int>(5);
             SetUpModel();
             ProbabilityA = CreateInitial();
         }
@@ -44,7 +37,6 @@ namespace MarkovModule.Models
             MarkovStatistics = new RunningMarkovStatistics(Model);
             Classifier = classifier;
             Classifier.Sensitivity = 1e-150;
-            StatesQueue = new Queue<int>(5);
             Model.Algorithm = HiddenMarkovModelAlgorithm.Viterbi;
             ProbabilityA = CreateInitial();
         }
@@ -82,14 +74,14 @@ namespace MarkovModule.Models
             }
             var classifierProbability = Classifier.Probability(sequence);
 
-            var operation = logLikelihoods.ToList().IndexOf(logLikelihoods.Max());
+            var logLikelihood = logLikelihoods.ToArray();
+            var operation = logLikelihood.IndexOf(logLikelihoods.Max());
 
             if (decision  == -1)
             {
                 Logger.Warn("The operation is: {}, but it is out the refrence. \n It is possible, that the robot is demage, please call the maintenance", operation);
             }
-            /*ComputeCurrentState(logLikelihoods.ToArray())*/;
-            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , ComputeCurrentState(logLikelihoods.ToArray()) + 1);
+            return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , ComputeCurrentState(logLikelihood) + 1);
         }
 
         public void Decide(double[][] sequence, string filePath)
@@ -107,7 +99,6 @@ namespace MarkovModule.Models
                 decisionList.Add(logLikelihoods.ToArray());
                 logLikelihoods.Clear();
             }
-            //ComputeCurrentState(logLikelihoods.ToArray());
             CsvSavers.SaveLogLikelihoodEvaluation(filePath, decisionList.ToArray());
         }
 
@@ -121,14 +112,14 @@ namespace MarkovModule.Models
         private int ComputeCurrentState(double[] probabilityC)
         {
             probabilityC = probabilityC.Select(item => item / probabilityC.Sum()).ToArray();
-            var probabilityD = Model.Transitions.Multiply(ProbabilityA);
+            var probabilityD = Model.LogTransitions.Dot(ProbabilityA);
             probabilityD = probabilityD.Select(item => item / probabilityD.Sum()).ToArray();
-            var newProbabilityA = Matrix.Diagonal(probabilityD).Multiply(probabilityC);
+            var newProbabilityA = Matrix.Diagonal(probabilityD).Dot(probabilityC);
 
             ProbabilityA = newProbabilityA;
-            //ProbabilityA = ProbabilityA.Select(item => item / ProbabilityA.Sum()).ToArray();
+            ProbabilityA = ProbabilityA.Select(item => item / ProbabilityA.Sum()).ToArray();
             return ProbabilityA.IndexOf(ProbabilityA.Min());
-        }
+       }
 
         private double[,] CalculateFrequency()
         {
@@ -139,7 +130,7 @@ namespace MarkovModule.Models
             for (var i = 0; i < 22; i++)
             {
                 var state = k;
-                transition[prevState, state] += 20;
+                transition[prevState, state] += 100;
                 prevState = state;
                 k++;
             }

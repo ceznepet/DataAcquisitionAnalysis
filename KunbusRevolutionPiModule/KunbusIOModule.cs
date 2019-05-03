@@ -20,12 +20,14 @@ namespace KunbusRevolutionPiModule
         private KunbusIoVariables MeasuredVariables { get; }
         private MongoSaver Saver { get; }
         private bool DeviceActive { get; }
+        private int[] Features { get; set; }
+        private List<double[]> MeasurmentBatch { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Kunbus Thread");
         private readonly ProfinetIOConfig _config;
         private readonly VariableComponent _changeCycle;
         private readonly Thread _samplerThread;
         private Thread SaveThread;
-        private MeasuredVariables ToSaveMeasurement;
+        private MeasuredVariables ToSaveMeasurement;        
         private List<VariableComponent> Time;
         private readonly uint ChangeDetectionStatus = 0;
 
@@ -52,7 +54,31 @@ namespace KunbusRevolutionPiModule
             }
 
             Logger.Trace("End of I/O read.");
-        }      
+        }   
+        
+        public KunbusIOModule(string pathToConfiguration, bool endian, int period, int[] features)
+        {
+            MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
+            Time = MeasuredVariables.Time;
+            _config = new ProfinetIOConfig { Period = period, BigEndian = endian };
+            _changeCycle = MeasuredVariables.ProfinetProperty[1];
+            MeasurmentBatch = new List<double[]>();
+            Features = features;
+            try
+            {
+                KunbusRevolutionPiWrapper.piControlOpen();
+                DeviceActive = true;
+                _samplerThread = new Thread(LiveDataAcquisition);
+                _samplerThread.Start();
+
+            }
+            catch (BadImageFormatException exception)
+            {
+                Logger.Error("It seems like the application is not running on Kunbus Device... {0}", exception);
+            }
+
+            Logger.Trace("End of I/O read.");
+        }
 
         ~KunbusIOModule()   
         {
@@ -64,6 +90,25 @@ namespace KunbusRevolutionPiModule
             else
             {
                 Logger.Warn("Application is not runnig on Kunbus Device...");
+            }
+        }
+
+        private void LiveDataAcquisition()
+        {
+            while (true)
+            {
+                Thread.Sleep(_config.Period);
+
+                if (!DeviceActive) continue;
+
+                try
+                {
+                    ReadVariablesFromInputs();
+                }
+                catch (OutOfMemoryException exception)
+                {
+                    Logger.Error("Out of memory!");
+                }
             }
         }
 
@@ -87,14 +132,30 @@ namespace KunbusRevolutionPiModule
             }
         }
 
-        private bool DataChange(VariableComponent kunbusIo)
+        private void ReadVariablesToBatch()
         {
-            var result = ReadKunbusInputs(kunbusIo);
-            if (result == ChangeDetectionStatus)
+            if(MeasuredVariables.ProfinetProperty[4].Value != 1)
             {
-                return true;
+                ToSaveMeasurement = null;
+                ToSaveMeasurement = new MeasuredVariables();
+
+                foreach (var variable in MeasuredVariables.Variables)
+                {
+                    ReadVariableFromInputs(variable, false);
+                }
+
+                var measuerement = MeasuredVariables.GetMeasuredValues().ToList();
+                var tempArray = new List<double>();
+                foreach (var position in Features)
+                {
+                    tempArray.Add(measuerement[position]);
+                }
+                MeasurmentBatch.Add(tempArray.ToArray());
             }
-            return false;
+            else
+            {
+                //TODO: Implement sending to classifier
+            }       
         }
 
         private void ReadVariablesFromInputs()

@@ -191,6 +191,16 @@
       "Name": "Change",
       "BytOffset": 28,
       "Length": 1
+    },
+    {
+      "Name": "StartProgram",
+      "BytOffset": 30,
+      "Length": 1
+    },
+    {
+      "Name": "EndProgram",
+      "BytOffset": 31,
+      "Length": 1
     }
   ],
   "Time": [

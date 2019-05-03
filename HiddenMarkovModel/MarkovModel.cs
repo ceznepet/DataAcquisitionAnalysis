@@ -15,10 +15,11 @@ namespace MarkovModule
     {
         private static readonly Logger Logger = LogManager.GetLogger("Markov main");
 
+        public DiscreteModel DiscreteModel { get; set; }
+
         public MarkovModel(string trainFolder, string testFolder, int states, int take)
         {
             const int skip = 0;
-            const bool product = false;
             Logger.Info("Start loading data...");
             var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true, take);
             var operations = train.ToList();
@@ -37,11 +38,7 @@ namespace MarkovModule
             var testOutputs = test.GetLabels().Take(100).ToArray();
             Logger.Info("Load done.");
 
-            //testData = testData.Apply(Accord.Statistics.Tools.ZScores);
-
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
-
-            //trainer.Decide(testData[400], @"C:\Users\cezyc\OneDrive\Plocha\log_likelihood.csv");
 
             var decisions = testData.Select(element => trainer.Decide(element));
             var count = 0;
@@ -61,50 +58,18 @@ namespace MarkovModule
                 count++;
             }
 
-
-
             var testPredict2 = enumerable.Select(item => item.State).ToArray();
             var confusionMatrix2 = new GeneralConfusionMatrix(testPredict2, testOutputs);
             var trainAccTest2 = confusionMatrix2.Accuracy;
 
             Logger.Info("Check of performance: {0}", trainAccTest2);
-            var meanOfThreshold = CreateList(enumerable);
-            //CsvSavers.SaveClassificationOuput(meanOfThreshold, "Op,Mean", @"C:\Users\cezyc\OneDrive\Plocha\means.csv");
-
-        }
+        }        
 
 
-        private Dictionary<int, double> CreateList(List<Decision> decisions)
+        public void LoadMarkovModels(string modelPath)
         {
-            var checkOperation = new HashSet<int>();
-            var dictonary = new Dictionary<int, List<double>>();
-
-            foreach(var decision in decisions)
-            {
-                if (!checkOperation.Contains(decision.State))
-                {
-                    checkOperation.Add(decision.State);
-                    dictonary.Add(decision.State, new List<double>());
-                }
-
-                dictonary[decision.State].Add(decision.LogLikelihoodDifferences);
-            }
-
-            return ComputeMean(dictonary);
-
-        }
-
-        private Dictionary<int, double>  ComputeMean(Dictionary<int, List<double>> dictionary)
-        {
-            var sorted = new SortedDictionary<int, List<double>>(dictionary);
-            var retList = new Dictionary<int, double>();
-
-            foreach(var key in sorted.Keys)
-            {
-                retList.Add(key, sorted[key].ToArray().Mean());
-            }
-
-            return retList;
+            var classifier = LoadModel.LoadMarkovClassifier(modelPath);
+            DiscreteModel = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier);
         }
     }
 }
