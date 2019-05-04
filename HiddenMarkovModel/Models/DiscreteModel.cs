@@ -84,6 +84,26 @@ namespace MarkovModule.Models
             return new Decision(classifierProbability, Classifier.Threshold.LogLikelihood(sequence) , ComputeCurrentState(logLikelihood) + 1);
         }
 
+        public void OnlineDecide(double[][] sequence)
+        {
+            var decision = Classifier.Decide(sequence);
+            var logLikelihoods = new List<double>();
+
+            foreach (var model in Classifier.Models)
+            {
+                logLikelihoods.Add(model.LogLikelihood(sequence));
+            }
+            var operation = logLikelihoods.IndexOf(logLikelihoods.Max()) + 1;
+            if (decision == -1)
+            {
+                Logger.Warn("The operation is: {}, but it is out the refrence. \n It is possible, that the robot is demage, please call the maintenance", operation);
+            }
+            else
+            {
+                Logger.Info("Current operation is: {}", decision);
+            }
+        }
+
         public void Decide(double[][] sequence, string filePath)
         {
             var decisionList = new List<double[]>();

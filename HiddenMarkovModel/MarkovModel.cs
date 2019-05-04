@@ -66,7 +66,7 @@ namespace MarkovModule
         }        
 
 
-        public void LoadMarkovModels(string modelPath)
+        public MarkovModel(string modelPath)
         {
             var classifier = LoadModel.LoadMarkovClassifier(modelPath);
             DiscreteModel = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier);

@@ -10,6 +10,7 @@ using KunbusRevolutionPiModule.Conversion;
 using KunbusRevolutionPiModule.Kunbus;
 using KunbusRevolutionPiModule.Robot;
 using KunbusRevolutionPiModule.Wrapper;
+using MarkovModule;
 using Newtonsoft.Json;
 using NLog;
 
@@ -22,11 +23,14 @@ namespace KunbusRevolutionPiModule
         private bool DeviceActive { get; }
         private int[] Features { get; set; }
         private List<double[]> MeasurmentBatch { get; set; }
+        private MarkovModel Markov { get; set; }
+        private float EdgeDetection { get; set; }
         private static readonly Logger Logger = LogManager.GetLogger("Kunbus Thread");
         private readonly ProfinetIOConfig _config;
         private readonly VariableComponent _changeCycle;
         private readonly Thread _samplerThread;
         private Thread SaveThread;
+        private Thread MarkovThread;
         private MeasuredVariables ToSaveMeasurement;        
         private List<VariableComponent> Time;
         private readonly uint ChangeDetectionStatus = 0;
@@ -56,9 +60,11 @@ namespace KunbusRevolutionPiModule
             Logger.Trace("End of I/O read.");
         }   
         
-        public KunbusIOModule(string pathToConfiguration, bool endian, int period, int[] features)
+        public KunbusIOModule(string pathToConfiguration, string pathToModels, bool endian, int period, int[] features)
         {
             MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
+            Markov = new MarkovModel(pathToModels);
+            EdgeDetection = 0;
             Time = MeasuredVariables.Time;
             _config = new ProfinetIOConfig { Period = period, BigEndian = endian };
             _changeCycle = MeasuredVariables.ProfinetProperty[1];
@@ -134,7 +140,7 @@ namespace KunbusRevolutionPiModule
 
         private void ReadVariablesToBatch()
         {
-            if(MeasuredVariables.ProfinetProperty[4].Value != 1)
+            if(MeasuredVariables.ProfinetProperty[4].Value == EdgeDetection)
             {
                 ToSaveMeasurement = null;
                 ToSaveMeasurement = new MeasuredVariables();
@@ -154,7 +160,9 @@ namespace KunbusRevolutionPiModule
             }
             else
             {
-                //TODO: Implement sending to classifier
+                MarkovThread = new Thread(() => Markov.DiscreteModel.OnlineDecide(MeasurmentBatch.ToArray()));
+                MarkovThread.Start();
+                MeasurmentBatch.Clear();
             }       
         }
 
