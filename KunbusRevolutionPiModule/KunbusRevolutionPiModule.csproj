@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DatabaseModule\DatabaseModule.csproj" />
+    <ProjectReference Include="..\HiddenMarkovModel\MarkovModule.csproj" />
   </ItemGroup>
 
 </Project>
