@@ -60,7 +60,7 @@ namespace KunbusRevolutionPiModule
             Logger.Trace("End of I/O read.");
         }   
         
-        public KunbusIOModule(string pathToConfiguration, string pathToModels, bool endian, int period, int[] features)
+        public KunbusIOModule(string pathToConfiguration, string pathToModels, bool endian, int period, string featuresPath)
         {
             MeasuredVariables = JsonConvert.DeserializeObject<KunbusIoVariables>(File.ReadAllText(pathToConfiguration));
             Markov = new MarkovModel(pathToModels);
@@ -69,7 +69,8 @@ namespace KunbusRevolutionPiModule
             _config = new ProfinetIOConfig { Period = period, BigEndian = endian };
             _changeCycle = MeasuredVariables.ProfinetProperty[1];
             MeasurmentBatch = new List<double[]>();
-            Features = features;
+            var features = JsonConvert.DeserializeObject<SelectedFeatures>(File.ReadAllText(featuresPath));
+            Features = features.Features.ToArray();
             try
             {
                 KunbusRevolutionPiWrapper.piControlOpen();
@@ -109,7 +110,7 @@ namespace KunbusRevolutionPiModule
 
                 try
                 {
-                    ReadVariablesFromInputs();
+                    ReadVariablesToBatch();
                 }
                 catch (OutOfMemoryException exception)
                 {

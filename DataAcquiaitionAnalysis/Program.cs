@@ -21,12 +21,14 @@ namespace DataAcquisitionAnalysis
         {
             LoggerSetUp.SetUpLogger();
             Parser.Default
-                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions, DataProcessingOptions>(args)
+                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions,
+                                DataProcessingOptions, OnlineClassificationOptions>(args)
                 .MapResult((TcpSocketSaveOptions options) => PacketSaver(options),
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
                     (KunbusOptions options) => KunbusModule(options),
                     (MarkovOptions options) => MarkovModel(options),
                     (DataProcessingOptions options) => DataProcessing(options),
+                    (OnlineClassificationOptions options) => OnlineAnalysis(options),
                     errs => 1);
         }
 
@@ -77,6 +79,14 @@ namespace DataAcquisitionAnalysis
         {
             Logger.Info("Start of learning the markov model.");
             var processing = new DataProcessing(options.Folder, options.SaveFile);
+            return 0;
+        }
+
+        public static int OnlineAnalysis(OnlineClassificationOptions options)
+        {
+            Logger.Info("Online Analysis started.");
+            var endian = options.BigEndian == "1";
+            var online = new KunbusIOModule(options.ConfigurationFile, options.FolderPath, endian, options.Period, options.Features);
             return 0;
         }
     }

@@ -35,6 +35,7 @@ namespace DatabaseModule.MongoDB
 
             var source = int.Parse(profinet) == 1 ? "_profinet" : "_ethernet";
             FileName = Folder + "/" + fileName + source;
+            CsvSavers.CsvHeader(FileName);
         }
 
         private IMongoDatabase Database { get; }

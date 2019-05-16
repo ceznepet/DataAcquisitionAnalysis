@@ -41,6 +41,21 @@ namespace MarkovModule.Models
             ProbabilityA = CreateInitial();
         }
 
+        public static int[] GetFake()
+        {
+            var state = 22;
+            var transition = GenerateFakeTranstionMatrix();
+
+            var emission = Matrix.Diagonal(state, state, 1.0);
+            var initial = Vector.Create(state, 1.0 / (state));
+
+            var model = new HiddenMarkovModel(transition, emission, initial);
+
+            var path = model.Generate(440);
+
+            return path;
+        }
+
         private void SetUpModel()
         {
             var transition = CreateTransitionMatrix();
@@ -156,6 +171,30 @@ namespace MarkovModule.Models
             }
 
             return transition;
+        }
+
+
+        private static double[,] GenerateFakeTranstionMatrix()
+        {
+            var states = 22;
+            var transition = Matrix.Create(states, states, 0.001);
+            var random = new Random();
+
+            var prevState = 21;
+            int k = 0;
+            for (var i = 0; i < 22; i++)
+            {
+                var state = k;
+                transition[prevState, state] += 100;
+                transition[prevState, random.Next(0, states)] += 90;
+                transition[prevState, random.Next(0, states)] += 90;
+                transition[prevState, random.Next(0, states)] += 90;
+                transition[prevState, random.Next(0, states)] += 90;
+                prevState = state;
+                k++;
+            }
+
+            return transition.ToJagged().Select(row => row.Divide(row.Sum())).ToArray().ToMatrix();
         }
 
         private static IEnumerable<double[]> NormalizeTransition(IEnumerable<double[]> transition)

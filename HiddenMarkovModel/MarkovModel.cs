@@ -38,6 +38,9 @@ namespace MarkovModule
             var testOutputs = test.GetLabels().Take(100).ToArray();
             Logger.Info("Load done.");
 
+            //var path = DiscreteModel.GetFake();
+            //CsvSavers.SaveMarkovPath(@"C:\Users\cezyc\Desktop\path.csv", path);
+
             var trainer = new DiscreteModel(LoadModel.LoadMarkovModel(modelPath), classifier); //LoadModel.LoadMarkovModel(modelPath), classifier || 22, testOutputs.Take(200).ToArray()
 
             var decisions = testData.Select(element => trainer.Decide(element));
