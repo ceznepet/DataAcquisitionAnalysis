@@ -7,11 +7,11 @@ using System.Text.RegularExpressions;
 using DatabaseModule.MongoDB;
 using NLog;
 
-namespace TcpCommunicationModule.TcpClientDAA
+namespace SocketModule.SocketClient
 {
-    public class TcpClientSocket
+    public class SocketClient
     {
-        public TcpClientSocket(string server, int port, string location, string database, string document)
+        public SocketClient(string server, int port, string location, string database, string document)
         {
             Server = server;
             Port = port;

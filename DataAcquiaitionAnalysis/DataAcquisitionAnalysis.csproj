@@ -19,7 +19,7 @@
     <ProjectReference Include="..\DatabaseModule\DatabaseModule.csproj" />
     <ProjectReference Include="..\HiddenMarkovModel\MarkovModule.csproj" />
     <ProjectReference Include="..\KunbusRevolutionPiModule\KunbusRevolutionPiModule.csproj" />
-    <ProjectReference Include="..\TcpCommunication\TcpCommunicationModule.csproj" />
+    <ProjectReference Include="..\TcpCommunication\SocketModule.csproj" />
   </ItemGroup>
 
 </Project>

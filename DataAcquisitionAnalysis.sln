@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.421
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAcquisitionAnalysis", "DataAcquiaitionAnalysis\DataAcquisitionAnalysis.csproj", "{4BA5B74C-ACAB-46A9-AACA-00CC5BAC80A9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{53F533B6-AC10-49E2-8763-E4484A12B664} = {53F533B6-AC10-49E2-8763-E4484A12B664}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcpCommunicationModule", "TcpCommunication\TcpCommunicationModule.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocketModule", "TcpCommunication\SocketModule.csproj", "{D7CC5DA8-47C0-4F38-9319-E8DA967B5B0D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseModule", "DatabaseModule\DatabaseModule.csproj", "{944B6E9C-5D28-418E-9125-F168DDBD0B33}"
 EndProject
