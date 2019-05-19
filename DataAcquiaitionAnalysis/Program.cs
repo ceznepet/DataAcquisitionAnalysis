@@ -1,16 +1,12 @@
-﻿using System;
-using System.IO;
-using CommandLine;
+﻿using CommandLine;
+using Common.Logging;
 using DataAcquisitionAnalysis.Options;
+using DataAcquisitionAnalysis.Processing;
 using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
-using KunbusRevolutionPiModule.Robot;
-using Newtonsoft.Json;
-using TcpCommunicationModule.TcpClientDAA;
-using Common.Logging;
-using DataAcquisitionAnalysis.Processing;
 using MarkovModule;
 using NLog;
+using SocketModule.SocketClient;
 
 namespace DataAcquisitionAnalysis
 {
@@ -21,9 +17,9 @@ namespace DataAcquisitionAnalysis
         {
             LoggerSetUp.SetUpLogger();
             Parser.Default
-                .ParseArguments<TcpSocketSaveOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions,
+                .ParseArguments<SocketOptions, LoadMongoDataOptions, KunbusOptions, MarkovOptions,
                                 DataProcessingOptions, OnlineClassificationOptions>(args)
-                .MapResult((TcpSocketSaveOptions options) => PacketSaver(options),
+                .MapResult((SocketOptions options) => PacketSaver(options),
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
                     (KunbusOptions options) => KunbusModule(options),
                     (MarkovOptions options) => MarkovModel(options),
@@ -32,10 +28,10 @@ namespace DataAcquisitionAnalysis
                     errs => 1);
         }
 
-        public static int PacketSaver(TcpSocketSaveOptions options)
+        public static int PacketSaver(SocketOptions options)
         {
-            Logger.Info("Tcp Socket client started.");
-            var client = new TcpClientSocket(options.Ip, options.Port, options.DatabaseLocation, 
+            Logger.Info("Socket client started.");
+            var client = new SocketClient(options.Ip, options.Port, options.Protocol, options.DatabaseLocation, 
                                              options.Database, options.Document);
             client.ConnectAndReceive();
             return 0;

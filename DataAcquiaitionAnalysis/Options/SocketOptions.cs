@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CommandLine;
+﻿using CommandLine;
 
 namespace DataAcquisitionAnalysis.Options
 {
     [Verb("socket", HelpText = "Use given IP and Port for connection to server.")]
-    public class TcpSocketSaveOptions
+    public class SocketOptions
     {
-        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://localhost:27017")]
+        [Option('l', "local", HelpText = "Network location of MongoDB.", Default = "mongodb://10.35.91.210:27017")]
         public string DatabaseLocation { get; set; }
 
-        [Option('i', "ip", HelpText = "IP address of TCP server", Default = "10.35.91.61")]
+        [Option('i', "ip", HelpText = "IP address of TCP/UDP server", Default = "10.35.91.61")]
         public string Ip { get; set; }
+
+        [Option('s', "protocol", HelpText = "Protocol type (0 - TCP/IP, 1 - UDP/IP)", Default = 0)]
+        public int Protocol { get; set; }
 
         [Option('p', "port", HelpText = "Port number", Default = 54600)]
         public int Port { get; set; }
