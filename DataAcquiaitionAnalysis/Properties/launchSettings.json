@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "mongo -d \"KunbusIoVariables\" -c \"TestbedTest_EthernetKRL\" -p \"0\" -f \"C:\\Data\\TCP\""
+      "commandLineArgs": "online -p \"C:\\Users\\cezyc\\DiskGoogle\\School\\magister\\diplomka\\_petr_cezner_cd_files\\DataAcquisitionAnalysis\\Models\""
     }
   }
 }
