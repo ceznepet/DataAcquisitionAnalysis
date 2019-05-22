@@ -151,11 +151,11 @@ namespace KunbusRevolutionPiModule
                     ReadVariableFromInputs(variable, false);
                 }
 
-                var measuerement = MeasuredVariables.GetMeasuredValues().ToList();
+                var measurement = MeasuredVariables.GetMeasuredValues().ToList();
                 var tempArray = new List<double>();
                 foreach (var position in Features)
                 {
-                    tempArray.Add(measuerement[position]);
+                    tempArray.Add(measurement[position]);
                 }
                 MeasurmentBatch.Add(tempArray.ToArray());
             }
