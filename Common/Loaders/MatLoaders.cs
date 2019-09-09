@@ -7,6 +7,7 @@ using Accord.Math;
 using Accord.Statistics.Kernels;
 using Common.Models;
 using NLog;
+using Common.Extensions;
 
 namespace Common.Loaders
 {
@@ -69,7 +70,7 @@ namespace Common.Loaders
                 throw new Exception("There are no *.mat files in that directory");
             }
 
-                return files.Select(file => LoadToTimeSeriesArray(file.FullName, product, take));
+            return files.Select(file => LoadToTimeSeriesArray(file.FullName, product, take));
         }
 
         private static List<TimeSeries> LoadToTimeSeries(string fileName, bool product)
@@ -81,22 +82,31 @@ namespace Common.Loaders
 
             var name = product ? Path.GetFileNameWithoutExtension(fileName)
                                : Path.GetFileName(Path.GetDirectoryName(fileName));
-            
+
             return data.Select(row => new TimeSeries(row, name)).ToList();
         }
 
         private static Operation LoadToTimeSeriesArray(string fileName, bool product, int take)
         {
-            var matReader = new MatReader(fileName);
+            var matReader = new MatReader(fileName, true, false);
             var names = matReader.FieldNames;
             var data = matReader.Read<double[,]>(names[0]).ToJagged(true);
 
+            var shape = data.Shape();
 
             var name = product ? ((int)data[0].ElementAt(data[0].Length - 1)).ToString()
-                : Path.GetFileName(Path.GetDirectoryName(fileName));
-
-            var saveData = product ? data.Select(row => row.Take(take).ToArray()).ToArray() : data;
-            return new Operation(saveData, name, fileName);
+            : Path.GetFileName(Path.GetDirectoryName(fileName));
+            var loadData = new double[(int)shape[0]][];
+            if (shape[0] > shape[1])
+            {
+                loadData = product ? data.Select(row => row.Take(take).ToArray()).ToArray() : data;
+            }
+            else
+            {
+                loadData = product ? data.Transpose().Select(row => row.Take(take).ToArray()).ToArray()
+                                   : data.Transpose();
+            }
+            return new Operation(loadData, name, fileName);
         }
 
 
@@ -122,6 +132,6 @@ namespace Common.Loaders
             }
 
             return dictionary;
-        }       
+        }
     }
 }

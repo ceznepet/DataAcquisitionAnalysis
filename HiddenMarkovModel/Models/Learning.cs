@@ -78,7 +78,6 @@ namespace MarkovModule.Models
         {
             Generator.Seed = 0;
 
-            var length = 22;
             var sequences = ToSequence(operation, true);
             var labels = GetLabels(operation, true);
 

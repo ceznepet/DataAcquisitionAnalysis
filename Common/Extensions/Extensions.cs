@@ -13,6 +13,16 @@ namespace Common.Extensions
             return data.Select(element => element.Data).ToArray();
         }
 
+        public static double[] Shape(this double[][] array)
+        {
+            var dimension_x = array.Length;
+            var dimension_y = array[0].Length;
+
+            var shape = new double[] {dimension_x, dimension_y};
+
+            return shape;
+        }
+
         public static double[][][] ToSequence(this Dictionary<int, List<double[]>> data)
         {
             var length = 22;

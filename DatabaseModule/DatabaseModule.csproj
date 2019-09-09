@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -11,12 +11,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="csmatio">
-      <HintPath>..\..\..\..\Users\cezyc\Downloads\csmatio.rev19\DotNETv40\csmatio.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

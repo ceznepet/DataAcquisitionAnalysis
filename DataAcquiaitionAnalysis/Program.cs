@@ -60,7 +60,7 @@ namespace DataAcquisitionAnalysis
 
         public static int MarkovModel(MarkovOptions options)
         {
-            if (options.Load == "1")
+            if (options.DoClassification == "1")
             {
                 Logger.Info("Loading the model form path: {}.", options.TrainFolderPath);
                 var predictor = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.DataSet);
