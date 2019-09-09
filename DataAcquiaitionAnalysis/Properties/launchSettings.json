@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DataAcquisitionAnalysis": {
+      "commandName": "Project",
+      "commandLineArgs": "online -p \"C:\\Users\\cezyc\\DiskGoogle\\School\\magister\\diplomka\\_petr_cezner_cd_files\\DataAcquisitionAnalysis\\Models\""
+    }
+  }
+}
