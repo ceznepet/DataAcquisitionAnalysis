@@ -22,6 +22,11 @@ namespace Common.Models
             Measurements.Add(variable);
         }
 
+        public void SortByTime()
+        {
+            var result = Measurements.AsParallel().AsOrdered().OrderBy(measurement => measurement.SaveTime);
+        }
+
         public void SortList()
         {
             foreach (var measurement in Measurements)
