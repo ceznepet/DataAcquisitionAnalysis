@@ -5,7 +5,7 @@ namespace DataAcquisitionAnalysis.Options
     [Verb("markov", HelpText = "Learning model for HMM")]
     public class MarkovOptions
     {
-        [Option('t', "train", HelpText = "Train of Classify", Required = true)]
+        [Option('c', "classification", HelpText = "Train of Classify", Required = true)]
         public string DoClassification { get; set; }
 
         [Option('p', "path", HelpText = "Path to the train folder.")]

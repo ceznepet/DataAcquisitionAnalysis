@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "markov -t 0 -p \"N:\\Vyvoj\\TACR1 - Damias\\data\\robotickeEnergie\\MladaBoleslav\\DT-2014-09-26\\test\""
+      "commandLineArgs": "markov -c \"1\" -p \"C:\\Projects\\DataAcquisitionAnalysis\\Models\" -f \"C:\\data\\ma_full\\operation\""
     }
   }
 }
