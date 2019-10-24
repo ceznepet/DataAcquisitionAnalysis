@@ -1,12 +1,15 @@
 ﻿using CommandLine;
 using Common.Logging;
+using Common.Models;
 using DataAcquisitionAnalysis.Options;
 using DataAcquisitionAnalysis.Processing;
 using DatabaseModule.MongoDB;
 using KunbusRevolutionPiModule;
 using MarkovModule;
+using Newtonsoft.Json;
 using NLog;
 using SocketModule.SocketClient;
+using System.IO;
 
 namespace DataAcquisitionAnalysis
 {
@@ -31,7 +34,7 @@ namespace DataAcquisitionAnalysis
         public static int PacketSaver(SocketOptions options)
         {
             Logger.Info("Socket client started.");
-            var client = new SocketClient(options.Ip, options.Port, options.Protocol, options.DatabaseLocation, 
+            var client = new SocketClient(options.Ip, options.Port, options.Protocol, options.DatabaseLocation,
                                              options.Database, options.Document);
             client.ConnectAndReceive();
             return 0;
@@ -51,30 +54,26 @@ namespace DataAcquisitionAnalysis
         public static int KunbusModule(KunbusOptions options)
         {
             Logger.Info("Kunbus started.");
-            var endian = options.BigEndian == "1";
-            var kunbus = new KunbusIOModule(endian, options.ConfigurationFile,
-                                          options.DatabaseLocation, options.Database, options.Document,
-                                          options.Period);
+            var setup_file = JsonConvert.DeserializeObject<KunbusSetup>(File.ReadAllText(options.Setup));
+            var endian = setup_file.BigEndian;
+            var kunbus = new KunbusIOModule(endian, setup_file.ConfigurationFile, setup_file.DatabaseLocation, 
+                                            setup_file.DatabaseName, setup_file.DatabaseDocument,
+                                            setup_file.ReadingPerios);
             return 0;
         }
 
         public static int MarkovModel(MarkovOptions options)
         {
-            if (options.DoClassification == "1")
+
+            var setup_file = JsonConvert.DeserializeObject<MarkovSetup>(File.ReadAllText(options.Setup));
+            if (setup_file.DoClassification)
             {
-                Logger.Info("Loading the model form path: {}.", options.TrainFolderPath);
-                var predictor = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.DataSet);
+                Logger.Info("Loading the model form path: {}.", setup_file.TrainFolderPath);
+                var predictor = new MarkovModel(setup_file.TrainFolderPath, setup_file.TestFolderPath, setup_file.TakeVector);
                 return 0;
             }
             Logger.Info("Start of learning the markov model.");
-            var model = new MarkovModel(options.TrainFolderPath, options.TestFolderPath, options.States, options.DataSet);
-            return 0;
-        }
-
-        public static int DataProcessing(DataProcessingOptions options)
-        {
-            Logger.Info("Start of learning the markov model.");
-            var processing = new DataProcessing(options.Folder, options.SaveFile);
+            var model = new MarkovModel(setup_file.TrainFolderPath, setup_file.TestFolderPath, setup_file.States, setup_file.TakeVector);
             return 0;
         }
 
