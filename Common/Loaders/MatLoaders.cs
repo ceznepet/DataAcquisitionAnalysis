@@ -106,7 +106,7 @@ namespace Common.Loaders
                 loadData = product ? data.Transpose().Select(row => row.Take(take).ToArray()).ToArray()
                                    : data.Transpose();
             }
-            return new Operation(loadData, name, fileName);
+            return new Operation(loadData, name);
         }
 
 
