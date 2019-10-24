@@ -13,11 +13,11 @@ using NLog;
 
 namespace DatabaseModule.MongoDB
 {
-    public class MongoLoader
+    public class MongoToFile
     {
         private static readonly Logger Logger = LogManager.GetLogger("File saving");
 
-        public MongoLoader(string databaseLocation, string database, string document, bool profinet, string folder,
+        public MongoToFile(string databaseLocation, string database, string document, bool profinet, string folder,
             string fileName, bool sorted, bool byProduct, bool toMatFile)
         {
             Profinet = profinet;
