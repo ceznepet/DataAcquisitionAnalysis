@@ -1,4 +1,4 @@
-﻿using Common.Models;
+﻿using Common.Models.Measurement;
 using System.Collections.Generic;
 
 namespace KunbusRevolutionPiModule.Robot

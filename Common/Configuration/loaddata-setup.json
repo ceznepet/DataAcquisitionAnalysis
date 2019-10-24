@@ -1,0 +1,11 @@
+﻿{
+  "DatabaseLocation": "mongodb://10.35.91.210:27017",
+  "DatabaseName": "Measurement",
+  "DatabaseDocument": "TestbedTest_Profinet",
+  "Profinet": true,
+  "SaveFolderLocation": "",
+  "Filename": "",
+  "SortData": true,
+  "SortByProduct": true,
+  "ToMatFile":  false
+}

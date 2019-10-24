@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Common.Models;
+﻿using System.Collections.Generic;
+using Common.Models.Tcp;
 
 namespace DatabaseModule.Models
 {

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Common.Models;
+using Common.Models.Tcp;
+using Common.Models.Measurement;
 using Common.Savers;
 using DatabaseModule.Extensions;
 using DatabaseModule.Models;
@@ -18,13 +17,14 @@ namespace DatabaseModule.MongoDB
     {
         private static readonly Logger Logger = LogManager.GetLogger("File saving");
 
-        public MongoLoader(string databaseLocation, string database, string document, string profinet, string folder,
-            string fileName, bool sorted, bool byProduct)
+        public MongoLoader(string databaseLocation, string database, string document, bool profinet, string folder,
+            string fileName, bool sorted, bool byProduct, bool toMatFile)
         {
-            Profinet = int.Parse(profinet) == 1;
+            Profinet = profinet;
             Sorted = sorted;
             Folder = folder;
             ByProduct = byProduct;
+            ToMatFile = toMatFile;
             SortedMeasurementProfinet = new SortMeasurementProfinet();
             SortedMeasurementEthernet = new SortMeasurementEthernet();
             MeasuredData = new List<double[]>();
@@ -33,7 +33,7 @@ namespace DatabaseModule.MongoDB
             Database = client.GetDatabase(database);
             Collection = Database.GetCollection<BsonDocument>(document);
 
-            var source = int.Parse(profinet) == 1 ? "_profinet" : "_ethernet";
+            var source = profinet ? "_profinet" : "_ethernet";
             FileName = Folder + "/" + fileName + source;
             CsvSavers.CsvHeader(FileName);
         }
@@ -43,6 +43,7 @@ namespace DatabaseModule.MongoDB
         private bool Profinet { get; }
         private bool Sorted { get; }
         private bool ByProduct { get; }
+        private bool ToMatFile { get; }
         private string Folder { get; }
         private string FileName { get; }
         private SortMeasurementProfinet SortedMeasurementProfinet { get; }
@@ -157,8 +158,7 @@ namespace DatabaseModule.MongoDB
                 rows.Add(data.ToArray());
                 CsvSavers.ToCsvFile(measurement, FileName);
             }
-
-            MatSavers.ToMatFile(rows, programNumber.ToString(), FileName);
+            SaveData(rows, programNumber.ToString(), FileName);
         }
 
         private void PrintOneProgramEthernet(int programNumber, List<TcpRobot> measuredVariables)
@@ -172,7 +172,19 @@ namespace DatabaseModule.MongoDB
                 CsvSavers.ToCsvFile(measurement, FileName);
             }
 
-            MatSavers.ToMatFile(rows, programNumber.ToString(), FileName);
+            SaveData(rows, programNumber.ToString(), FileName);
+        }
+
+        private void SaveData(List<double[]> measuredData, string name, string fileName)
+        {
+            if (ToMatFile)
+            {
+                MatSavers.ToMatFile(measuredData, name, FileName);
+            }
+            else
+            {
+                CsvSavers.ToCsvFile(measuredData, name, FileName);
+            }
         }
     }
 }

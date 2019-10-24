@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Common.Models;
+using Common.Models.Tcp;
+using Common.Models.Measurement;
 
 namespace Common.Savers
 {
@@ -37,6 +38,16 @@ namespace Common.Savers
                 measuredData.GetMeasuredValues().ToArray()
                     .Select(element => element.ToString(CultureInfo.InvariantCulture)).ToArray());
             File.AppendAllText(fileName + ".csv", begin + ", " + newLine + "\n");
+        }
+
+
+        public static void ToCsvFile(List<double[]> measuredData, string name, string fileName)
+        {
+            var fill = int.Parse(name) < 10 ? "000" : int.Parse(name) < 100 ? "00" : "0";
+            foreach(var row in measuredData)
+            {
+                File.AppendAllText(fileName + "_op_" + fill + name + ".csv", string.Join(",", row)+ "\n");
+            }
         }
 
         public static void ToCsvFile(double[] measuredData, int operationNumber, string fileName)

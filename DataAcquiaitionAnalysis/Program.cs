@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 using Common.Logging;
-using Common.Models;
+using Common.Models.Setup;
 using DataAcquisitionAnalysis.Options;
 using DataAcquisitionAnalysis.Processing;
 using DatabaseModule.MongoDB;
@@ -26,7 +26,6 @@ namespace DataAcquisitionAnalysis
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
                     (KunbusOptions options) => KunbusModule(options),
                     (MarkovOptions options) => MarkovModel(options),
-                    (DataProcessingOptions options) => DataProcessing(options),
                     (OnlineClassificationOptions options) => OnlineAnalysis(options),
                     errs => 1);
         }
@@ -42,12 +41,11 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
-            var sorted = options.Sorted == "Yes";
-            var byProduct = options.ByProduct == "Yes";
+            var setup_file = JsonConvert.DeserializeObject<MonogoSetup>(File.ReadAllText(options.Setup));
             Logger.Info("Loading of data from DB started.");
-            MongoDbCall.LoadDataAndSave(options.DatabaseLocation, options.Database, options.Document,
-                                        options.Profinet, options.Folder, options.FilderName, sorted,
-                                        byProduct);
+            MongoDbCall.LoadDataAndSave(setup_file.DatabaseLocation, setup_file.DatabaseName, setup_file.DatabaseDocument,
+                                        setup_file.Profinet, setup_file.SaveFolderLocation, setup_file.Filename, setup_file.SortData,
+                                        setup_file.SortByProduct, setup_file.ToMatFile);
             return 0;
         }
 
@@ -55,10 +53,8 @@ namespace DataAcquisitionAnalysis
         {
             Logger.Info("Kunbus started.");
             var setup_file = JsonConvert.DeserializeObject<KunbusSetup>(File.ReadAllText(options.Setup));
-            var endian = setup_file.BigEndian;
-            var kunbus = new KunbusIOModule(endian, setup_file.ConfigurationFile, setup_file.DatabaseLocation, 
-                                            setup_file.DatabaseName, setup_file.DatabaseDocument,
-                                            setup_file.ReadingPerios);
+            var kunbus = new KunbusIOModule(setup_file.BigEndian, setup_file.ConfigurationFile, setup_file.DatabaseLocation, 
+                                            setup_file.DatabaseName, setup_file.DatabaseDocument, setup_file.ReadingPerios);
             return 0;
         }
 
