@@ -1,4 +1,4 @@
-﻿using Accord.Math;
+using Accord.Math;
 using Accord.Statistics;
 using Accord.Statistics.Analysis;
 using Common.Extensions;
@@ -17,18 +17,21 @@ namespace MarkovModule
 
         public DiscreteModel DiscreteModel { get; set; }
 
-        public MarkovModel(string trainFolder, string testFolder, int states, int take)
+        public static void LearnFromMatFile(string dataFolder, int states, int take, float trainSplit, 
+                                            string modelFolder)
         {
             const int skip = 0;
             Logger.Info("Start loading data...");
-            var train = MatLoaders.LoadProgramsAsTimeSeries(trainFolder, true, take);
+            var train = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take);
             var operations = train.ToList();
             var length = operations.Count();
+            var split = (int)(length * trainSplit);
             Logger.Info("Loading is succesfully done...");
-            Learning.StartTeaching(operations.Take(length / 2), operations.Skip(length / 2), skip, take, states, testFolder);
+            Learning.StartTeaching(operations.Take(split), operations.Skip(split), skip, take, states, modelFolder);
         }
 
         public MarkovModel(string modelPath, string dataFolder, int take)
+        public static void ClassifieFromFile(string modelPath, string dataFolder, int take)
         {
             Logger.Info("Loading data.");
             var test = MatLoaders.LoadProgramsAsTimeSeries(dataFolder, true, take).ToList();
