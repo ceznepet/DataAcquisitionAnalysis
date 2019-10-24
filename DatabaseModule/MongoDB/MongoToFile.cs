@@ -17,7 +17,7 @@ namespace DatabaseModule.MongoDB
     {
         private static readonly Logger Logger = LogManager.GetLogger("File saving");
 
-        public MongoToFile(string databaseLocation, string database, string document, bool profinet, string folder,
+        public MongoToFile(string databaseLocation, string database, string collection, bool profinet, string folder,
             string fileName, bool sorted, bool byProduct, bool toMatFile)
         {
             Profinet = profinet;
@@ -31,7 +31,7 @@ namespace DatabaseModule.MongoDB
 
             var client = new MongoClient(MongoUrl.Create(databaseLocation));
             Database = client.GetDatabase(database);
-            Collection = Database.GetCollection<BsonDocument>(document);
+            Collection = Database.GetCollection<BsonDocument>(collection);
 
             var source = profinet ? "_profinet" : "_ethernet";
             FileName = Folder + "/" + fileName + source;

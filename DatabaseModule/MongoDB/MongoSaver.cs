@@ -15,14 +15,14 @@ namespace DatabaseModule.MongoDB
         private IMongoCollection<BsonDocument> Collection { get; set; }
         private static readonly Logger _logger = LogManager.GetLogger("Mongo Saver");
 
-        public MongoSaver(string databaseLocation, string database, string document)
+        public MongoSaver(string databaseLocation, string database, string collection)
         {
             try
             {
                 var client = new MongoClient(MongoUrl.Create(databaseLocation));
                 Database = client.GetDatabase(database);
 
-                Collection = Database.GetCollection<BsonDocument>(document);
+                Collection = Database.GetCollection<BsonDocument>(collection);
             }
             catch (MongoConfigurationException exception)
             {

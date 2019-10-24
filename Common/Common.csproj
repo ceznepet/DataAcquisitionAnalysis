@@ -45,6 +45,12 @@
     <None Update="Configuration\features.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Configuration\kunbus-setup.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Configuration\loaddata-setup.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Configuration\markov-setup.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

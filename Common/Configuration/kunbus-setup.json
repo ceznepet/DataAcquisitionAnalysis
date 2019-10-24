@@ -3,6 +3,6 @@
   "BigEndian": 0,
   "DatabaseLocation": "mongodb://10.35.91.210:27017",
   "DatabaseName": "Measurement",
-  "DatabaseDocument": "TestbedTest_Profinet",
+  "DatabaseCollection": "TestbedTest_Profinet",
   "ReadingPeriod": 6
 }

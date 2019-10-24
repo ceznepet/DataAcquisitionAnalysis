@@ -5,7 +5,7 @@ namespace Common.Models.Setup
     {
         public string DatabaseLocation { get; set; }
         public string DatabaseName { get; set; }
-        public string DatabaseDocument { get; set; }
+        public string DatabaseCollection { get; set; }
         public bool Profinet { get; set; }
         public string SaveFolderLocation { get; set; }
         public string Filename { get; set; }
