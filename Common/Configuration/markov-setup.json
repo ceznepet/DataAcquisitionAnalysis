@@ -1,0 +1,11 @@
+{
+  "DoClassification": 1,
+  "TrainFolderPath": "",
+  "TestFolderPath": "",
+  "DataFolderPath": "C:/data/ma_full/operation",
+  "ModelFolder": "C:/Projects/DataAcquisitionAnalysis/Models",
+  "States": 14,
+  "TakeVector": 30,
+  "__com_take_vector":  "This field defined how many vectors are taken from data",
+  "SignificantFeatures": [ 0, 1, 2, 3, 5, 6, 7, 8, 11, 23, 24, 25, 28 ]
+}
