@@ -2,7 +2,7 @@
   "profiles": {
     "DataAcquisitionAnalysis": {
       "commandName": "Project",
-      "commandLineArgs": "markov -c \"1\" -p \"C:\\Projects\\DataAcquisitionAnalysis\\Models\" -f \"C:\\data\\ma_full\\operation\""
+      "commandLineArgs": "mongo -s \"C:\\Projects\\DataAcquisitionAnalysis\\Common\\Configuration\\loaddata-setup.json\""
     }
   }
 }

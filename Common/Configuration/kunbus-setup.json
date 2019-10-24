@@ -1,8 +1,9 @@
 {
   "ConfigurationFile": "Configuration/measureVariable.json",
-  "BigEndian": 0,
+  "BigEndian": 1,
   "DatabaseLocation": "mongodb://10.35.91.210:27017",
   "DatabaseName": "Measurement",
   "DatabaseCollection": "TestbedTest_Profinet",
-  "ReadingPeriod": 6
+  "ReadingPeriod": 6,
+  "__comment":  "For Kuka robots, pleasu use BigEndian == 1"
 }

@@ -41,7 +41,7 @@ namespace DataAcquisitionAnalysis
 
         public static int LoadDataFromMongoDb(LoadMongoDataOptions options)
         {
-            var setup_file = JsonConvert.DeserializeObject<MonogoSetup>(File.ReadAllText(options.Setup));
+            var setup_file = JsonConvert.DeserializeObject<LoadDataDBSetup>(File.ReadAllText(options.Setup));
             Logger.Info("Loading of data from DB started.");
             MongoDbCall.LoadDataAndSave(setup_file.DatabaseLocation, setup_file.DatabaseName, setup_file.DatabaseCollection,
                                         setup_file.Profinet, setup_file.SaveFolderLocation, setup_file.Filename, setup_file.SortData,
@@ -54,7 +54,7 @@ namespace DataAcquisitionAnalysis
             Logger.Info("Kunbus started.");
             var setup_file = JsonConvert.DeserializeObject<KunbusSetup>(File.ReadAllText(options.Setup));
             var kunbus = new KunbusIOModule(setup_file.BigEndian, setup_file.ConfigurationFile, setup_file.DatabaseLocation, 
-                                            setup_file.DatabaseName, setup_file.DatabaseCollection, setup_file.ReadingPerios);
+                                            setup_file.DatabaseName, setup_file.DatabaseCollection, setup_file.ReadingPeriod);
             return 0;
         }
 

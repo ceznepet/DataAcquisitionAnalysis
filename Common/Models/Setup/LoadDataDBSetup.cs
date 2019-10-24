@@ -1,7 +1,7 @@
 ﻿
 namespace Common.Models.Setup
 {
-    public class MonogoSetup
+    public class LoadDataDBSetup
     {
         public string DatabaseLocation { get; set; }
         public string DatabaseName { get; set; }

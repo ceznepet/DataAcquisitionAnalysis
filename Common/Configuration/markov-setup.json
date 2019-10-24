@@ -1,6 +1,6 @@
 {
   "DoClassification": 1,
-  "LearnFormDB": 0,
+  "LearnFromDB": 1,
   "DataFolder": "",
   "DataFolderPath": "C:/data/ma_full/operation",
   "ModelFolder": "C:/Projects/DataAcquisitionAnalysis/Models",

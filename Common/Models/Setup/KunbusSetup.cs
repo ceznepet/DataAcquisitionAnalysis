@@ -11,6 +11,6 @@ namespace Common.Models.Setup
         public string DatabaseLocation { get; set; }
         public string DatabaseName { get; set; }
         public string DatabaseCollection { get; set; }
-        public int ReadingPerios { get; set; }
+        public int ReadingPeriod { get; set; }
     }
 }
