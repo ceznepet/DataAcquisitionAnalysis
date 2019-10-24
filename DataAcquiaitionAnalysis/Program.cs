@@ -25,7 +25,7 @@ namespace DataAcquisitionAnalysis
                 .MapResult((SocketOptions options) => PacketSaver(options),
                     (LoadMongoDataOptions options) => LoadDataFromMongoDb(options),
                     (KunbusOptions options) => KunbusModule(options),
-                    (MarkovOptions options) => MarkovModel(options),
+                    (MarkovOptions options) => MarkovModule(options),
                     (OnlineClassificationOptions options) => OnlineAnalysis(options),
                     errs => 1);
         }
@@ -43,7 +43,7 @@ namespace DataAcquisitionAnalysis
         {
             var setup_file = JsonConvert.DeserializeObject<MonogoSetup>(File.ReadAllText(options.Setup));
             Logger.Info("Loading of data from DB started.");
-            MongoDbCall.LoadDataAndSave(setup_file.DatabaseLocation, setup_file.DatabaseName, setup_file.DatabaseDocument,
+            MongoDbCall.LoadDataAndSave(setup_file.DatabaseLocation, setup_file.DatabaseName, setup_file.DatabaseCollection,
                                         setup_file.Profinet, setup_file.SaveFolderLocation, setup_file.Filename, setup_file.SortData,
                                         setup_file.SortByProduct, setup_file.ToMatFile);
             return 0;
@@ -54,22 +54,32 @@ namespace DataAcquisitionAnalysis
             Logger.Info("Kunbus started.");
             var setup_file = JsonConvert.DeserializeObject<KunbusSetup>(File.ReadAllText(options.Setup));
             var kunbus = new KunbusIOModule(setup_file.BigEndian, setup_file.ConfigurationFile, setup_file.DatabaseLocation, 
-                                            setup_file.DatabaseName, setup_file.DatabaseDocument, setup_file.ReadingPerios);
+                                            setup_file.DatabaseName, setup_file.DatabaseCollection, setup_file.ReadingPerios);
             return 0;
         }
 
-        public static int MarkovModel(MarkovOptions options)
+        public static int MarkovModule(MarkovOptions options)
         {
 
             var setup_file = JsonConvert.DeserializeObject<MarkovSetup>(File.ReadAllText(options.Setup));
             if (setup_file.DoClassification)
             {
-                Logger.Info("Loading the model form path: {}.", setup_file.TrainFolderPath);
-                var predictor = new MarkovModel(setup_file.TrainFolderPath, setup_file.TestFolderPath, setup_file.TakeVector);
+                Logger.Info("Loading the model form path: {}.", setup_file.DataFolder);
+                MarkovModel.ClassifieFromFile(setup_file.ModelFolder, setup_file.DataFolder, setup_file.TakeVector);
                 return 0;
             }
-            Logger.Info("Start of learning the markov model.");
-            var model = new MarkovModel(setup_file.TrainFolderPath, setup_file.TestFolderPath, setup_file.States, setup_file.TakeVector);
+            if (setup_file.LearnFromDB)
+            {
+                Logger.Info("Start of learning the markov model from MongoDB.");
+                MarkovModel.LearnFromDB(setup_file.DatabaseCollection, setup_file.DatabaseName, setup_file.DatabaseCollection,
+                                        setup_file.States, setup_file.TakeVector, setup_file.TrainDatasetSize, setup_file.ModelFolder);
+            }
+            else
+            {
+                Logger.Info("Start of learning the markov model from Mat file.");
+                MarkovModel.LearnFromMatFile(setup_file.DataFolder, setup_file.States,
+                                             setup_file.TakeVector, setup_file.TrainDatasetSize, setup_file.ModelFolder);
+            }
             return 0;
         }
 
