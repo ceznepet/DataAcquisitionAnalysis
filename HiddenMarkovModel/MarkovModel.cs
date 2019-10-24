@@ -1,13 +1,11 @@
-using Accord.Math;
-using Accord.Statistics;
+﻿using Accord.Math;
 using Accord.Statistics.Analysis;
 using Common.Extensions;
 using Common.Loaders;
-using Common.Savers;
 using NLog;
-using System.Collections.Generic;
 using System.Linq;
 using MarkovModule.Models;
+using DatabaseModule.MongoDB;
 
 namespace MarkovModule
 {
@@ -30,7 +28,19 @@ namespace MarkovModule
             Learning.StartTeaching(operations.Take(split), operations.Skip(split), skip, take, states, modelFolder);
         }
 
-        public MarkovModel(string modelPath, string dataFolder, int take)
+        public static void LearnFromDB(string databaseLocation, string databaseName, string collection, int states,
+                                       int take, float trainSplit, string modelFolder)
+        {
+            const int skip = 0;
+            Logger.Info("Start loading data...");
+            var train = MongoLoader.GetData(databaseLocation, databaseName, collection);
+            var operations = train.ToList();
+            var length = operations.Count();
+            var split = (int)(length * trainSplit);
+            Logger.Info("Loading is succesfully done...");
+            Learning.StartTeaching(operations.Take(split), operations.Skip(split), skip, take, states, modelFolder);
+        }
+
         public static void ClassifieFromFile(string modelPath, string dataFolder, int take)
         {
             Logger.Info("Loading data.");
