@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DatabaseModule.MongoDB
 {
@@ -14,6 +15,8 @@ namespace DatabaseModule.MongoDB
         private IMongoDatabase Database { get; set; }
         private IMongoCollection<BsonDocument> Collection { get; set; }
         private static readonly Logger _logger = LogManager.GetLogger("Mongo Saver");
+
+        private List<BsonDocument> BatchData { get; set; }
 
         public MongoSaver(string databaseLocation, string database, string collection)
         {
@@ -54,6 +57,22 @@ namespace DatabaseModule.MongoDB
             
             Collection.InsertOne(document);
             _logger.Info("Saving of the I/O is done.");            
+        }
+
+        public void SaveBatchData(dynamic measurement)
+        {
+            if (measurement == null)
+            {
+                _logger.Info("Document is empty!");
+                return;
+            }
+            var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
+            BatchData.Add(document);
+            if (BatchData.Count == 500)
+            {
+                Collection.InsertManyAsync(BatchData);
+                BatchData.Clear();
+            }
         }
     }
 }

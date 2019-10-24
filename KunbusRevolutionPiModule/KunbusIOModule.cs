@@ -188,8 +188,9 @@ namespace KunbusRevolutionPiModule
             }
             
             ToSaveMeasurement.Variables = MeasuredVariables.Variables;
-            SaveThread = new Thread(() => Saver.SaveIOData(ToSaveMeasurement));
-            SaveThread.Start();
+            Saver.SaveBatchData(ToSaveMeasurement);
+            //SaveThread = new Thread(() => Saver.SaveIOData(ToSaveMeasurement));
+            //SaveThread.Start();
         }
 
         private void GetDataRobotTime()
