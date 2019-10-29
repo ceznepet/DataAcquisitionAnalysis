@@ -174,7 +174,7 @@ namespace KunbusRevolutionPiModule
 
             ToSaveMeasurement = null;
             ToSaveMeasurement = new MeasuredVariables();
-            GetDataRobotTime();
+            GetRobotTime();
             var time = Time.ToDateTime().ToString("yyyy-MM-dd-HH-mm-ss-FFF");
             var programNum = ReadKunbusInputs(MeasuredVariables.ProfinetProperty[0]);
 
@@ -189,11 +189,9 @@ namespace KunbusRevolutionPiModule
             
             ToSaveMeasurement.Variables = MeasuredVariables.Variables;
             Saver.SaveBatchData(ToSaveMeasurement);
-            //SaveThread = new Thread(() => Saver.SaveIOData(ToSaveMeasurement));
-            //SaveThread.Start();
         }
 
-        private void GetDataRobotTime()
+        private void GetRobotTime()
         {
             foreach (var component in Time)
             {

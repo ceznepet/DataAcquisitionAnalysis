@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DatabaseModule.MongoDB
 {
@@ -16,7 +17,8 @@ namespace DatabaseModule.MongoDB
         private IMongoCollection<BsonDocument> Collection { get; set; }
         private static readonly Logger _logger = LogManager.GetLogger("Mongo Saver");
 
-        private List<BsonDocument> BatchData { get; set; }
+        private List<BsonDocument> BatchData = new List<BsonDocument>();
+        private int DocumentCount = 0;
 
         public MongoSaver(string databaseLocation, string database, string collection)
         {
@@ -66,13 +68,24 @@ namespace DatabaseModule.MongoDB
                 _logger.Info("Document is empty!");
                 return;
             }
-            var document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
+            BsonDocument document = BsonDocument.Parse(JsonConvert.SerializeObject(measurement));
             BatchData.Add(document);
-            if (BatchData.Count == 500)
+            DocumentCount++;
+            if (DocumentCount == 500)
             {
-                Collection.InsertManyAsync(BatchData);
+                _logger.Info("Batch of data saved.");
+                DocumentCount = 0;
+                var batch = new List<BsonDocument>(BatchData);
+                var thread = new Thread(() => SendBatchData(batch));
+                thread.Start();
                 BatchData.Clear();
             }
         }
+
+        private void SendBatchData(List<BsonDocument> batchData)
+        {
+            Collection.InsertMany(batchData);
+        }
+
     }
 }
