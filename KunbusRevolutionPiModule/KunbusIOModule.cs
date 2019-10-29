@@ -163,7 +163,8 @@ namespace KunbusRevolutionPiModule
             }
             else
             {
-                MarkovThread = new Thread(() => Markov.DiscreteModel.OnlineDecide(MeasurmentBatch.ToArray()));
+                var batch = new List<double[]>(MeasurmentBatch);
+                MarkovThread = new Thread(() => Markov.DiscreteModel.OnlineDecide(batch.ToArray()));
                 MarkovThread.Start();
                 MeasurmentBatch.Clear();
             }       
